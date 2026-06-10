@@ -1,0 +1,319 @@
+import type {
+  BlendMode,
+  DecalLayer,
+  DistortionLayer,
+  ImageLayer,
+  Layer,
+  PatternLayer,
+  SolidColorLayer,
+  ZoneId,
+} from '../state/types';
+import { renderPattern } from './patterns';
+
+const ZONE_CANVAS_DIMS: Record<ZoneId, { w: number; h: number }> = {
+  headTube: { w: 1024, h: 1024 },
+  topTube: { w: 256, h: 1024 },
+  downTube: { w: 320, h: 1024 },
+  seatTube: { w: 256, h: 1024 },
+  seatStays: { w: 160, h: 1024 },
+  chainStays: { w: 224, h: 1024 },
+  forkCrown: { w: 1024, h: 256 },
+  forkLegs: { w: 224, h: 1024 },
+  frontRim: { w: 2048, h: 128 },
+  rearRim: { w: 2048, h: 128 },
+};
+
+const BLEND_MODE_MAP: Record<BlendMode, GlobalCompositeOperation> = {
+  normal: 'source-over',
+  multiply: 'multiply',
+  screen: 'screen',
+  overlay: 'overlay',
+  softLight: 'soft-light',
+  hardLight: 'hard-light',
+  colorDodge: 'color-dodge',
+  colorBurn: 'color-burn',
+};
+
+const imageCache = new Map<string, HTMLImageElement>();
+
+function loadImage(src: string): Promise<HTMLImageElement> {
+  const cached = imageCache.get(src);
+  if (cached && cached.complete) return Promise.resolve(cached);
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      imageCache.set(src, img);
+      resolve(img);
+    };
+    img.onerror = reject;
+    img.src = src;
+  });
+}
+
+function cssFilterForImage(layer: ImageLayer): string {
+  const b = 1 + layer.brightness;
+  const c = 1 + layer.contrast;
+  const s = 1 + layer.saturation;
+  const h = layer.hueShift;
+  return `brightness(${b}) contrast(${c}) saturate(${s}) hue-rotate(${h}deg)`;
+}
+
+function applyLevelsAndDodgeBurn(data: ImageData, layer: ImageLayer): void {
+  const black = layer.levelsBlack * 255;
+  const white = layer.levelsWhite * 255;
+  const gamma = layer.levelsGamma;
+  const dodge = layer.dodge;
+  const burn = layer.burn;
+  const span = Math.max(1, white - black);
+  const invGamma = 1 / Math.max(0.01, gamma);
+  const needsLevels = black > 0 || white < 255 || Math.abs(gamma - 1) > 0.001;
+  const needsDodge = dodge > 0.001;
+  const needsBurn = burn > 0.001;
+  if (!needsLevels && !needsDodge && !needsBurn) return;
+
+  const arr = data.data;
+  for (let i = 0; i < arr.length; i += 4) {
+    if (arr[i + 3] === 0) continue;
+    for (let c = 0; c < 3; c++) {
+      let v = arr[i + c] / 255;
+      if (needsLevels) {
+        v = (v * 255 - black) / span;
+        if (v < 0) v = 0;
+        else if (v > 1) v = 1;
+        v = Math.pow(v, invGamma);
+      }
+      if (needsDodge) {
+        const denom = Math.max(0.001, 1 - dodge);
+        v = v / denom;
+        if (v > 1) v = 1;
+      }
+      if (needsBurn) {
+        const denom = Math.max(0.001, 1 - burn);
+        v = 1 - (1 - v) / denom;
+        if (v < 0) v = 0;
+      }
+      arr[i + c] = Math.round(v * 255);
+    }
+  }
+}
+
+export class ZoneCompositor {
+  canvas: HTMLCanvasElement;
+  ctx: CanvasRenderingContext2D;
+  zoneId: ZoneId;
+
+  constructor(zoneId: ZoneId) {
+    this.zoneId = zoneId;
+    const dims = ZONE_CANVAS_DIMS[zoneId];
+    this.canvas = document.createElement('canvas');
+    this.canvas.width = dims.w;
+    this.canvas.height = dims.h;
+    const ctx = this.canvas.getContext('2d', { willReadFrequently: true });
+    if (!ctx) throw new Error('Canvas 2D context not available');
+    this.ctx = ctx;
+  }
+
+  async render(layers: Layer[]): Promise<HTMLCanvasElement> {
+    const ctx = this.ctx;
+    const w = this.canvas.width;
+    const h = this.canvas.height;
+
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.globalAlpha = 1;
+    ctx.filter = 'none';
+    ctx.clearRect(0, 0, w, h);
+
+    for (const layer of layers) {
+      if (!layer.visible) continue;
+
+      if (layer.type === 'distortion') {
+        this.applyDistortion(layer);
+        continue;
+      }
+
+      ctx.save();
+      ctx.globalAlpha = layer.opacity;
+      ctx.globalCompositeOperation = BLEND_MODE_MAP[layer.blendMode];
+
+      if (layer.type === 'solid') {
+        this.drawSolid(layer);
+      } else if (layer.type === 'pattern') {
+        await this.drawPattern(layer);
+      } else if (layer.type === 'image') {
+        await this.drawImage(layer);
+      } else if (layer.type === 'decal') {
+        await this.drawDecal(layer);
+      }
+
+      ctx.restore();
+    }
+
+    return this.canvas;
+  }
+
+  private drawSolid(layer: SolidColorLayer) {
+    const ctx = this.ctx;
+    ctx.fillStyle = layer.color;
+    ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+  }
+
+  private async drawPattern(layer: PatternLayer) {
+    const ctx = this.ctx;
+    const tile = await renderPattern(layer);
+    const pattern = ctx.createPattern(tile, 'repeat');
+    if (!pattern) return;
+    const w = this.canvas.width;
+    const h = this.canvas.height;
+    const cx = w / 2;
+    const cy = h / 2;
+
+    ctx.translate(cx, cy);
+    ctx.rotate((layer.rotation * Math.PI) / 180);
+    ctx.translate(-cx, -cy);
+
+    ctx.fillStyle = pattern;
+    ctx.fillRect(-w, -h, w * 3, h * 3);
+  }
+
+  private async drawImage(layer: ImageLayer) {
+    const ctx = this.ctx;
+    try {
+      const img = await loadImage(layer.src);
+      const w = this.canvas.width;
+      const h = this.canvas.height;
+      const cx = w * layer.x;
+      const cy = h * layer.y;
+      const base = Math.min(w, h);
+      const maxDim = Math.max(img.width, img.height);
+      const targetW = (img.width / maxDim) * base * layer.scale;
+      const targetH = (img.height / maxDim) * base * layer.scale;
+
+      const needsPixelOps =
+        layer.dodge > 0.001 ||
+        layer.burn > 0.001 ||
+        layer.levelsBlack > 0 ||
+        layer.levelsWhite < 1 ||
+        Math.abs(layer.levelsGamma - 1) > 0.001;
+
+      if (!needsPixelOps) {
+        ctx.translate(cx, cy);
+        ctx.rotate((layer.rotation * Math.PI) / 180);
+        ctx.filter = cssFilterForImage(layer);
+        ctx.drawImage(img, -targetW / 2, -targetH / 2, targetW, targetH);
+        return;
+      }
+
+      const off = document.createElement('canvas');
+      const ow = Math.max(1, Math.round(targetW));
+      const oh = Math.max(1, Math.round(targetH));
+      off.width = ow;
+      off.height = oh;
+      const octx = off.getContext('2d', { willReadFrequently: true });
+      if (!octx) return;
+      octx.filter = cssFilterForImage(layer);
+      octx.drawImage(img, 0, 0, ow, oh);
+      const imageData = octx.getImageData(0, 0, ow, oh);
+      applyLevelsAndDodgeBurn(imageData, layer);
+      octx.putImageData(imageData, 0, 0);
+
+      ctx.translate(cx, cy);
+      ctx.rotate((layer.rotation * Math.PI) / 180);
+      ctx.drawImage(off, -targetW / 2, -targetH / 2, targetW, targetH);
+    } catch {
+      // ignore missing images
+    }
+  }
+
+  private async drawDecal(layer: DecalLayer) {
+    const ctx = this.ctx;
+    const w = this.canvas.width;
+    const h = this.canvas.height;
+    const cx = w * layer.x;
+    const cy = h * layer.y;
+
+    ctx.translate(cx, cy);
+    ctx.rotate((layer.rotation * Math.PI) / 180);
+
+    const base = Math.min(w, h);
+    const px = layer.size * 0.01 * base;
+    const fontSpec = `700 ${px}px "${layer.font}", sans-serif`;
+
+    try {
+      await document.fonts.load(fontSpec);
+    } catch {
+      // fall back to whatever is available
+    }
+
+    ctx.font = fontSpec;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    (ctx as CanvasRenderingContext2D & { letterSpacing?: string }).letterSpacing =
+      `${layer.letterSpacing ?? 0}px`;
+
+    if (layer.outlineWidth > 0) {
+      ctx.strokeStyle = layer.outlineColor;
+      ctx.lineWidth = layer.outlineWidth * 2;
+      ctx.lineJoin = 'round';
+      ctx.strokeText(layer.text, 0, 0);
+    }
+    ctx.fillStyle = layer.color;
+    ctx.fillText(layer.text, 0, 0);
+  }
+
+  private applyDistortion(layer: DistortionLayer) {
+    const ctx = this.ctx;
+    const w = this.canvas.width;
+    const h = this.canvas.height;
+    if (layer.amount <= 0) return;
+
+    const snap = document.createElement('canvas');
+    snap.width = w;
+    snap.height = h;
+    const sctx = snap.getContext('2d');
+    if (!sctx) return;
+    sctx.drawImage(this.canvas, 0, 0);
+
+    ctx.save();
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.globalAlpha = layer.opacity;
+    ctx.clearRect(0, 0, w, h);
+
+    if (layer.kind === 'gaussian') {
+      ctx.filter = `blur(${layer.amount}px)`;
+      ctx.drawImage(snap, 0, 0);
+    } else {
+      const steps = 12;
+      const rad = (layer.angle * Math.PI) / 180;
+      const dx = Math.cos(rad);
+      const dy = Math.sin(rad);
+      const total = layer.amount;
+      ctx.globalAlpha = (layer.opacity / steps) * 1.6;
+      for (let i = 0; i < steps; i++) {
+        const t = (i / (steps - 1) - 0.5) * 2;
+        const ox = dx * t * total;
+        const oy = dy * t * total;
+        if (layer.kind === 'directional') {
+          ctx.filter = `blur(${Math.max(0.5, total * 0.1)}px)`;
+        } else {
+          ctx.filter = 'none';
+        }
+        ctx.drawImage(snap, ox, oy);
+      }
+    }
+    ctx.restore();
+  }
+}
+
+const compositors = new Map<ZoneId, ZoneCompositor>();
+
+export function getCompositor(zoneId: ZoneId): ZoneCompositor {
+  let c = compositors.get(zoneId);
+  if (!c) {
+    c = new ZoneCompositor(zoneId);
+    compositors.set(zoneId, c);
+  }
+  return c;
+}
