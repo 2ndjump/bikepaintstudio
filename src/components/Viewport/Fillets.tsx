@@ -1,9 +1,7 @@
 import { useEffect, useMemo } from 'react';
 import * as THREE from 'three';
-import { useDesignStore } from '../../state/designStore';
 import type { FrameAnchors } from '../../geometry/frame';
-import { finishParams } from '../../rendering/finish';
-import { useZoneTexture } from '../../rendering/useZoneTexture';
+import { ZonePaintedMaterial } from './ZoneMaterial';
 import type { ZoneId } from '../../state/types';
 
 interface Props {
@@ -11,93 +9,133 @@ interface Props {
 }
 
 /**
- * Small ellipsoid fillet bodies at joints where two cylindrical tubes cross.
- * Sized to just barely cover the "armpit" void between adjacent tubes, and
- * oriented along the dominant tube axis so they read as a gentle thickening
- * of that tube rather than a separate sphere stuck on.
+ * Junction hardware — the pieces a real frame actually has where tubes meet:
+ *
+ * - BB shell: PF86-style bottom bracket housing across the DT/ST/CS convergence.
+ * - Seat clamp collar at the ST top.
+ * - Rear dropouts + front fork tips with thru-axle end caps.
+ *
+ * Tube-to-tube junctions themselves need no cover geometry: cross-sections in
+ * frame.ts are sized so the smaller tube always tucks fully inside its partner
+ * (TT inside ST and HT, DT inside HT, blades inside the crown).
  */
 export function Fillets({ anchors }: Props) {
-  const { bb, stTop, htTop, htBot, seatstayAttach, halfStay, seatTubeAngle, headTubeAngle } = anchors;
+  const { bb, stTop, rearHub, frontHub, stAxis, halfStayRear, halfStayFront, bbShellHalfWidth } =
+    anchors;
 
-  // Axes (unit vectors) for each tube at its joint
-  const htAxis = useMemo(
-    () => new THREE.Vector3(-Math.cos(headTubeAngle), Math.sin(headTubeAngle), 0),
-    [headTubeAngle],
-  );
-  const stAxis = useMemo(
-    () => new THREE.Vector3(-Math.cos(seatTubeAngle), Math.sin(seatTubeAngle), 0),
-    [seatTubeAngle],
-  );
+  // ---- BB shell: rounded cylinder along z ----
+  const bbShellGeo = useMemo(() => {
+    const w = bbShellHalfWidth;
+    const r = 0.0235;
+    const profile: THREE.Vector2[] = [
+      new THREE.Vector2(0.013, -w),
+      new THREE.Vector2(r * 0.92, -w + 0.002),
+      new THREE.Vector2(r, -w + 0.009),
+      new THREE.Vector2(r, w - 0.009),
+      new THREE.Vector2(r * 0.92, w - 0.002),
+      new THREE.Vector2(0.013, w),
+    ];
+    const g = new THREE.LatheGeometry(profile, 32);
+    g.rotateX(Math.PI / 2); // lathe axis Y → z
+    return g;
+  }, [bbShellHalfWidth]);
 
-  const seatstayR = useMemo(() => seatstayAttach.clone().setZ(0.012), [seatstayAttach]);
-  const seatstayL = useMemo(() => seatstayAttach.clone().setZ(-0.012), [seatstayAttach]);
+  // ---- Seat clamp collar ----
+  const clusterQuat = useMemo(
+    () => new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), stAxis),
+    [stAxis],
+  );
+  const collarGeo = useMemo(() => {
+    const profile: THREE.Vector2[] = [
+      new THREE.Vector2(0.0140, -0.0065),
+      new THREE.Vector2(0.0186, -0.0055),
+      new THREE.Vector2(0.0190, 0.0),
+      new THREE.Vector2(0.0186, 0.0055),
+      new THREE.Vector2(0.0140, 0.0065),
+    ];
+    return new THREE.LatheGeometry(profile, 28);
+  }, []);
+  // Wrapped AROUND the tube just below its top edge — not perched above it.
+  const collarPos = useMemo(
+    () => stTop.clone().addScaledVector(stAxis, -0.004),
+    [stTop, stAxis],
+  );
 
   return (
     <group>
-      {/* HT-top — align long axis with HT so it looks like the HT thickening. */}
-      <Fillet position={htTop} scale={[0.012, 0.018, 0.014]} axis={htAxis} zone="headTube" />
+      <PaintedPart geometry={bbShellGeo} position={bb} zone="downTube" />
+      <PaintedPart geometry={collarGeo} position={collarPos} quaternion={clusterQuat} zone="seatTube" />
 
-      {/* HT-bot — same shape, mirrored along HT axis. */}
-      <Fillet position={htBot} scale={[0.014, 0.020, 0.016]} axis={htAxis} zone="headTube" />
-
-      {/* ST-top — gentle bulge along ST. */}
-      <Fillet position={stTop} scale={[0.010, 0.016, 0.012]} axis={stAxis} zone="seatTube" />
-
-      {/* BB — along lateral axis (matches BB shell direction). */}
-      <Fillet
-        position={bb}
-        scale={[0.018, 0.018, halfStay * 0.55]}
-        axis={new THREE.Vector3(0, 0, 1)}
-        zone="downTube"
-      />
-
-      {/* Seatstay attach points — tiny. */}
-      <Fillet position={seatstayR} scale={[0.008, 0.008, 0.008]} axis={stAxis} zone="seatTube" />
-      <Fillet position={seatstayL} scale={[0.008, 0.008, 0.008]} axis={stAxis} zone="seatTube" />
+      <Dropout hub={rearHub} z={halfStayRear} zone="chainStays" />
+      <Dropout hub={rearHub} z={-halfStayRear} zone="chainStays" />
+      <Dropout hub={frontHub} z={halfStayFront} zone="forkLegs" small />
+      <Dropout hub={frontHub} z={-halfStayFront} zone="forkLegs" small />
     </group>
   );
 }
 
-interface FilletProps {
+/* ----------------------------------------------------------------------- */
+
+function PaintedPart({
+  geometry,
+  position,
+  quaternion,
+  zone,
+}: {
+  geometry: THREE.BufferGeometry;
   position: THREE.Vector3;
-  /** Ellipsoid half-axes (meters) in local space: [x, y=along-axis, z]. */
-  scale: [number, number, number];
-  /** World direction the long Y axis aligns to. */
-  axis: THREE.Vector3;
+  quaternion?: THREE.Quaternion;
   zone: ZoneId;
-}
-
-function Fillet({ position, scale, axis, zone }: FilletProps) {
-  const finish = useDesignStore((s) => s.zones[zone].finish);
-  const texture = useZoneTexture(zone);
-  const fp = finishParams(finish);
-  const wantsSpecular = finish === 'glossy' || finish === 'metallic';
-
-  const geometry = useMemo(() => {
-    const g = new THREE.SphereGeometry(1, 20, 14);
-    g.scale(scale[0], scale[1], scale[2]);
-    return g;
-  }, [scale]);
+}) {
   useEffect(() => () => geometry.dispose(), [geometry]);
-
-  const quaternion = useMemo(
-    () =>
-      new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), axis.clone().normalize()),
-    [axis],
-  );
-
   return (
     <mesh geometry={geometry} position={position.toArray()} quaternion={quaternion} receiveShadow>
-      {wantsSpecular ? (
-        <meshStandardMaterial
-          map={texture}
-          roughness={fp.roughness}
-          metalness={fp.metalness}
-          envMapIntensity={fp.envMapIntensity}
-        />
-      ) : (
-        <meshBasicMaterial map={texture} side={THREE.DoubleSide} />
-      )}
+      <ZonePaintedMaterial zone={zone} />
     </mesh>
+  );
+}
+
+/** Painted dropout body + dark thru-axle end cap. */
+function Dropout({
+  hub,
+  z,
+  zone,
+  small,
+}: {
+  hub: THREE.Vector3;
+  z: number;
+  zone: ZoneId;
+  small?: boolean;
+}) {
+  const r = small ? 0.0128 : 0.0130;
+  const bodyGeo = useMemo(() => {
+    const profile: THREE.Vector2[] = [
+      new THREE.Vector2(0.004, -0.007),
+      new THREE.Vector2(r * 0.9, -0.006),
+      new THREE.Vector2(r, -0.002),
+      new THREE.Vector2(r, 0.003),
+      new THREE.Vector2(r * 0.8, 0.006),
+      new THREE.Vector2(0.004, 0.007),
+    ];
+    const g = new THREE.LatheGeometry(profile, 24);
+    g.rotateX(Math.PI / 2);
+    return g;
+  }, [r]);
+  useEffect(() => () => bodyGeo.dispose(), [bodyGeo]);
+
+  const capGeo = useMemo(() => new THREE.CylinderGeometry(0.0062, 0.0062, 0.005, 18), []);
+  useEffect(() => () => capGeo.dispose(), [capGeo]);
+
+  const sign = Math.sign(z);
+
+  return (
+    <group position={[hub.x, hub.y, z]}>
+      <mesh geometry={bodyGeo} receiveShadow>
+        <ZonePaintedMaterial zone={zone} />
+      </mesh>
+      <mesh geometry={capGeo} position={[0, 0, sign * 0.0085]} rotation={[Math.PI / 2, 0, 0]}>
+        <meshStandardMaterial color="#2e2e2e" roughness={0.4} metalness={0.85} />
+      </mesh>
+    </group>
   );
 }

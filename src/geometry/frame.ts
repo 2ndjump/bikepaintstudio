@@ -15,12 +15,20 @@ export interface FrameAnchors {
   stTop: THREE.Vector3;
   htTop: THREE.Vector3;
   htBot: THREE.Vector3;
-  forkCrownTop: THREE.Vector3;
-  forkCrownBot: THREE.Vector3;
+  crownBot: THREE.Vector3;
   seatstayAttach: THREE.Vector3;
   rearHub: THREE.Vector3;
   frontHub: THREE.Vector3;
-  halfStay: number;
+  /** Unit vector along the seat tube, pointing up (BB → stTop). */
+  stAxis: THREE.Vector3;
+  /** Unit vector along the head tube / steering axis, pointing up (htBot → htTop). */
+  htAxis: THREE.Vector3;
+  /** Rear dropout half-spacing (z offset of each chainstay/seatstay end). */
+  halfStayRear: number;
+  /** Front fork tip half-spacing. */
+  halfStayFront: number;
+  /** BB shell half-width along z. */
+  bbShellHalfWidth: number;
   seatTubeAngle: number;
   headTubeAngle: number;
 }
@@ -32,60 +40,60 @@ export interface TubeDesc {
   radiusStart: number;
   /** Radius at path end — defaults to radiusStart */
   radiusEnd?: number;
-  /** Oval scaling at start (x=side, z=fore-aft) */
+  /** Oval scaling at start (x=side-to-side, z=in-plane perpendicular) */
   csStart?: { x: number; z: number };
   /** Oval scaling at end — defaults to csStart */
   csEnd?: { x: number; z: number };
   radialSegments?: number;
   tubularSegments?: number;
-  /**
-   * Cross-section shape exponent (Lamé curve / superellipse):
-   *   2 = ellipse (default), 4 = rounded rectangle, 8 = nearly sharp rectangle.
-   */
+  /** Superellipse exponent: 2 = ellipse, 2.5-3 = rounded rectangle. */
   shapeExponent?: number;
 }
 
 /**
- * Geometry parameters that drive the frame shape. Numbers approximate published
- * specs of size-56cm bikes from the named brands. Lengths are meters, angles
- * are degrees.
+ * Frame geometry parameters. All lengths in meters, angles in degrees.
+ * Numbers follow a real 56cm endurance road bike (Specialized Roubaix /
+ * Trek Domane class): stack 565, reach 385, HT 73°, ST 73.5°,
+ * chainstay 412, BB drop 72, fork rake 47.
  */
 export interface BikeGeo {
+  /** Seat tube length BB → seat cluster (center-top). */
   seatTubeLen: number;
   seatTubeAngle: number;
-  topTubeLen: number;
-  topTubeDrop: number;
+  /** Horizontal distance BB → head tube top center. */
+  reach: number;
+  /** Vertical distance BB → head tube top center. */
+  stack: number;
   headTubeLen: number;
   headTubeAngle: number;
-  forkLen: number;
+  /** Fork rake (offset perpendicular to steering axis). */
   forkRake: number;
-  rearHubX: number;
-  hubHeight: number;
-  /** Tire cross-section radius (used by Wheel.tsx) */
+  /** Chainstay length (BB center → rear axle, 3D). */
+  chainstayLen: number;
+  /** BB drop: how far hubs sit ABOVE the BB. */
+  bbDrop: number;
+  /** Tire cross-section radius (half the tire width). */
   tireWidth: number;
-  /** Outer wheel radius including tire */
+  /** Outer wheel radius including tire. */
   wheelRadius: number;
 }
 
-// Modern endurance road bike geometry — tuned for visible front-wheel clearance.
-// `topTubeDrop` is the rise from seat-tube-top to head-tube-top (compact frame).
-// Seat tube and head tube are each shortened by half the original head-tube
-// length so the top tube sits lower (seatpost + steerer take up the slack).
+// 56cm endurance road geometry.
 export const ROAD_GEO: BikeGeo = {
-  seatTubeLen: 0.422,
+  seatTubeLen: 0.500,
   seatTubeAngle: 73.5,
-  topTubeLen: 0.605,
-  topTubeDrop: 0.080,
-  headTubeLen: 0.077,
-  headTubeAngle: 71.0,
-  forkLen: 0.395,
-  forkRake: 0.060,
-  rearHubX: -0.420,
-  hubHeight: 0.063,
+  reach: 0.385,
+  stack: 0.565,
+  headTubeLen: 0.150,
+  headTubeAngle: 73.0,
+  // Rake is exaggerated past a real ~47mm to open up down-tube/front-wheel
+  // clearance — the fork sweeps the hub further forward.
+  forkRake: 0.085,
+  chainstayLen: 0.412,
+  bbDrop: 0.072,
   tireWidth: 0.014,
-  wheelRadius: 0.336,
+  wheelRadius: 0.339,
 };
-
 
 const D2R = Math.PI / 180;
 
@@ -95,250 +103,214 @@ export function buildBikeFrame(geo: BikeGeo = ROAD_GEO): FrameGeometryDesc {
   const seatTubeAngle = geo.seatTubeAngle * D2R;
   const headTubeAngle = geo.headTubeAngle * D2R;
 
-  // --- Main triangle ---
+  // --- Key points ---
   const stTop = new THREE.Vector3(
-    bb.x - Math.cos(seatTubeAngle) * geo.seatTubeLen,
-    bb.y + Math.sin(seatTubeAngle) * geo.seatTubeLen,
+    -Math.cos(seatTubeAngle) * geo.seatTubeLen,
+    Math.sin(seatTubeAngle) * geo.seatTubeLen,
     0,
   );
 
-  const htTop = new THREE.Vector3(stTop.x + geo.topTubeLen, stTop.y + geo.topTubeDrop, 0);
-
+  const htTop = new THREE.Vector3(geo.reach, geo.stack, 0);
   const htBot = new THREE.Vector3(
     htTop.x + Math.cos(headTubeAngle) * geo.headTubeLen,
     htTop.y - Math.sin(headTubeAngle) * geo.headTubeLen,
     0,
   );
 
-  // --- Hubs & rear stays ---
-  const rearHub = new THREE.Vector3(geo.rearHubX, geo.hubHeight, 0);
-
+  // Hubs. Rear from chainstay length + BB drop; front from steering geometry.
+  const hubY = geo.bbDrop;
+  const rearHub = new THREE.Vector3(
+    -Math.sqrt(geo.chainstayLen * geo.chainstayLen - hubY * hubY),
+    hubY,
+    0,
+  );
   const frontHub = new THREE.Vector3(
-    htBot.x + Math.cos(headTubeAngle) * geo.forkLen + Math.sin(headTubeAngle) * geo.forkRake,
-    geo.hubHeight,
+    htBot.x + (htBot.y - hubY) / Math.tan(headTubeAngle) + geo.forkRake / Math.sin(headTubeAngle),
+    hubY,
     0,
   );
 
-  const halfStay = 0.057;
-  const rRear = new THREE.Vector3(rearHub.x, rearHub.y, halfStay);
-  const lRear = new THREE.Vector3(rearHub.x, rearHub.y, -halfStay);
-  const rFront = new THREE.Vector3(frontHub.x, frontHub.y, halfStay * 0.9);
-  const lFront = new THREE.Vector3(frontHub.x, frontHub.y, -halfStay * 0.9);
+  // --- Axes ---
+  const stAxis = stTop.clone().normalize(); // BB is origin
+  const htAxis = new THREE.Vector3().subVectors(htTop, htBot).normalize();
+  const ttAxis = new THREE.Vector3().subVectors(htTop, stTop).normalize();
 
-  // Fork crown positions
-  const forkCrownTop = new THREE.Vector3(htBot.x, htBot.y, 0);
-  const forkCrownBot = new THREE.Vector3(
-    htBot.x + Math.cos(headTubeAngle) * 0.045,
-    htBot.y - Math.sin(headTubeAngle) * 0.045,
-    0,
-  );
+  // --- Stay / shell spacing ---
+  const halfStayRear = 0.0635; // 142mm hub minus dropout thickness
+  const halfStayFront = 0.070; // wide fork stance — wide gap between blades
+  const bbShellHalfWidth = 0.044;
 
-  // --- Joint-extension helper ---
-  // Small overlap so tube ends sit inside the partner tube and aren't visible
-  // as flat caps. Junction fillets fill any remaining armpit between two
-  // crossing tubes.
-  const SELF_EXT = 0.010;
-  const axis = (from: THREE.Vector3, to: THREE.Vector3): THREE.Vector3 =>
-    new THREE.Vector3().subVectors(to, from).normalize();
+  // Dropped seatstays: attach at 80% up the seat tube. Roots sit close to the
+  // ST axis so their end caps stay buried inside the tube body.
+  const seatstayAttach = stTop.clone().multiplyScalar(0.80);
+  seatstayAttach.x -= 0.004;
 
-  const ttAxis = axis(stTop, htTop);
-  const stAxis = axis(bb, stTop);
-  const htAxis = axis(htBot, htTop);
-  const dtMidpoint = new THREE.Vector3(
-    bb.x + (htBot.x - bb.x) * 0.35,
-    bb.y + (htBot.y - bb.y) * 0.35 + 0.01,
-    0,
-  );
-  const dtAxisAtEnd = axis(dtMidpoint, htBot);
-  const forkCrownAxis = axis(forkCrownTop, forkCrownBot);
-
-  // --- Path builders ---
-
-  // Chainstay: bows outward around chainring, flat oval cross-section
-  const chainstayPath = (sign: 1 | -1): THREE.Vector3[] => {
-    const zEnd = halfStay * sign;
-    return [
-      new THREE.Vector3(bb.x + 0.006, bb.y - 0.005, 0.022 * sign),
-      new THREE.Vector3(bb.x - 0.06, bb.y + 0.002, halfStay * 1.55 * sign),
-      new THREE.Vector3(bb.x - 0.18, bb.y + 0.015, halfStay * 1.12 * sign),
-      new THREE.Vector3(bb.x - 0.32, bb.y + 0.035, zEnd * 1.02),
-      new THREE.Vector3(rearHub.x, rearHub.y, zEnd),
-    ];
-  };
-
-  // Seatstay: thin aero blade. Modern endurance/gravel bikes use "dropped"
-  // seatstays — they attach low on the seat tube (around mid-tube) instead of
-  // at stTop, giving more vertical compliance.
-  const stLen = Math.sqrt(stTop.x * stTop.x + stTop.y * stTop.y);
-  const seatstayAttachT = 0.55; // fraction along ST from BB
-  const seatstayAttach = new THREE.Vector3(
-    stTop.x * seatstayAttachT,
-    stTop.y * seatstayAttachT,
-    0,
-  );
-  // Push the attach point slightly rearward of the ST centerline so the stay
-  // emerges from the back of the seat tube, not its axis.
-  seatstayAttach.x -= 0.012;
-  void stLen;
-  const seatstayPath = (target: THREE.Vector3): THREE.Vector3[] => {
-    const mid = new THREE.Vector3().lerpVectors(seatstayAttach, target, 0.55);
-    mid.z = (seatstayAttach.z + target.z) / 2 + (target.z > 0 ? 0.006 : -0.006);
-    return [seatstayAttach.clone(), mid, target.clone()];
-  };
-
-  // Fork leg: nearly straight — rake comes from the crown offset, not blade curve.
-  // This matches the modern straight-bladed carbon fork (eg ENVE All-Road) look.
-  const forkLegPath = (target: THREE.Vector3): THREE.Vector3[] => {
-    const start = new THREE.Vector3(forkCrownBot.x, forkCrownBot.y, target.z * 0.55);
-    // Use only 2 points = LineCurve3 = perfectly straight blade.
-    return [start, target.clone()];
-  };
+  // Fork crown.
+  const crownTop = htBot.clone().addScaledVector(htAxis, -0.004);
+  // Crown extended further down so its wide bottom reaches and caps the
+  // (shortened) leg tops cleanly, instead of the legs poking up into the cone.
+  const crownBot = htBot.clone().addScaledVector(htAxis, -0.050);
 
   const tubes: TubeDesc[] = [
-    // Head tube — stays round. Extended along its own axis so caps tuck inside
-    // the fork crown (bottom) and the top tube (top).
+    // ── Head tube ── chunky tapered modern HT (41 → 49mm). Oversized enough
+    // that the TT and DT roots bury fully inside it with 2mm+ margin. Bottom
+    // end sits 10mm inside the crown so its cap rim never reaches the skin.
     {
       zone: 'headTube',
       path: [
-        htBot.clone().addScaledVector(htAxis, -SELF_EXT),
-        htTop.clone().addScaledVector(htAxis, SELF_EXT),
+        htBot.clone().addScaledVector(htAxis, -0.010),
+        htTop.clone().addScaledVector(htAxis, 0.012),
       ],
-      radiusStart: 0.026,
-      radiusEnd: 0.023,
-      csStart: { x: 1.0, z: 0.95 },
-      radialSegments: 20,
+      radiusStart: 0.0245,
+      radiusEnd: 0.0205,
+      csStart: { x: 1.0, z: 1.05 },
+      csEnd: { x: 1.0, z: 1.05 },
+      radialSegments: 24,
+      tubularSegments: 12,
+      shapeExponent: 2,
     },
 
-    // Top tube — wide+flat elliptic cross-section. Extended along TT axis past both ends.
+    // ── Top tube ── flattened oval, gentle slope down toward the seat cluster.
+    // End caps sit just SHORT of each partner tube's axis so the cap rim stays
+    // buried inside the partner's skin (the tube walls still pierce the
+    // partner surface, which is what makes the joint read as welded).
     {
       zone: 'topTube',
       path: [
-        stTop.clone().addScaledVector(ttAxis, -SELF_EXT),
-        htTop.clone().addScaledVector(ttAxis, SELF_EXT),
+        stTop.clone().addScaledVector(ttAxis, 0.005),
+        htTop.clone().addScaledVector(htAxis, -0.026).addScaledVector(ttAxis, -0.009),
       ],
-      radiusStart: 0.021,
+      radiusStart: 0.019,
       radiusEnd: 0.019,
-      csStart: { x: 1.30, z: 0.60 },
-      csEnd: { x: 1.20, z: 0.55 },
-      radialSegments: 18,
-      tubularSegments: 40,
+      csStart: { x: 0.85, z: 0.75 },
+      csEnd: { x: 0.92, z: 1.02 },
+      radialSegments: 22,
+      tubularSegments: 24,
+      shapeExponent: 2.4,
     },
 
-    // Down tube — rounded rectangle (3 height : 2 width), tapering toward the
-    // head tube. Extended along its own axis at HT end so the cap is hidden.
-    {
-      zone: 'downTube',
-      path: [
-        bb.clone(),
-        dtMidpoint,
-        htBot.clone().addScaledVector(dtAxisAtEnd, SELF_EXT),
-      ],
-      radiusStart: 0.030,
-      radiusEnd: 0.022,
-      csStart: { x: 1.0, z: 1.5 },
-      csEnd: { x: 0.8, z: 1.2 },
-      radialSegments: 28,
-      tubularSegments: 56,
-      shapeExponent: 4,
-    },
+    // ── Down tube ── the big aero member: 45×60mm rounded-rect at BB,
+    // narrowing to meet the 49mm head tube bottom. End cap pulled back along
+    // its own axis so the rim stays under the HT skin.
+    ...(() => {
+      const dtStart = new THREE.Vector3(-0.008, 0.002, 0);
+      const dtEndNominal = htBot.clone().addScaledVector(htAxis, 0.022);
+      const dtAxis = new THREE.Vector3().subVectors(dtEndNominal, dtStart).normalize();
+      const dtEnd = dtEndNominal.addScaledVector(dtAxis, -0.013);
+      const dt: TubeDesc = {
+        zone: 'downTube',
+        path: [dtStart, dtEnd],
+        radiusStart: 0.030,
+        radiusEnd: 0.0235,
+        csStart: { x: 0.75, z: 1.00 },
+        csEnd: { x: 0.78, z: 0.85 },
+        radialSegments: 26,
+        tubularSegments: 32,
+        shapeExponent: 2.6,
+      };
+      return [dt];
+    })(),
 
-    // Seat tube — aero airfoil at the BB, transitioning to round at the top so
-    // the wider top-tube extension is hidden inside the junction.
+    // ── Seat tube ── stout at the top (covers the TT root + clamp area),
+    // flaring to an aero section at the BB.
     {
       zone: 'seatTube',
       path: [
-        bb.clone(),
-        stTop.clone().addScaledVector(stAxis, SELF_EXT),
+        new THREE.Vector3(0.004, -0.002, 0),
+        stTop.clone().addScaledVector(stAxis, 0.006),
       ],
-      radiusStart: 0.022,
-      radiusEnd: 0.022,
-      csStart: { x: 0.7, z: 1.5 },
+      radiusStart: 0.021,
+      radiusEnd: 0.0175,
+      csStart: { x: 0.85, z: 1.30 },
       csEnd: { x: 1.0, z: 1.0 },
       radialSegments: 22,
-      tubularSegments: 32,
+      tubularSegments: 24,
+      shapeExponent: 2.2,
     },
 
-    // Seatstays — thin blades, right + left
-    {
-      zone: 'seatStays',
-      path: seatstayPath(rRear),
-      radiusStart: 0.010,
-      radiusEnd: 0.007,
-      csStart: { x: 0.55, z: 1.8 },
-      csEnd: { x: 0.45, z: 1.5 },
-      radialSegments: 12,
-      tubularSegments: 28,
-    },
-    {
-      zone: 'seatStays',
-      path: seatstayPath(lRear),
-      radiusStart: 0.010,
-      radiusEnd: 0.007,
-      csStart: { x: 0.55, z: 1.8 },
-      csEnd: { x: 0.45, z: 1.5 },
-      radialSegments: 12,
-      tubularSegments: 28,
-    },
-
-    // Chainstays — flat oval blade shape, right + left
-    {
+    // ── Chainstays ── tall blades at the BB (18×42mm) tapering to the
+    // dropouts, bowed outward for tire clearance.
+    ...([1, -1] as const).map((side): TubeDesc => ({
       zone: 'chainStays',
-      path: chainstayPath(1),
-      radiusStart: 0.016,
-      radiusEnd: 0.010,
-      csStart: { x: 0.60, z: 1.9 },
-      csEnd: { x: 0.50, z: 1.4 },
-      radialSegments: 14,
-      tubularSegments: 40,
-    },
-    {
-      zone: 'chainStays',
-      path: chainstayPath(-1),
-      radiusStart: 0.016,
-      radiusEnd: 0.010,
-      csStart: { x: 0.60, z: 1.9 },
-      csEnd: { x: 0.50, z: 1.4 },
-      radialSegments: 14,
-      tubularSegments: 40,
-    },
+      path: [
+        new THREE.Vector3(-0.012, -0.002, 0.030 * side),
+        new THREE.Vector3(-0.16, 0.012, (halfStayRear + 0.008) * side),
+        new THREE.Vector3(rearHub.x + 0.012, rearHub.y - 0.001, halfStayRear * side),
+      ],
+      radiusStart: 0.015,
+      radiusEnd: 0.0085,
+      csStart: { x: 0.60, z: 1.40 },
+      csEnd: { x: 0.75, z: 1.10 },
+      radialSegments: 16,
+      tubularSegments: 24,
+      shapeExponent: 2.3,
+    })),
 
-    // Fork crown — subtle taper sitting just below the HT. Matches the blade
-    // cross-section at the bottom so there's no visible step where blades emerge.
-    // No self-extension up: the crown sits flush against htBot, where the HT
-    // body itself extends down to cover the join.
+    // ── Seatstays ── thin dropped blades with a slight arc. Roots start at
+    // z ±9mm so the end caps stay inside the seat tube (half-width ~17.7mm).
+    ...([1, -1] as const).map((side): TubeDesc => ({
+      zone: 'seatStays',
+      path: [
+        new THREE.Vector3(seatstayAttach.x, seatstayAttach.y, 0.009 * side),
+        new THREE.Vector3(
+          (seatstayAttach.x + rearHub.x) / 2 - 0.008,
+          (seatstayAttach.y + rearHub.y) / 2 + 0.012,
+          (0.009 + halfStayRear) * 0.55 * side,
+        ),
+        new THREE.Vector3(rearHub.x + 0.010, rearHub.y + 0.006, halfStayRear * side),
+      ],
+      radiusStart: 0.0075,
+      radiusEnd: 0.0060,
+      csStart: { x: 0.85, z: 1.30 },
+      csEnd: { x: 0.85, z: 1.10 },
+      radialSegments: 14,
+      tubularSegments: 20,
+      shapeExponent: 2,
+    })),
+
+    // ── Fork crown ── flows out of the head tube bottom and spreads laterally
+    // into the blades. Bottom width must fully cover the blade roots.
     {
       zone: 'forkCrown',
-      path: [forkCrownTop.clone(), forkCrownBot.clone()],
-      radiusStart: 0.025,
-      radiusEnd: 0.018,
-      csStart: { x: 1.05, z: 1.0 },
-      csEnd: { x: 0.85, z: 1.25 },
-      radialSegments: 20,
-      tubularSegments: 12,
+      path: [crownTop.clone(), crownBot.clone()],
+      // Top matches the head-tube/steerer diameter at htBot (~0.024, slightly
+      // oval fore-aft) for a flush transition, then flares to the wide bottom
+      // that caps the leg tops.
+      radiusStart: 0.0240,
+      radiusEnd: 0.030,
+      csStart: { x: 1.0, z: 1.05 },
+      csEnd: { x: 1.52, z: 0.85 },
+      radialSegments: 24,
+      tubularSegments: 10,
+      shapeExponent: 2.2,
     },
 
-    // Fork legs — straight blades with a mild aero (deep fore-aft, narrow lateral)
-    // airfoil. Blade-top cross-section matches crown-bottom so they merge cleanly.
-    {
+    // ── Fork legs ── beefy airfoil blades. Tops spread apart (z ±26mm) for a
+    // wide gap between the blades. Tops sit just 3mm into the crown's widest
+    // bottom edge — enough to be capped, but not poking up into the narrowing
+    // cone where they'd overlap through the crown wall.
+    ...([1, -1] as const).map((side): TubeDesc => ({
       zone: 'forkLegs',
-      path: forkLegPath(rFront),
+      path: [
+        // Top pushed out to z ±31mm so the blade's outer line sits flush with
+        // the crown's lower-diameter edge, and ended right at the crown's
+        // bottom edge (-1mm) so it doesn't poke up into the tapering wall.
+        new THREE.Vector3(crownBot.x - 0.002, crownBot.y - 0.001, 0.031 * side),
+        new THREE.Vector3(
+          crownBot.x + (frontHub.x - crownBot.x) * 0.55 - 0.004,
+          crownBot.y + (frontHub.y - crownBot.y) * 0.55,
+          (0.031 + halfStayFront) * 0.56 * side,
+        ),
+        new THREE.Vector3(frontHub.x - 0.002, frontHub.y + 0.004, halfStayFront * side),
+      ],
       radiusStart: 0.016,
-      radiusEnd: 0.012,
-      csStart: { x: 0.85, z: 1.25 },
-      csEnd: { x: 0.7, z: 1.35 },
+      radiusEnd: 0.0115,
+      csStart: { x: 0.86, z: 1.32 },
+      csEnd: { x: 0.78, z: 1.20 },
       radialSegments: 16,
-      tubularSegments: 12,
-    },
-    {
-      zone: 'forkLegs',
-      path: forkLegPath(lFront),
-      radiusStart: 0.016,
-      radiusEnd: 0.012,
-      csStart: { x: 0.85, z: 1.25 },
-      csEnd: { x: 0.7, z: 1.35 },
-      radialSegments: 16,
-      tubularSegments: 12,
-    },
+      tubularSegments: 22,
+      shapeExponent: 2.2,
+    })),
   ];
 
   const anchors: FrameAnchors = {
@@ -346,12 +318,15 @@ export function buildBikeFrame(geo: BikeGeo = ROAD_GEO): FrameGeometryDesc {
     stTop: stTop.clone(),
     htTop: htTop.clone(),
     htBot: htBot.clone(),
-    forkCrownTop: forkCrownTop.clone(),
-    forkCrownBot: forkCrownBot.clone(),
+    crownBot: crownBot.clone(),
     seatstayAttach: seatstayAttach.clone(),
     rearHub: rearHub.clone(),
     frontHub: frontHub.clone(),
-    halfStay,
+    stAxis: stAxis.clone(),
+    htAxis: htAxis.clone(),
+    halfStayRear,
+    halfStayFront,
+    bbShellHalfWidth,
     seatTubeAngle,
     headTubeAngle,
   };

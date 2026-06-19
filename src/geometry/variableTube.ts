@@ -14,6 +14,15 @@ export interface VariableTubeOptions {
    *   2 = ellipse (default), 4 = rounded rectangle, 8 = nearly sharp rectangle.
    */
   shapeExponent?: number;
+  /**
+   * Whether to add flat end-cap discs (default true). Capped tubes show their
+   * end disc when not fully buried in a neighbour, and under lighting that disc
+   * shades dark (its normal points along the tube axis) which reads as a hole.
+   * For frame tubes whose ends interpenetrate other tubes, set false and render
+   * the mesh DoubleSide: the buried ends are covered by the partner tube and
+   * any open end shows the lit inner wall instead of a black cap.
+   */
+  caps?: boolean;
 }
 
 /**
@@ -35,6 +44,7 @@ export function buildVariableTubeGeo(
     csStart = { x: 1, z: 1 },
     csEnd = csStart,
     shapeExponent = 2,
+    caps = true,
   } = opts;
 
   // Lamé / superellipse parameterization. For n=2 this reduces to a standard
@@ -144,31 +154,34 @@ export function buildVariableTubeGeo(
   }
 
   // End caps — without these, tubes that don't fully interpenetrate a neighbor
-  // show the background through their open end as a hole.
-  const startCenter = points[0];
-  const endCenter = points[N];
-  const startTangent = tangents[0];
-  const endTangent = tangents[N];
+  // show the background through their open end as a hole. Skipped for frame
+  // tubes (caps:false) that interpenetrate partners and render DoubleSide.
+  if (caps) {
+    const startCenter = points[0];
+    const endCenter = points[N];
+    const startTangent = tangents[0];
+    const endTangent = tangents[N];
 
-  // Start cap: vertex at start center with normal pointing back along -startTangent.
-  const startCenterIdx = positions.length / 3;
-  positions.push(startCenter.x, startCenter.y, startCenter.z);
-  normalsBuf.push(-startTangent.x, -startTangent.y, -startTangent.z);
-  uvs.push(0.5, 0.5);
-  for (let j = 0; j < R; j++) {
-    const a = 0 * (R + 1) + j;
-    indices.push(startCenterIdx, a + 1, a);
-  }
+    // Start cap: vertex at start center with normal pointing back along -startTangent.
+    const startCenterIdx = positions.length / 3;
+    positions.push(startCenter.x, startCenter.y, startCenter.z);
+    normalsBuf.push(-startTangent.x, -startTangent.y, -startTangent.z);
+    uvs.push(0.5, 0.5);
+    for (let j = 0; j < R; j++) {
+      const a = 0 * (R + 1) + j;
+      indices.push(startCenterIdx, a + 1, a);
+    }
 
-  // End cap: vertex at end center with normal pointing forward along +endTangent.
-  const endCenterIdx = positions.length / 3;
-  positions.push(endCenter.x, endCenter.y, endCenter.z);
-  normalsBuf.push(endTangent.x, endTangent.y, endTangent.z);
-  uvs.push(0.5, 0.5);
-  const endRingBase = N * (R + 1);
-  for (let j = 0; j < R; j++) {
-    const a = endRingBase + j;
-    indices.push(endCenterIdx, a, a + 1);
+    // End cap: vertex at end center with normal pointing forward along +endTangent.
+    const endCenterIdx = positions.length / 3;
+    positions.push(endCenter.x, endCenter.y, endCenter.z);
+    normalsBuf.push(endTangent.x, endTangent.y, endTangent.z);
+    uvs.push(0.5, 0.5);
+    const endRingBase = N * (R + 1);
+    for (let j = 0; j < R; j++) {
+      const a = endRingBase + j;
+      indices.push(endCenterIdx, a, a + 1);
+    }
   }
 
   const geo = new THREE.BufferGeometry();
