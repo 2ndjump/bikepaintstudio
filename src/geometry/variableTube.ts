@@ -23,6 +23,13 @@ export interface VariableTubeOptions {
    * any open end shows the lit inner wall instead of a black cap.
    */
   caps?: boolean;
+  /**
+   * Place the UV seam (and the start of the radial wrap) on the underside of
+   * the tube so decals/patterns on the visible top face never cross the cut.
+   * Default false keeps the original (arbitrary) seam orientation — used for
+   * the fork legs/crown, whose wrap would otherwise rotate ~90°.
+   */
+  seamDown?: boolean;
 }
 
 /**
@@ -45,6 +52,7 @@ export function buildVariableTubeGeo(
     csEnd = csStart,
     shapeExponent = 2,
     caps = true,
+    seamDown = false,
   } = opts;
 
   // Lamé / superellipse parameterization. For n=2 this reduces to a standard
@@ -73,10 +81,25 @@ export function buildVariableTubeGeo(
   const normals: THREE.Vector3[] = new Array(N + 1);
   const binormals: THREE.Vector3[] = new Array(N + 1);
 
-  // Bootstrap first frame: find vector most perpendicular to first tangent
+  // Bootstrap first frame. The UV seam (u=0/1, i.e. radial angle 0) sits along
+  // this first normal, and is carried down the tube by the rotation-minimizing
+  // frames. With seamDown, point it DOWN so the seam runs along the underside
+  // of the tube, where the texture wrap/cut is hidden (decals/patterns are
+  // centred at u=0.5, the opposite side, so they land on top). Otherwise use
+  // the original arbitrary-perpendicular bootstrap.
   const t0 = tangents[0];
-  const tmp = Math.abs(t0.x) < 0.9 ? new THREE.Vector3(1, 0, 0) : new THREE.Vector3(0, 1, 0);
-  normals[0] = new THREE.Vector3().crossVectors(t0, tmp).normalize();
+  let n0: THREE.Vector3 | null = null;
+  if (seamDown) {
+    const down = new THREE.Vector3(0, -1, 0);
+    const proj = down.clone().addScaledVector(t0, -down.dot(t0)); // project -Y onto plane ⟂ t0
+    if (proj.lengthSq() >= 1e-6) n0 = proj;
+    // else (near-vertical tube): fall through to the default bootstrap below.
+  }
+  if (!n0) {
+    const tmp = Math.abs(t0.x) < 0.9 ? new THREE.Vector3(1, 0, 0) : new THREE.Vector3(0, 1, 0);
+    n0 = new THREE.Vector3().crossVectors(t0, tmp);
+  }
+  normals[0] = n0.normalize();
   binormals[0] = new THREE.Vector3().crossVectors(t0, normals[0]).normalize();
 
   // Parallel-transport frames

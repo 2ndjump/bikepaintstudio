@@ -38,18 +38,11 @@ export function PatternLayerEditor({ layer, zoneId }: Props) {
           </option>
         ))}
       </select>
-      <div className="grid grid-cols-2 gap-2">
-        <ColorPicker
-          value={layer.color}
-          label={t('color')}
-          onChange={(color) => updateLayer(zoneId, layer.id, { color })}
-        />
-        <ColorPicker
-          value={layer.background}
-          label={t('background')}
-          onChange={(background) => updateLayer(zoneId, layer.id, { background })}
-        />
-      </div>
+      <ColorPicker
+        value={layer.color}
+        label={t('color')}
+        onChange={(color) => updateLayer(zoneId, layer.id, { color })}
+      />
       <label className="text-xs text-neutral-400 flex flex-col gap-1">
         {t('scale')} {layer.scale.toFixed(1)}
         <input

@@ -114,7 +114,7 @@ export class ZoneCompositor {
     this.ctx = ctx;
   }
 
-  async render(layers: Layer[]): Promise<HTMLCanvasElement> {
+  async render(layers: Layer[], baseColor: string): Promise<HTMLCanvasElement> {
     const ctx = this.ctx;
     const w = this.canvas.width;
     const h = this.canvas.height;
@@ -124,6 +124,10 @@ export class ZoneCompositor {
     ctx.globalAlpha = 1;
     ctx.filter = 'none';
     ctx.clearRect(0, 0, w, h);
+
+    // Opaque base fill the user-managed layer stack composites on top of.
+    ctx.fillStyle = baseColor;
+    ctx.fillRect(0, 0, w, h);
 
     for (const layer of layers) {
       if (!layer.visible) continue;
@@ -234,7 +238,10 @@ export class ZoneCompositor {
     const cy = h * layer.y;
 
     ctx.translate(cx, cy);
-    ctx.rotate((layer.rotation * Math.PI) / 180);
+    // +90° baseline so a stored rotation of 0 reads ALONG the tube (the zone
+    // canvas runs lengthwise vertically); the slider then turns left/right
+    // from that neutral orientation.
+    ctx.rotate(((layer.rotation + 90) * Math.PI) / 180);
 
     const base = Math.min(w, h);
     const px = layer.size * 0.01 * base;
@@ -249,17 +256,39 @@ export class ZoneCompositor {
     ctx.font = fontSpec;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    (ctx as CanvasRenderingContext2D & { letterSpacing?: string }).letterSpacing =
-      `${layer.letterSpacing ?? 0}px`;
+    // Glyphs are laid out and spaced manually (so each can be rotated), so the
+    // native letterSpacing is cleared and the gap applied between glyphs below.
+    (ctx as CanvasRenderingContext2D & { letterSpacing?: string }).letterSpacing = '0px';
 
-    if (layer.outlineWidth > 0) {
-      ctx.strokeStyle = layer.outlineColor;
-      ctx.lineWidth = layer.outlineWidth * 2;
-      ctx.lineJoin = 'round';
-      ctx.strokeText(layer.text, 0, 0);
+    // Lay out each character one by one along the (local) baseline. Each glyph
+    // is rotated about its own centre by glyphRotation. The advance stays based
+    // on glyph width only (rotation never changes spacing); the gap between
+    // glyphs is controlled solely by the letterSpacing slider.
+    const chars = [...layer.text];
+    const glyph = ((layer.glyphRotation ?? 0) * Math.PI) / 180;
+    const gap = layer.letterSpacing ?? 0;
+    const sizes = chars.map((c) => ctx.measureText(c).width);
+
+    let total = gap * Math.max(0, chars.length - 1);
+    for (const s of sizes) total += s;
+
+    let cursor = -total / 2;
+    for (let i = 0; i < chars.length; i++) {
+      const s = sizes[i];
+      ctx.save();
+      ctx.translate(cursor + s / 2, 0);
+      ctx.rotate(glyph);
+      if (layer.outlineWidth > 0) {
+        ctx.strokeStyle = layer.outlineColor;
+        ctx.lineWidth = layer.outlineWidth * 2;
+        ctx.lineJoin = 'round';
+        ctx.strokeText(chars[i], 0, 0);
+      }
+      ctx.fillStyle = layer.color;
+      ctx.fillText(chars[i], 0, 0);
+      ctx.restore();
+      cursor += s + gap;
     }
-    ctx.fillStyle = layer.color;
-    ctx.fillText(layer.text, 0, 0);
   }
 
   private applyDistortion(layer: DistortionLayer) {

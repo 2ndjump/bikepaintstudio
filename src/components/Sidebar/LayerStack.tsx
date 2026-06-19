@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { useDesignStore, newLayerId } from '../../state/designStore';
 import type { DuplicateOptions } from '../../state/designStore';
 import type { BlendMode, Layer } from '../../state/types';
-import { SolidColorLayerEditor } from '../LayerTypes/SolidColorLayer';
 import { PatternLayerEditor } from '../LayerTypes/PatternLayer';
 import { ImageLayerEditor } from '../LayerTypes/ImageLayer';
 import { DecalLayerEditor } from '../LayerTypes/DecalLayer';
@@ -77,19 +76,6 @@ export function LayerStack() {
   const t = useT();
   const [duplicatingId, setDuplicatingId] = useState<string | null>(null);
 
-  function addSolid() {
-    const layer: Layer = {
-      id: newLayerId('solid'),
-      name: t('color'),
-      type: 'solid',
-      color: '#ffffff',
-      visible: true,
-      opacity: 1,
-      blendMode: 'normal',
-    };
-    addLayer(activeZone, layer);
-  }
-
   function addPattern() {
     const layer: Layer = {
       id: newLayerId('pattern'),
@@ -97,7 +83,6 @@ export function LayerStack() {
       type: 'pattern',
       pattern: 'hexagons',
       color: '#ffffff',
-      background: '#000000',
       scale: 10,
       rotation: 0,
       intensity: 1,
@@ -161,6 +146,7 @@ export function LayerStack() {
       x: 0.5,
       y: 0.5,
       rotation: 0,
+      glyphRotation: 0,
       visible: true,
       opacity: 1,
       blendMode: 'normal',
@@ -192,7 +178,6 @@ export function LayerStack() {
       </div>
 
       <div className="flex gap-1 flex-wrap">
-        <button className="btn-mini" onClick={addSolid}>{t('addColor')}</button>
         <button className="btn-mini" onClick={addPattern}>{t('addPattern')}</button>
         <button className="btn-mini" onClick={addImage}>{t('addImage')}</button>
         <button className="btn-mini" onClick={addDecal}>{t('addText')}</button>
@@ -295,9 +280,6 @@ export function LayerStack() {
               </label>
             </div>
 
-            {layer.type === 'solid' && (
-              <SolidColorLayerEditor layer={layer} zoneId={activeZone} />
-            )}
             {layer.type === 'pattern' && (
               <PatternLayerEditor layer={layer} zoneId={activeZone} />
             )}

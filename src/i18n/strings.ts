@@ -7,6 +7,7 @@ export type I18nKey =
   | 'pngExport'
   | 'zones'
   | 'paintFinish'
+  | 'baseColor'
   | 'finishMatte'
   | 'finishSatin'
   | 'finishGlossy'
@@ -43,6 +44,7 @@ export type I18nKey =
   | 'outline'
   | 'size'
   | 'outlineWidth'
+  | 'letterRotation'
   | 'bgDark'
   | 'bgLight'
   | 'bgStudio'
@@ -83,6 +85,7 @@ const STRINGS: Record<I18nKey, Record<Lang, string>> = {
   pngExport: { de: 'PNG Export', en: 'Export PNG' },
   zones: { de: 'Zonen', en: 'Zones' },
   paintFinish: { de: 'Lack-Finish', en: 'Paint Finish' },
+  baseColor: { de: 'Grundfarbe', en: 'Base Color' },
   finishMatte: { de: 'Matt', en: 'Matte' },
   finishSatin: { de: 'Seidenmatt', en: 'Satin' },
   finishGlossy: { de: 'Glanz', en: 'Glossy' },
@@ -119,6 +122,7 @@ const STRINGS: Record<I18nKey, Record<Lang, string>> = {
   outline: { de: 'Outline', en: 'Outline' },
   size: { de: 'Größe', en: 'Size' },
   outlineWidth: { de: 'Outline Breite', en: 'Outline Width' },
+  letterRotation: { de: 'Buchstaben-Rotation', en: 'Letter rotation' },
   bgDark: { de: 'Dunkel', en: 'Dark' },
   bgLight: { de: 'Hell', en: 'Light' },
   bgStudio: { de: 'Studio', en: 'Studio' },

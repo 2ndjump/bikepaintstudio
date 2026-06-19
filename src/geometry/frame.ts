@@ -217,7 +217,9 @@ export function buildBikeFrame(geo: BikeGeo = ROAD_GEO): FrameGeometryDesc {
       zone: 'seatTube',
       path: [
         new THREE.Vector3(0.004, -0.002, 0),
-        stTop.clone().addScaledVector(stAxis, 0.006),
+        // Extended up so the ST top reaches the upper edge of the top tube
+        // (TT half-height ≈ 0.019 * 0.85 above its centerline near stTop).
+        stTop.clone().addScaledVector(stAxis, 0.018),
       ],
       radiusStart: 0.021,
       radiusEnd: 0.0175,

@@ -36,6 +36,9 @@ function buildTubeGeometry(tube: TubeDesc): THREE.BufferGeometry {
     // partner tube, and DoubleSide (below) renders the lit inner wall on any
     // end that peeks — so matte/satin can stay fully lit.
     caps: false,
+    // Hide the UV seam on the underside so decals stay clear of the cut. The
+    // fork legs/crown keep the original wrap (down-projection rotates them ~90°).
+    seamDown: tube.zone !== 'forkLegs' && tube.zone !== 'forkCrown',
   });
 }
 

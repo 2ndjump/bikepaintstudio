@@ -31,7 +31,6 @@ function layerToXML(layer: Layer, indent: string): string {
         `${indent}<layer type="pattern"${base}` +
         attr('pattern', layer.pattern) +
         attr('color', layer.color) +
-        attr('background', layer.background) +
         attr('scale', layer.scale) +
         attr('rotation', layer.rotation) +
         attr('intensity', layer.intensity) +
@@ -63,9 +62,11 @@ function layerToXML(layer: Layer, indent: string): string {
         attr('color', layer.color) +
         attr('outlineColor', layer.outlineColor) +
         attr('outlineWidth', layer.outlineWidth) +
+        attr('letterSpacing', layer.letterSpacing) +
         attr('x', layer.x) +
         attr('y', layer.y) +
         attr('rotation', layer.rotation) +
+        attr('glyphRotation', layer.glyphRotation) +
         `>\n${indent}  <text>${esc(layer.text)}</text>\n${indent}</layer>`
       );
     case 'distortion':
@@ -83,7 +84,7 @@ function zoneToXML(id: ZoneId, zone: ZoneState): string {
   const [a, b, c] = zone.chameleonColors;
   const layers = zone.layers.map((l) => layerToXML(l, '      ')).join('\n');
   return (
-    `    <zone id="${id}" finish="${zone.finish}">\n` +
+    `    <zone id="${id}" finish="${zone.finish}" baseColor="${esc(zone.baseColor)}">\n` +
     `      <chameleonColors a="${esc(a)}" b="${esc(b)}" c="${esc(c)}" />\n` +
     `      <layers>\n${layers}\n      </layers>\n` +
     `    </zone>`
@@ -137,7 +138,6 @@ function parseLayer(el: Element): Layer | null {
         type: 'pattern',
         pattern: str(el, 'pattern', 'hexagons') as import('./types').PatternKind,
         color: str(el, 'color', '#ffffff'),
-        background: str(el, 'background', '#000000'),
         scale: num(el, 'scale', 10),
         rotation: num(el, 'rotation', 0),
         intensity: num(el, 'intensity', 1),
@@ -174,9 +174,11 @@ function parseLayer(el: Element): Layer | null {
         color: str(el, 'color', '#ffffff'),
         outlineColor: str(el, 'outlineColor', '#000000'),
         outlineWidth: num(el, 'outlineWidth', 0),
+        letterSpacing: num(el, 'letterSpacing', 0),
         x: num(el, 'x', 0.5),
         y: num(el, 'y', 0.5),
         rotation: num(el, 'rotation', 0),
+        glyphRotation: num(el, 'glyphRotation', 0),
       };
     }
     case 'distortion':
@@ -218,14 +220,23 @@ export function xmlToDesign(xml: string): DesignState {
       ccEl?.getAttribute('c') ?? '#14b8a6',
     ];
 
-    const layers: Layer[] = [];
+    let layers: Layer[] = [];
     for (const layerEl of Array.from(zoneEl.querySelectorAll('layers > layer'))) {
       const l = parseLayer(layerEl);
       if (l) layers.push(l);
     }
 
+    // Prefer the explicit baseColor attribute; fall back to promoting a
+    // legacy base solid layer (older files stored it in the stack).
+    let baseColor = zoneEl.getAttribute('baseColor') ?? undefined;
+    if (baseColor === undefined && layers.length > 0 && layers[0].type === 'solid') {
+      baseColor = layers[0].color;
+      layers = layers.slice(1);
+    }
+
     zones[id] = {
       finish: (zoneEl.getAttribute('finish') ?? 'glossy') as import('./types').FinishType,
+      baseColor: baseColor ?? '#cccccc',
       chameleonColors,
       layers,
     };
@@ -236,8 +247,9 @@ export function xmlToDesign(xml: string): DesignState {
       z,
       zones[z] ?? {
         finish: 'glossy' as const,
+        baseColor: '#cccccc',
         chameleonColors: ['#1e3a8a', '#a855f7', '#14b8a6'] as [string, string, string],
-        layers: [{ id: `base-${z}`, name: 'Base Color', type: 'solid' as const, color: '#cccccc', visible: true, opacity: 1, blendMode: 'normal' as const }],
+        layers: [],
       },
     ]),
   ) as Record<ZoneId, ZoneState>;

@@ -29,7 +29,7 @@ function migrateLayer(layer: Layer): Layer {
     };
   }
   if (layer.type === 'decal') {
-    return { letterSpacing: 0, ...layer };
+    return { letterSpacing: 0, glyphRotation: 0, ...layer };
   }
   return layer;
 }
@@ -37,13 +37,24 @@ function migrateLayer(layer: Layer): Layer {
 function migrateZone(zone: Partial<ZoneState> | undefined, fallbackColor: string): ZoneState {
   const base = makeDefaultZoneState(fallbackColor);
   if (!zone) return base;
+
+  // Legacy designs stored the base color as the bottom-most solid layer.
+  // Promote it to the dedicated baseColor field and drop it from the stack.
+  let layers = zone.layers ? zone.layers.map(migrateLayer) : base.layers;
+  let baseColor = zone.baseColor;
+  if (baseColor === undefined && layers.length > 0 && layers[0].type === 'solid') {
+    baseColor = layers[0].color;
+    layers = layers.slice(1);
+  }
+
   return {
     finish: zone.finish ?? base.finish,
+    baseColor: baseColor ?? base.baseColor,
     chameleonColors:
       zone.chameleonColors && zone.chameleonColors.length === 3
         ? ([...zone.chameleonColors] as [string, string, string])
         : ([...DEFAULT_CHAMELEON_COLORS] as [string, string, string]),
-    layers: zone.layers ? zone.layers.map(migrateLayer) : base.layers,
+    layers,
   };
 }
 
@@ -90,6 +101,7 @@ export interface DuplicateOptions {
 interface DesignActions {
   setActiveZone(zone: ZoneId): void;
   setFinish(zone: ZoneId, finish: FinishType): void;
+  setBaseColor(zone: ZoneId, color: string): void;
   setChameleonColor(zone: ZoneId, index: 0 | 1 | 2, color: string): void;
   updateLayer(zone: ZoneId, layerId: string, patch: Partial<Layer>): void;
   addLayer(zone: ZoneId, layer: Layer): void;
@@ -130,6 +142,14 @@ export const useDesignStore = create<Store>((set, get) => {
       set((s) => ({
         history,
         zones: { ...s.zones, [zone]: { ...s.zones[zone], finish } },
+      }));
+    },
+
+    setBaseColor: (zone, color) => {
+      const history = recordHistory();
+      set((s) => ({
+        history,
+        zones: { ...s.zones, [zone]: { ...s.zones[zone], baseColor: color } },
       }));
     },
 

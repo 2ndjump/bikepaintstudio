@@ -3,7 +3,7 @@ import type { PatternLayer } from '../state/types';
 const cache = new Map<string, HTMLCanvasElement>();
 
 export async function renderPattern(layer: PatternLayer): Promise<HTMLCanvasElement> {
-  const key = `${layer.pattern}|${layer.color}|${layer.background}|${layer.scale}|${layer.intensity}`;
+  const key = `${layer.pattern}|${layer.color}|${layer.scale}|${layer.intensity}`;
   const cached = cache.get(key);
   if (cached) return cached;
 
@@ -13,8 +13,7 @@ export async function renderPattern(layer: PatternLayer): Promise<HTMLCanvasElem
   canvas.height = size;
   const ctx = canvas.getContext('2d')!;
 
-  ctx.fillStyle = layer.background;
-  ctx.fillRect(0, 0, size, size);
+  // Transparent background: the layer below (or the base color) shows through.
   ctx.globalAlpha = layer.intensity;
 
   if (layer.pattern === 'hexagons') drawHexagons(ctx, size, layer);
@@ -83,10 +82,12 @@ function drawCarbon(ctx: CanvasRenderingContext2D, size: number, layer: PatternL
       ctx.rotate(checker ? Math.PI / 4 : -Math.PI / 4);
       const w = cell * 0.95;
       const h = cell * 0.35;
+      // Threads fade to transparent at their edges so the surface below
+      // reads as the gaps in the weave.
       const g = ctx.createLinearGradient(-w / 2, 0, w / 2, 0);
-      g.addColorStop(0, layer.background);
+      g.addColorStop(0, 'rgba(0,0,0,0)');
       g.addColorStop(0.5, layer.color);
-      g.addColorStop(1, layer.background);
+      g.addColorStop(1, 'rgba(0,0,0,0)');
       ctx.fillStyle = g;
       ctx.fillRect(-w / 2, -h / 2, w, h);
       ctx.restore();
@@ -138,8 +139,10 @@ function parseHex(hex: string): [number, number, number] {
 }
 
 function drawSmoke(ctx: CanvasRenderingContext2D, size: number, layer: PatternLayer) {
+  // Smoke fades from transparent (thin) to the foreground color (dense) so the
+  // surface below shows through the wisps. putImageData bypasses globalAlpha,
+  // so fold the layer intensity into the per-pixel alpha here.
   const imgData = ctx.getImageData(0, 0, size, size);
-  const [br, bg, bb] = parseHex(layer.background);
   const [fr, fg, fb] = parseHex(layer.color);
   const period = 4;
   const scale = period / size;
@@ -149,10 +152,10 @@ function drawSmoke(ctx: CanvasRenderingContext2D, size: number, layer: PatternLa
       const n = fbmTiled(x * scale, y * scale, period, 5, seed);
       const t = Math.max(0, Math.min(1, (n - 0.3) * 2.2));
       const idx = (y * size + x) * 4;
-      imgData.data[idx] = br * (1 - t) + fr * t;
-      imgData.data[idx + 1] = bg * (1 - t) + fg * t;
-      imgData.data[idx + 2] = bb * (1 - t) + fb * t;
-      imgData.data[idx + 3] = 255;
+      imgData.data[idx] = fr;
+      imgData.data[idx + 1] = fg;
+      imgData.data[idx + 2] = fb;
+      imgData.data[idx + 3] = Math.round(t * layer.intensity * 255);
     }
   }
   ctx.putImageData(imgData, 0, 0);

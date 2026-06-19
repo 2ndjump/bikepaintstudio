@@ -21,8 +21,10 @@ const CHAMELEON_LABELS: Record<0 | 1 | 2, I18nKey> = {
 export function FinishPicker() {
   const activeZone = useDesignStore((s) => s.activeZone);
   const finish = useDesignStore((s) => s.zones[s.activeZone].finish);
+  const baseColor = useDesignStore((s) => s.zones[s.activeZone].baseColor);
   const chameleonColors = useDesignStore((s) => s.zones[s.activeZone].chameleonColors);
   const setFinish = useDesignStore((s) => s.setFinish);
+  const setBaseColor = useDesignStore((s) => s.setBaseColor);
   const setChameleonColor = useDesignStore((s) => s.setChameleonColor);
   const t = useT();
 
@@ -61,6 +63,12 @@ export function FinishPicker() {
           ))}
         </div>
       )}
+
+      <ColorPicker
+        value={baseColor}
+        label={t('baseColor')}
+        onChange={(color) => setBaseColor(activeZone, color)}
+      />
     </div>
   );
 }

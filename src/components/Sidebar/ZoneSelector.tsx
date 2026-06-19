@@ -15,8 +15,7 @@ export function ZoneSelector() {
       </div>
       {ZONES_PARAMETRIC.map((z) => {
         const active = z === activeZone;
-        const base = zones[z].layers.find((l) => l.type === 'solid');
-        const color = base && base.type === 'solid' ? base.color : '#888';
+        const color = zones[z].baseColor;
         return (
           <button
             key={z}

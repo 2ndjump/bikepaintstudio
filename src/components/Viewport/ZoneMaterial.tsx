@@ -8,6 +8,13 @@ import type { ZoneId } from '../../state/types';
 interface Props {
   zone: ZoneId;
   side?: THREE.Side;
+  /**
+   * Paint with the flat zone base colour only, ignoring the layer stack.
+   * Used for junction hardware (BB shell, dropouts, caps): their lathe UVs
+   * don't match the tube wrap, so the tube's decals/patterns would smear
+   * across them. They still follow the zone's base colour + finish.
+   */
+  baseOnly?: boolean;
 }
 
 /**
@@ -27,20 +34,25 @@ interface Props {
  * hex survives lighting/tonemapping almost exactly, so the lit finishes stay
  * true to the colour the user chose.
  */
-export function ZonePaintedMaterial({ zone, side }: Props) {
+export function ZonePaintedMaterial({ zone, side, baseOnly }: Props) {
   const finish = useDesignStore((s) => s.zones[zone].finish);
   const chameleonColors = useDesignStore((s) => s.zones[zone].chameleonColors);
+  const baseColor = useDesignStore((s) => s.zones[zone].baseColor);
   const texture = useZoneTexture(zone);
   const fp = finishParams(finish);
 
-  if (finish === 'chameleon') {
+  // baseOnly: flat base colour, no layer texture map. Otherwise the composited
+  // canvas (base + layers) is the colour map.
+  const paint = baseOnly ? { color: baseColor } : { map: texture };
+
+  if (finish === 'chameleon' && !baseOnly) {
     return <ChameleonMaterial texture={texture} fp={fp} colors={chameleonColors} side={side} />;
   }
 
   if (finish === 'glossy' || finish === 'metallic') {
     return (
       <meshPhysicalMaterial
-        map={texture}
+        {...paint}
         roughness={fp.roughness}
         metalness={fp.metalness}
         clearcoat={fp.clearcoat}
@@ -56,7 +68,7 @@ export function ZonePaintedMaterial({ zone, side }: Props) {
   // soft sheen difference between matte and satin.
   return (
     <meshStandardMaterial
-      map={texture}
+      {...paint}
       roughness={fp.roughness}
       metalness={fp.metalness}
       envMapIntensity={fp.envMapIntensity}

@@ -140,53 +140,66 @@ export function DecalLayerEditor({ layer, zoneId }: Props) {
         />
       </label>
 
-      <div className="grid grid-cols-3 gap-2">
-        <label className="text-xs text-neutral-400 flex flex-col gap-1">
-          X {(layer.x * 100).toFixed(0)}%
-          <input
-            type="range"
-            min={-1}
-            max={2}
-            step={0.01}
-            value={layer.x}
-            onChange={(e) =>
-              updateLayer(zoneId, layer.id, {
-                x: parseFloat(e.target.value),
-              })
-            }
-          />
-        </label>
-        <label className="text-xs text-neutral-400 flex flex-col gap-1">
-          Y {(layer.y * 100).toFixed(0)}%
-          <input
-            type="range"
-            min={-1}
-            max={2}
-            step={0.01}
-            value={layer.y}
-            onChange={(e) =>
-              updateLayer(zoneId, layer.id, {
-                y: parseFloat(e.target.value),
-              })
-            }
-          />
-        </label>
-        <label className="text-xs text-neutral-400 flex flex-col gap-1">
-          {t('rotationShort')} {layer.rotation.toFixed(0)}°
-          <input
-            type="range"
-            min={0}
-            max={360}
-            step={1}
-            value={layer.rotation}
-            onChange={(e) =>
-              updateLayer(zoneId, layer.id, {
-                rotation: parseFloat(e.target.value),
-              })
-            }
-          />
-        </label>
-      </div>
+      <label className="text-xs text-neutral-400 flex flex-col gap-1">
+        X {(layer.x * 100).toFixed(0)}%
+        <input
+          type="range"
+          min={-1}
+          max={2}
+          step={0.01}
+          value={layer.x}
+          onChange={(e) =>
+            updateLayer(zoneId, layer.id, {
+              x: parseFloat(e.target.value),
+            })
+          }
+        />
+      </label>
+      <label className="text-xs text-neutral-400 flex flex-col gap-1">
+        Y {(layer.y * 100).toFixed(0)}%
+        <input
+          type="range"
+          min={-1}
+          max={2}
+          step={0.01}
+          value={layer.y}
+          onChange={(e) =>
+            updateLayer(zoneId, layer.id, {
+              y: parseFloat(e.target.value),
+            })
+          }
+        />
+      </label>
+      <label className="text-xs text-neutral-400 flex flex-col gap-1">
+        {t('rotationShort')} {layer.rotation.toFixed(0)}°
+        <input
+          type="range"
+          min={-180}
+          max={180}
+          step={1}
+          value={layer.rotation}
+          onChange={(e) =>
+            updateLayer(zoneId, layer.id, {
+              rotation: parseFloat(e.target.value),
+            })
+          }
+        />
+      </label>
+      <label className="text-xs text-neutral-400 flex flex-col gap-1">
+        {t('letterRotation')} {layer.glyphRotation.toFixed(0)}°
+        <input
+          type="range"
+          min={-180}
+          max={180}
+          step={1}
+          value={layer.glyphRotation}
+          onChange={(e) =>
+            updateLayer(zoneId, layer.id, {
+              glyphRotation: parseFloat(e.target.value),
+            })
+          }
+        />
+      </label>
     </div>
   );
 }

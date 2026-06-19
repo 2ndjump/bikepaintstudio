@@ -21,19 +21,20 @@ function getOrCreateTexture(zoneId: ZoneId): THREE.CanvasTexture {
 
 export function useZoneTexture(zoneId: ZoneId): THREE.CanvasTexture {
   const layers = useDesignStore((s) => s.zones[zoneId].layers);
+  const baseColor = useDesignStore((s) => s.zones[zoneId].baseColor);
   const [texture] = useState(() => getOrCreateTexture(zoneId));
 
   useEffect(() => {
     const compositor = getCompositor(zoneId);
     let cancelled = false;
-    compositor.render(layers).then(() => {
+    compositor.render(layers, baseColor).then(() => {
       if (cancelled) return;
       texture.needsUpdate = true;
     });
     return () => {
       cancelled = true;
     };
-  }, [layers, zoneId, texture]);
+  }, [layers, baseColor, zoneId, texture]);
 
   return texture;
 }

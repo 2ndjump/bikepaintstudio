@@ -86,7 +86,6 @@ export interface PatternLayer extends LayerBase {
   type: 'pattern';
   pattern: PatternKind;
   color: string;
-  background: string;
   scale: number;
   rotation: number;
   intensity: number;
@@ -122,6 +121,9 @@ export interface DecalLayer extends LayerBase {
   x: number;
   y: number;
   rotation: number;
+  /** Per-letter rotation (degrees) about each glyph's own centre. Combined
+   *  with `rotation` this allows e.g. upright vertically-stacked text. */
+  glyphRotation: number;
 }
 
 export type DistortionKind = 'gaussian' | 'directional' | 'motion';
@@ -142,6 +144,8 @@ export type Layer =
 
 export interface ZoneState {
   finish: FinishType;
+  /** Opaque background fill the layer stack composites on top of. */
+  baseColor: string;
   layers: Layer[];
   chameleonColors: [string, string, string];
 }
@@ -167,17 +171,8 @@ export const DEFAULT_CHAMELEON_COLORS: [string, string, string] = [
 export function makeDefaultZoneState(color = '#888888'): ZoneState {
   return {
     finish: 'matte',
+    baseColor: color,
     chameleonColors: [...DEFAULT_CHAMELEON_COLORS] as [string, string, string],
-    layers: [
-      {
-        id: 'base-' + Math.random().toString(36).slice(2, 8),
-        name: 'Base Color',
-        type: 'solid',
-        color,
-        visible: true,
-        opacity: 1,
-        blendMode: 'normal',
-      },
-    ],
+    layers: [],
   };
 }

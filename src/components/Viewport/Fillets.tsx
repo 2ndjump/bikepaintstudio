@@ -12,7 +12,8 @@ interface Props {
  * Junction hardware — the pieces a real frame actually has where tubes meet:
  *
  * - BB shell: PF86-style bottom bracket housing across the DT/ST/CS convergence.
- * - Seat clamp collar at the ST top.
+ * - Headset top cap closing the open top of the steerer / head tube.
+ * - Seat tube top cap closing its open top.
  * - Rear dropouts + front fork tips with thru-axle end caps.
  *
  * Tube-to-tube junctions themselves need no cover geometry: cross-sections in
@@ -20,8 +21,18 @@ interface Props {
  * (TT inside ST and HT, DT inside HT, blades inside the crown).
  */
 export function Fillets({ anchors }: Props) {
-  const { bb, stTop, rearHub, frontHub, stAxis, halfStayRear, halfStayFront, bbShellHalfWidth } =
-    anchors;
+  const {
+    bb,
+    stTop,
+    stAxis,
+    htTop,
+    htAxis,
+    rearHub,
+    frontHub,
+    halfStayRear,
+    halfStayFront,
+    bbShellHalfWidth,
+  } = anchors;
 
   // ---- BB shell: rounded cylinder along z ----
   const bbShellGeo = useMemo(() => {
@@ -40,31 +51,56 @@ export function Fillets({ anchors }: Props) {
     return g;
   }, [bbShellHalfWidth]);
 
-  // ---- Seat clamp collar ----
-  const clusterQuat = useMemo(
+  // ---- Headset top cap ----
+  // The head tube renders open at the top; a shallow domed cap closes it the
+  // way a real headset top cover / stem cap does.
+  const steererQuat = useMemo(
+    () => new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), htAxis),
+    [htAxis],
+  );
+  const topCapGeo = useMemo(() => {
+    const profile: THREE.Vector2[] = [
+      new THREE.Vector2(0.0205, 0.0),
+      new THREE.Vector2(0.0200, 0.0020),
+      new THREE.Vector2(0.0165, 0.0045),
+      new THREE.Vector2(0.0100, 0.0060),
+      new THREE.Vector2(0.0000, 0.0065),
+    ];
+    return new THREE.LatheGeometry(profile, 32);
+  }, []);
+  // Base tucked just inside the head tube's open top so the seam stays buried.
+  const topCapPos = useMemo(
+    () => htTop.clone().addScaledVector(htAxis, 0.010),
+    [htTop, htAxis],
+  );
+
+  // ---- Seat tube top cap ----
+  // Closes the open top of the seat tube (ST top end radius ≈ 0.0175, round).
+  const seatQuat = useMemo(
     () => new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), stAxis),
     [stAxis],
   );
-  const collarGeo = useMemo(() => {
+  const seatCapGeo = useMemo(() => {
     const profile: THREE.Vector2[] = [
-      new THREE.Vector2(0.0140, -0.0065),
-      new THREE.Vector2(0.0186, -0.0055),
-      new THREE.Vector2(0.0190, 0.0),
-      new THREE.Vector2(0.0186, 0.0055),
-      new THREE.Vector2(0.0140, 0.0065),
+      new THREE.Vector2(0.0175, 0.0),
+      new THREE.Vector2(0.0170, 0.0018),
+      new THREE.Vector2(0.0140, 0.0040),
+      new THREE.Vector2(0.0085, 0.0053),
+      new THREE.Vector2(0.0000, 0.0058),
     ];
-    return new THREE.LatheGeometry(profile, 28);
+    return new THREE.LatheGeometry(profile, 32);
   }, []);
-  // Wrapped AROUND the tube just below its top edge — not perched above it.
-  const collarPos = useMemo(
-    () => stTop.clone().addScaledVector(stAxis, -0.004),
+  // ST top end is at stTop + stAxis*0.018; tuck the base just inside it.
+  const seatCapPos = useMemo(
+    () => stTop.clone().addScaledVector(stAxis, 0.016),
     [stTop, stAxis],
   );
 
   return (
     <group>
       <PaintedPart geometry={bbShellGeo} position={bb} zone="downTube" />
-      <PaintedPart geometry={collarGeo} position={collarPos} quaternion={clusterQuat} zone="seatTube" />
+      <PaintedPart geometry={topCapGeo} position={topCapPos} quaternion={steererQuat} zone="headTube" />
+      <PaintedPart geometry={seatCapGeo} position={seatCapPos} quaternion={seatQuat} zone="seatTube" />
 
       <Dropout hub={rearHub} z={halfStayRear} zone="chainStays" />
       <Dropout hub={rearHub} z={-halfStayRear} zone="chainStays" />
@@ -90,7 +126,7 @@ function PaintedPart({
   useEffect(() => () => geometry.dispose(), [geometry]);
   return (
     <mesh geometry={geometry} position={position.toArray()} quaternion={quaternion} receiveShadow>
-      <ZonePaintedMaterial zone={zone} />
+      <ZonePaintedMaterial zone={zone} baseOnly />
     </mesh>
   );
 }
@@ -131,7 +167,7 @@ function Dropout({
   return (
     <group position={[hub.x, hub.y, z]}>
       <mesh geometry={bodyGeo} receiveShadow>
-        <ZonePaintedMaterial zone={zone} />
+        <ZonePaintedMaterial zone={zone} baseOnly />
       </mesh>
       <mesh geometry={capGeo} position={[0, 0, sign * 0.0085]} rotation={[Math.PI / 2, 0, 0]}>
         <meshStandardMaterial color="#2e2e2e" roughness={0.4} metalness={0.85} />
