@@ -81,6 +81,8 @@ export function LayerStack() {
       color: '#ffffff',
       scale: 10,
       rotation: 0,
+      rotationX: 0,
+      rotationY: 0,
       intensity: 1,
       visible: true,
       opacity: 1,

@@ -72,6 +72,32 @@ export function PatternLayerEditor({ layer, zoneId }: Props) {
         />
       </label>
       <label className="text-xs text-neutral-400 flex flex-col gap-1">
+        {t('rotationX')} {(layer.rotationX ?? 0).toFixed(0)}°
+        <input
+          type="range"
+          min={-80}
+          max={80}
+          step={1}
+          value={layer.rotationX ?? 0}
+          onChange={(e) =>
+            updateLayer(zoneId, layer.id, { rotationX: parseFloat(e.target.value) })
+          }
+        />
+      </label>
+      <label className="text-xs text-neutral-400 flex flex-col gap-1">
+        {t('rotationY')} {(layer.rotationY ?? 0).toFixed(0)}°
+        <input
+          type="range"
+          min={-80}
+          max={80}
+          step={1}
+          value={layer.rotationY ?? 0}
+          onChange={(e) =>
+            updateLayer(zoneId, layer.id, { rotationY: parseFloat(e.target.value) })
+          }
+        />
+      </label>
+      <label className="text-xs text-neutral-400 flex flex-col gap-1">
         {t('intensity')} {Math.round(layer.intensity * 100)}%
         <input
           type="range"

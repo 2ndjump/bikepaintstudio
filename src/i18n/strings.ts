@@ -35,6 +35,8 @@ export type I18nKey =
   | 'background'
   | 'scale'
   | 'rotation'
+  | 'rotationX'
+  | 'rotationY'
   | 'rotationShort'
   | 'intensity'
   | 'brightness'
@@ -114,6 +116,8 @@ const STRINGS: Record<I18nKey, Record<Lang, string>> = {
   background: { de: 'Hintergrund', en: 'Background' },
   scale: { de: 'Scale', en: 'Scale' },
   rotation: { de: 'Rotation', en: 'Rotation' },
+  rotationX: { de: 'Rotation X', en: 'Rotation X' },
+  rotationY: { de: 'Rotation Y', en: 'Rotation Y' },
   rotationShort: { de: 'Rot', en: 'Rot' },
   intensity: { de: 'Intensität', en: 'Intensity' },
   brightness: { de: 'Helligkeit', en: 'Brightness' },

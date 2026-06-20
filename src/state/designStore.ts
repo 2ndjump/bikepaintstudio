@@ -31,6 +31,9 @@ function migrateLayer(layer: Layer): Layer {
   if (layer.type === 'decal') {
     return { letterSpacing: 0, glyphRotation: 0, ...layer };
   }
+  if (layer.type === 'pattern') {
+    return { rotationX: 0, rotationY: 0, ...layer };
+  }
   return layer;
 }
 

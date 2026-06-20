@@ -96,6 +96,10 @@ export interface PatternLayer extends LayerBase {
   color: string;
   scale: number;
   rotation: number;
+  /** Out-of-plane tilt (degrees) around the X and Y axes — a 3D-style
+   *  perspective tilt on top of the in-plane `rotation`. */
+  rotationX: number;
+  rotationY: number;
   intensity: number;
 }
 

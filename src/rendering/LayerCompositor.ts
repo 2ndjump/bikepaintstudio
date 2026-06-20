@@ -252,12 +252,18 @@ export class ZoneCompositor {
     const cx = w / 2;
     const cy = h / 2;
 
+    const rx = ((layer.rotationX ?? 0) * Math.PI) / 180;
+    const ry = ((layer.rotationY ?? 0) * Math.PI) / 180;
+
     ctx.translate(cx, cy);
+    // Out-of-plane X/Y tilt as a shear (perspective-style), then in-plane spin.
+    if (rx !== 0 || ry !== 0) ctx.transform(1, Math.tan(rx), Math.tan(ry), 1, 0, 0);
     ctx.rotate((layer.rotation * Math.PI) / 180);
     ctx.translate(-cx, -cy);
 
     ctx.fillStyle = pattern;
-    ctx.fillRect(-w, -h, w * 3, h * 3);
+    // Generous overdraw so the sheared/rotated fill still covers the canvas.
+    ctx.fillRect(-w * 2, -h * 2, w * 5, h * 5);
   }
 
   private async drawImage(layer: ImageLayer) {

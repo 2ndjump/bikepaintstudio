@@ -38,6 +38,8 @@ function layerToXML(layer: Layer, indent: string): string {
         attr('color', layer.color) +
         attr('scale', layer.scale) +
         attr('rotation', layer.rotation) +
+        attr('rotationX', layer.rotationX) +
+        attr('rotationY', layer.rotationY) +
         attr('intensity', layer.intensity) +
         ' />'
       );
@@ -148,6 +150,8 @@ function parseLayer(el: Element): Layer | null {
         color: str(el, 'color', '#ffffff'),
         scale: num(el, 'scale', 10),
         rotation: num(el, 'rotation', 0),
+        rotationX: num(el, 'rotationX', 0),
+        rotationY: num(el, 'rotationY', 0),
         intensity: num(el, 'intensity', 1),
       };
     case 'image': {
