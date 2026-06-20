@@ -5,7 +5,7 @@ import type { BlendMode, Layer } from '../../state/types';
 import { PatternLayerEditor } from '../LayerTypes/PatternLayer';
 import { ImageLayerEditor } from '../LayerTypes/ImageLayer';
 import { DecalLayerEditor } from '../LayerTypes/DecalLayer';
-import { DistortionLayerEditor } from '../LayerTypes/DistortionLayer';
+import { EffectEditor } from '../LayerTypes/EffectEditor';
 import { useT } from '../../i18n/useT';
 
 const EMPTY_LAYERS: Layer[] = [];
@@ -150,21 +150,6 @@ export function LayerStack() {
     addLayer(activeZone, layer);
   }
 
-  function addDistortion() {
-    const layer: Layer = {
-      id: newLayerId('dist'),
-      name: t('addDistortion').replace('+ ', ''),
-      type: 'distortion',
-      kind: 'gaussian',
-      amount: 6,
-      angle: 0,
-      visible: true,
-      opacity: 1,
-      blendMode: 'normal',
-    };
-    addLayer(activeZone, layer);
-  }
-
   return (
     <div className="space-y-3">
       <div className="m3-section-title">{t('layers')}</div>
@@ -173,7 +158,6 @@ export function LayerStack() {
         <button className="btn-mini" onClick={addPattern}>{t('addPattern')}</button>
         <button className="btn-mini" onClick={addImage}>{t('addImage')}</button>
         <button className="btn-mini" onClick={addDecal}>{t('addText')}</button>
-        <button className="btn-mini" onClick={addDistortion}>{t('addDistortion')}</button>
       </div>
 
       <div className="space-y-2">
@@ -278,9 +262,10 @@ export function LayerStack() {
             {layer.type === 'decal' && (
               <DecalLayerEditor layer={layer} zoneId={activeZone} />
             )}
-            {layer.type === 'distortion' && (
-              <DistortionLayerEditor layer={layer} zoneId={activeZone} />
-            )}
+
+            <div className="pt-1 border-t border-[var(--md-outline-variant)]">
+              <EffectEditor layer={layer} zoneId={activeZone} />
+            </div>
           </div>
         ))}
       </div>

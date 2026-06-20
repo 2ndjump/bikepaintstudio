@@ -1,14 +1,58 @@
 import type {
   BlendMode,
   DecalLayer,
-  DistortionLayer,
   ImageLayer,
   Layer,
+  LayerEffect,
   PatternLayer,
   SolidColorLayer,
   ZoneId,
 } from '../state/types';
 import { renderPattern } from './patterns';
+
+/** Apply a blur/smear effect to a canvas's own pixels, in place. Opacity/blend
+ *  are handled by the caller when compositing the result. */
+function applyEffect(
+  canvas: HTMLCanvasElement,
+  ctx: CanvasRenderingContext2D,
+  effect: LayerEffect,
+): void {
+  const { kind, amount, angle } = effect;
+  if (amount <= 0) return;
+  const w = canvas.width;
+  const h = canvas.height;
+
+  const snap = document.createElement('canvas');
+  snap.width = w;
+  snap.height = h;
+  const sctx = snap.getContext('2d');
+  if (!sctx) return;
+  sctx.drawImage(canvas, 0, 0);
+
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.globalCompositeOperation = 'source-over';
+  ctx.globalAlpha = 1;
+  ctx.clearRect(0, 0, w, h);
+
+  if (kind === 'gaussian') {
+    ctx.filter = `blur(${amount}px)`;
+    ctx.drawImage(snap, 0, 0);
+    ctx.filter = 'none';
+  } else {
+    const steps = 12;
+    const rad = (angle * Math.PI) / 180;
+    const dx = Math.cos(rad);
+    const dy = Math.sin(rad);
+    ctx.globalAlpha = (1 / steps) * 1.6;
+    for (let i = 0; i < steps; i++) {
+      const t = (i / (steps - 1) - 0.5) * 2;
+      ctx.filter = kind === 'directional' ? `blur(${Math.max(0.5, amount * 0.1)}px)` : 'none';
+      ctx.drawImage(snap, dx * t * amount, dy * t * amount);
+    }
+    ctx.globalAlpha = 1;
+    ctx.filter = 'none';
+  }
+}
 
 const ZONE_CANVAS_DIMS: Record<ZoneId, { w: number; h: number }> = {
   headTube: { w: 1024, h: 1024 },
@@ -131,29 +175,65 @@ export class ZoneCompositor {
     for (const layer of layers) {
       if (!layer.visible) continue;
 
-      if (layer.type === 'distortion') {
-        this.applyDistortion(layer);
+      const effect = layer.effect;
+      if (effect && effect.amount > 0) {
+        // Render the layer to its own offscreen canvas, apply the effect to
+        // just that layer's pixels, then composite the result.
+        const off = this.getEffectCanvas();
+        const offCtx = off.ctx;
+        const prevCtx = this.ctx;
+        this.ctx = offCtx;
+        offCtx.setTransform(1, 0, 0, 1, 0, 0);
+        offCtx.globalAlpha = 1;
+        offCtx.globalCompositeOperation = 'source-over';
+        offCtx.filter = 'none';
+        offCtx.clearRect(0, 0, w, h);
+        await this.drawLayerContent(layer);
+        this.ctx = prevCtx;
+
+        applyEffect(off.canvas, offCtx, effect);
+
+        ctx.save();
+        ctx.globalAlpha = layer.opacity;
+        ctx.globalCompositeOperation = BLEND_MODE_MAP[layer.blendMode];
+        ctx.filter = 'none';
+        ctx.drawImage(off.canvas, 0, 0);
+        ctx.restore();
         continue;
       }
 
       ctx.save();
       ctx.globalAlpha = layer.opacity;
       ctx.globalCompositeOperation = BLEND_MODE_MAP[layer.blendMode];
-
-      if (layer.type === 'solid') {
-        this.drawSolid(layer);
-      } else if (layer.type === 'pattern') {
-        await this.drawPattern(layer);
-      } else if (layer.type === 'image') {
-        await this.drawImage(layer);
-      } else if (layer.type === 'decal') {
-        await this.drawDecal(layer);
-      }
-
+      await this.drawLayerContent(layer);
       ctx.restore();
     }
 
     return this.canvas;
+  }
+
+  /** Draw a layer's content (no blend/opacity — caller sets those). */
+  private async drawLayerContent(layer: Layer): Promise<void> {
+    if (layer.type === 'solid') this.drawSolid(layer);
+    else if (layer.type === 'pattern') await this.drawPattern(layer);
+    else if (layer.type === 'image') await this.drawImage(layer);
+    else if (layer.type === 'decal') await this.drawDecal(layer);
+  }
+
+  private effectCanvas?: HTMLCanvasElement;
+  private effectCtx?: CanvasRenderingContext2D;
+
+  private getEffectCanvas(): { canvas: HTMLCanvasElement; ctx: CanvasRenderingContext2D } {
+    if (!this.effectCanvas || !this.effectCtx) {
+      const c = document.createElement('canvas');
+      c.width = this.canvas.width;
+      c.height = this.canvas.height;
+      const ctx = c.getContext('2d', { willReadFrequently: true });
+      if (!ctx) throw new Error('Canvas 2D context not available');
+      this.effectCanvas = c;
+      this.effectCtx = ctx;
+    }
+    return { canvas: this.effectCanvas, ctx: this.effectCtx };
   }
 
   private drawSolid(layer: SolidColorLayer) {
@@ -290,49 +370,6 @@ export class ZoneCompositor {
     }
   }
 
-  private applyDistortion(layer: DistortionLayer) {
-    const ctx = this.ctx;
-    const w = this.canvas.width;
-    const h = this.canvas.height;
-    if (layer.amount <= 0) return;
-
-    const snap = document.createElement('canvas');
-    snap.width = w;
-    snap.height = h;
-    const sctx = snap.getContext('2d');
-    if (!sctx) return;
-    sctx.drawImage(this.canvas, 0, 0);
-
-    ctx.save();
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.globalCompositeOperation = 'source-over';
-    ctx.globalAlpha = layer.opacity;
-    ctx.clearRect(0, 0, w, h);
-
-    if (layer.kind === 'gaussian') {
-      ctx.filter = `blur(${layer.amount}px)`;
-      ctx.drawImage(snap, 0, 0);
-    } else {
-      const steps = 12;
-      const rad = (layer.angle * Math.PI) / 180;
-      const dx = Math.cos(rad);
-      const dy = Math.sin(rad);
-      const total = layer.amount;
-      ctx.globalAlpha = (layer.opacity / steps) * 1.6;
-      for (let i = 0; i < steps; i++) {
-        const t = (i / (steps - 1) - 0.5) * 2;
-        const ox = dx * t * total;
-        const oy = dy * t * total;
-        if (layer.kind === 'directional') {
-          ctx.filter = `blur(${Math.max(0.5, total * 0.1)}px)`;
-        } else {
-          ctx.filter = 'none';
-        }
-        ctx.drawImage(snap, ox, oy);
-      }
-    }
-    ctx.restore();
-  }
 }
 
 const compositors = new Map<ZoneId, ZoneCompositor>();

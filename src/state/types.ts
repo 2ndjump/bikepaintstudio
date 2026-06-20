@@ -57,12 +57,24 @@ export type BlendMode =
   | 'colorDodge'
   | 'colorBurn';
 
+export type EffectKind = 'gaussian' | 'directional' | 'motion';
+
+/** A blur/smear effect applied to a single layer's own pixels (not the layers
+ *  beneath it). Attached to any layer via LayerBase.effect. */
+export interface LayerEffect {
+  kind: EffectKind;
+  amount: number;
+  angle: number;
+}
+
 export interface LayerBase {
   id: string;
   name: string;
   visible: boolean;
   opacity: number;
   blendMode: BlendMode;
+  /** Optional per-layer effect (blur/smear). Absent = no effect. */
+  effect?: LayerEffect;
 }
 
 export interface SolidColorLayer extends LayerBase {
@@ -122,21 +134,11 @@ export interface DecalLayer extends LayerBase {
   glyphRotation: number;
 }
 
-export type DistortionKind = 'gaussian' | 'directional' | 'motion';
-
-export interface DistortionLayer extends LayerBase {
-  type: 'distortion';
-  kind: DistortionKind;
-  amount: number;
-  angle: number;
-}
-
 export type Layer =
   | SolidColorLayer
   | PatternLayer
   | ImageLayer
-  | DecalLayer
-  | DistortionLayer;
+  | DecalLayer;
 
 export interface ZoneState {
   finish: FinishType;

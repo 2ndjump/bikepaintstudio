@@ -38,9 +38,15 @@ function migrateZone(zone: Partial<ZoneState> | undefined, fallbackColor: string
   const base = makeDefaultZoneState(fallbackColor);
   if (!zone) return base;
 
+  // Drop legacy standalone 'distortion' layers — effects are now a per-layer
+  // property and there's no clean 1:1 conversion for a stack-wide distortion.
+  const rawLayers = zone.layers
+    ? zone.layers.filter((l) => (l as { type?: string }).type !== 'distortion')
+    : undefined;
+
   // Legacy designs stored the base color as the bottom-most solid layer.
   // Promote it to the dedicated baseColor field and drop it from the stack.
-  let layers = zone.layers ? zone.layers.map(migrateLayer) : base.layers;
+  let layers = rawLayers ? rawLayers.map(migrateLayer) : base.layers;
   let baseColor = zone.baseColor;
   if (baseColor === undefined && layers.length > 0 && layers[0].type === 'solid') {
     baseColor = layers[0].color;
@@ -229,11 +235,13 @@ export const useDesignStore = create<Store>((set, get) => {
             if (mirrorH) r = (180 - r + 360) % 360;
             if (mirrorV) r = (360 - r) % 360;
             clone = { ...clone, rotation: r };
-          } else if (clone.type === 'distortion') {
-            let a = clone.angle;
+          }
+          // Mirror the per-layer effect smear angle (any layer type)
+          if (clone.effect) {
+            let a = clone.effect.angle;
             if (mirrorH) a = (180 - a + 360) % 360;
             if (mirrorV) a = (360 - a) % 360;
-            clone = { ...clone, angle: a };
+            clone = { ...clone, effect: { ...clone.effect, angle: a } };
           }
         }
         const next = [...layers];

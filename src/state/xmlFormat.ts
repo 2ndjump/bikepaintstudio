@@ -21,7 +21,12 @@ function layerToXML(layer: Layer, indent: string): string {
     attr('name', layer.name) +
     attr('visible', layer.visible) +
     attr('opacity', layer.opacity) +
-    attr('blendMode', layer.blendMode);
+    attr('blendMode', layer.blendMode) +
+    (layer.effect
+      ? attr('effectKind', layer.effect.kind) +
+        attr('effectAmount', layer.effect.amount) +
+        attr('effectAngle', layer.effect.angle)
+      : '');
 
   switch (layer.type) {
     case 'solid':
@@ -69,14 +74,6 @@ function layerToXML(layer: Layer, indent: string): string {
         attr('glyphRotation', layer.glyphRotation) +
         `>\n${indent}  <text>${esc(layer.text)}</text>\n${indent}</layer>`
       );
-    case 'distortion':
-      return (
-        `${indent}<layer type="distortion"${base}` +
-        attr('kind', layer.kind) +
-        attr('amount', layer.amount) +
-        attr('angle', layer.angle) +
-        ' />'
-      );
   }
 }
 
@@ -122,12 +119,23 @@ function bool(el: Element, name: string, fallback = true): boolean {
 
 function parseLayer(el: Element): Layer | null {
   const type = el.getAttribute('type');
+  if (type === 'distortion') return null; // legacy standalone effect — dropped
+  const effectKind = el.getAttribute('effectKind');
   const base = {
     id: str(el, 'id'),
     name: str(el, 'name'),
     visible: bool(el, 'visible'),
     opacity: num(el, 'opacity', 1),
     blendMode: str(el, 'blendMode', 'normal') as Layer['blendMode'],
+    ...(effectKind
+      ? {
+          effect: {
+            kind: effectKind as import('./types').EffectKind,
+            amount: num(el, 'effectAmount', 6),
+            angle: num(el, 'effectAngle', 0),
+          },
+        }
+      : {}),
   };
   switch (type) {
     case 'solid':
@@ -181,14 +189,6 @@ function parseLayer(el: Element): Layer | null {
         glyphRotation: num(el, 'glyphRotation', 0),
       };
     }
-    case 'distortion':
-      return {
-        ...base,
-        type: 'distortion',
-        kind: str(el, 'kind', 'gaussian') as import('./types').DistortionKind,
-        amount: num(el, 'amount', 6),
-        angle: num(el, 'angle', 0),
-      };
     default:
       return null;
   }

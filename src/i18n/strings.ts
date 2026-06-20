@@ -63,6 +63,7 @@ export type I18nKey =
   | 'distortionGaussian'
   | 'distortionDirectional'
   | 'distortionMotion'
+  | 'effectNone'
   | 'amount'
   | 'angle'
   | 'patternSmoke'
@@ -141,6 +142,7 @@ const STRINGS: Record<I18nKey, Record<Lang, string>> = {
   distortionGaussian: { de: 'Weichzeichnen', en: 'Gaussian Blur' },
   distortionDirectional: { de: 'Richtungs-Blur', en: 'Directional Blur' },
   distortionMotion: { de: 'Bewegungs-Blur', en: 'Motion Blur' },
+  effectNone: { de: 'Kein', en: 'None' },
   amount: { de: 'Stärke', en: 'Amount' },
   angle: { de: 'Winkel', en: 'Angle' },
   patternSmoke: { de: 'Rauch', en: 'Smoke' },
