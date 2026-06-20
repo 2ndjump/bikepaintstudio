@@ -8,6 +8,8 @@ import { DecalLayerEditor } from '../LayerTypes/DecalLayer';
 import { DistortionLayerEditor } from '../LayerTypes/DistortionLayer';
 import { useT } from '../../i18n/useT';
 
+const EMPTY_LAYERS: Layer[] = [];
+
 const BLEND_MODES: BlendMode[] = [
   'normal',
   'multiply',
@@ -30,9 +32,9 @@ function DuplicatePopover({ layerId, onClose }: { layerId: string; onClose: () =
   }
 
   return (
-    <div className="mt-1 rounded border border-neutral-700 bg-neutral-800 p-2 space-y-1.5">
-      <div className="text-[10px] uppercase tracking-wider text-neutral-400">Duplicate options</div>
-      <label className="flex items-center gap-2 text-xs text-neutral-300 cursor-pointer">
+    <div className="m3-card-nested p-2.5 space-y-1.5">
+      <div className="m3-section-title">Duplicate options</div>
+      <label className="flex items-center gap-2 m3-label cursor-pointer">
         <input
           type="checkbox"
           checked={opts.mirrorH}
@@ -40,7 +42,7 @@ function DuplicatePopover({ layerId, onClose }: { layerId: string; onClose: () =
         />
         Mirror horizontal
       </label>
-      <label className="flex items-center gap-2 text-xs text-neutral-300 cursor-pointer">
+      <label className="flex items-center gap-2 m3-label cursor-pointer">
         <input
           type="checkbox"
           checked={opts.mirrorV}
@@ -48,17 +50,11 @@ function DuplicatePopover({ layerId, onClose }: { layerId: string; onClose: () =
         />
         Mirror vertical
       </label>
-      <div className="flex gap-1 pt-0.5">
-        <button
-          onClick={confirm}
-          className="flex-1 text-xs bg-blue-600 hover:bg-blue-500 text-white rounded px-2 py-1"
-        >
+      <div className="flex gap-1.5 pt-1">
+        <button onClick={confirm} className="m3-btn m3-btn-filled m3-btn-sm flex-1">
           Duplicate
         </button>
-        <button
-          onClick={onClose}
-          className="text-xs bg-neutral-700 hover:bg-neutral-600 text-neutral-300 rounded px-2 py-1"
-        >
+        <button onClick={onClose} className="m3-btn m3-btn-text m3-btn-sm">
           Cancel
         </button>
       </div>
@@ -68,7 +64,7 @@ function DuplicatePopover({ layerId, onClose }: { layerId: string; onClose: () =
 
 export function LayerStack() {
   const activeZone = useDesignStore((s) => s.activeZone);
-  const layers = useDesignStore((s) => s.zones[s.activeZone].layers);
+  const layers = useDesignStore((s) => s.zones[s.activeZone]?.layers ?? EMPTY_LAYERS);
   const updateLayer = useDesignStore((s) => s.updateLayer);
   const addLayer = useDesignStore((s) => s.addLayer);
   const removeLayer = useDesignStore((s) => s.removeLayer);
@@ -170,66 +166,59 @@ export function LayerStack() {
   }
 
   return (
-    <div className="space-y-2">
-      <div className="flex items-center justify-between">
-        <div className="text-xs uppercase tracking-wider text-neutral-400">
-          {t('layers')}
-        </div>
-      </div>
+    <div className="space-y-3">
+      <div className="m3-section-title">{t('layers')}</div>
 
-      <div className="flex gap-1 flex-wrap">
+      <div className="flex gap-1.5 flex-wrap">
         <button className="btn-mini" onClick={addPattern}>{t('addPattern')}</button>
         <button className="btn-mini" onClick={addImage}>{t('addImage')}</button>
         <button className="btn-mini" onClick={addDecal}>{t('addText')}</button>
         <button className="btn-mini" onClick={addDistortion}>{t('addDistortion')}</button>
       </div>
 
-      <div className="space-y-2 mt-2">
+      <div className="space-y-2">
         {[...layers].reverse().map((layer) => (
-          <div
-            key={layer.id}
-            className="rounded border border-neutral-700 bg-neutral-900/70 p-2 space-y-2"
-          >
-            <div className="flex items-center gap-2">
+          <div key={layer.id} className="m3-card-nested p-2.5 space-y-2.5">
+            <div className="flex items-center gap-1">
               <button
                 onClick={() =>
                   updateLayer(activeZone, layer.id, { visible: !layer.visible })
                 }
-                className="text-xs w-6 text-center"
+                className="m3-icon-btn m3-icon-btn-sm"
                 title={t('tooltipVisibility')}
               >
                 {layer.visible ? '●' : '○'}
               </button>
               <input
-                className="flex-1 bg-transparent text-sm outline-none border-b border-transparent hover:border-neutral-600 focus:border-blue-500"
+                className="flex-1 min-w-0 bg-transparent text-sm outline-none border-b border-transparent focus:border-[var(--md-primary)]"
                 value={layer.name}
                 onChange={(e) =>
                   updateLayer(activeZone, layer.id, { name: e.target.value })
                 }
               />
               <button
-                className="text-xs text-neutral-400 hover:text-white"
+                className="m3-icon-btn m3-icon-btn-sm"
                 onClick={() => reorderLayer(activeZone, layer.id, 1)}
                 title={t('tooltipMoveUp')}
               >
                 ▲
               </button>
               <button
-                className="text-xs text-neutral-400 hover:text-white"
+                className="m3-icon-btn m3-icon-btn-sm"
                 onClick={() => reorderLayer(activeZone, layer.id, -1)}
                 title={t('tooltipMoveDown')}
               >
                 ▼
               </button>
               <button
-                className="text-xs text-neutral-400 hover:text-blue-400"
+                className="m3-icon-btn m3-icon-btn-sm"
                 onClick={() => setDuplicatingId(duplicatingId === layer.id ? null : layer.id)}
                 title="Duplicate"
               >
                 ⧉
               </button>
               <button
-                className="text-xs text-neutral-400 hover:text-red-400"
+                className="m3-icon-btn m3-icon-btn-sm hover:text-[var(--md-error)]"
                 onClick={() => removeLayer(activeZone, layer.id)}
                 title={t('tooltipDelete')}
               >
@@ -245,7 +234,7 @@ export function LayerStack() {
             )}
 
             <div className="grid grid-cols-2 gap-2">
-              <label className="text-xs text-neutral-400 flex flex-col gap-1">
+              <label className="m3-label flex flex-col gap-1">
                 Blend
                 <select
                   value={layer.blendMode}
@@ -254,7 +243,7 @@ export function LayerStack() {
                       blendMode: e.target.value as BlendMode,
                     })
                   }
-                  className="bg-neutral-800 text-neutral-100 text-xs rounded px-1 py-0.5 border border-neutral-700"
+                  className="m3-field"
                 >
                   {BLEND_MODES.map((m) => (
                     <option key={m} value={m}>
@@ -263,7 +252,7 @@ export function LayerStack() {
                   ))}
                 </select>
               </label>
-              <label className="text-xs text-neutral-400 flex flex-col gap-1">
+              <label className="m3-label flex flex-col gap-1">
                 Opacity {Math.round(layer.opacity * 100)}%
                 <input
                   type="range"

@@ -25,6 +25,7 @@ dist-ssr
 
 # Debug / session artifacts
 /*.png
+screenshots/
 .playwright-mcp/
 
 # Per-user Claude Code config (project-shared config goes in .claude/settings.json or .mcp.json instead)

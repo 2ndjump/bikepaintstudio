@@ -59,8 +59,14 @@ function migrateZone(zone: Partial<ZoneState> | undefined, fallbackColor: string
 }
 
 function migrateDesign(state: DesignState): DesignState {
+  // Legacy designs split the fork into 'forkLegs' + 'forkCrown'; both now map
+  // to the single 'fork' zone (prefer the old legs as the merged source).
+  const legacy = (state.zones ?? {}) as Record<string, Partial<ZoneState> | undefined>;
   const zones = Object.fromEntries(
-    ALL_ZONES.map((z) => [z, migrateZone(state.zones?.[z], '#cccccc')]),
+    ALL_ZONES.map((z) => {
+      const src = legacy[z] ?? (z === 'fork' ? legacy.forkLegs ?? legacy.forkCrown : undefined);
+      return [z, migrateZone(src, '#cccccc')];
+    }),
   ) as Record<ZoneId, ZoneState>;
   return {
     activeZone: state.activeZone && ALL_ZONES.includes(state.activeZone) ? state.activeZone : 'topTube',
@@ -81,8 +87,7 @@ const DEFAULT_ZONE_COLORS: Record<ZoneId, string> = {
   seatTube: '#888888',
   seatStays: '#888888',
   chainStays: '#888888',
-  forkLegs: '#888888',
-  forkCrown: '#888888',
+  fork: '#888888',
   frontRim: '#1a1a1a',
   rearRim: '#1a1a1a',
 };

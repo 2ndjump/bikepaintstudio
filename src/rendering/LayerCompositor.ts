@@ -17,8 +17,7 @@ const ZONE_CANVAS_DIMS: Record<ZoneId, { w: number; h: number }> = {
   seatTube: { w: 256, h: 1024 },
   seatStays: { w: 160, h: 1024 },
   chainStays: { w: 224, h: 1024 },
-  forkCrown: { w: 1024, h: 256 },
-  forkLegs: { w: 224, h: 1024 },
+  fork: { w: 256, h: 1024 },
   frontRim: { w: 2048, h: 128 },
   rearRim: { w: 2048, h: 128 },
 };

@@ -7,11 +7,9 @@ export function RimPanel() {
   const t = useT();
 
   return (
-    <div className="space-y-2">
-      <div className="text-xs uppercase tracking-wider text-neutral-400">
-        {t('rimGeometry')}
-      </div>
-      <label className="text-xs text-neutral-400 flex flex-col gap-1">
+    <div className="space-y-2.5">
+      <div className="m3-section-title">{t('rimGeometry')}</div>
+      <label className="m3-label flex flex-col gap-1">
         {t('depth')} {rim.depth}mm
         <input
           type="range"
@@ -22,7 +20,7 @@ export function RimPanel() {
           onChange={(e) => setRim({ depth: parseFloat(e.target.value) })}
         />
       </label>
-      <label className="text-xs text-neutral-400 flex flex-col gap-1">
+      <label className="m3-label flex flex-col gap-1">
         {t('width')} {rim.width}mm
         <input
           type="range"
@@ -33,7 +31,7 @@ export function RimPanel() {
           onChange={(e) => setRim({ width: parseFloat(e.target.value) })}
         />
       </label>
-      <label className="text-xs text-neutral-400 flex flex-col gap-1">
+      <label className="m3-label flex flex-col gap-1">
         {t('spokes')} {rim.spokeCount}
         <input
           type="range"

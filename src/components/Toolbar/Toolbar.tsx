@@ -113,11 +113,12 @@ export function Toolbar() {
   const langOptions: Lang[] = ['de', 'en'];
 
   return (
-    <div className="flex items-center gap-2 px-4 py-2 bg-neutral-950 border-b border-neutral-800">
-      <h1 className="text-sm font-semibold tracking-wide text-neutral-100">
-        Bike Paint Studio
-      </h1>
-      <div className="flex-1" />
+    <header
+      className="flex items-center flex-wrap gap-x-2 gap-y-2 px-3 sm:px-4 py-2 m3-panel"
+      style={{ borderBottom: '1px solid var(--md-outline-variant)' }}
+    >
+      <h1 className="m3-title text-base mr-1">Bike Paint Studio</h1>
+      <div className="flex-1 min-w-0" />
 
       <SegmentedControl>
         {bgOptions.map((opt) => (
@@ -133,55 +134,51 @@ export function Toolbar() {
 
       <SegmentedControl>
         {langOptions.map((l) => (
-          <SegmentButton
-            key={l}
-            active={lang === l}
-            onClick={() => setLang(l)}
-          >
+          <SegmentButton key={l} active={lang === l} onClick={() => setLang(l)}>
             {l.toUpperCase()}
           </SegmentButton>
         ))}
       </SegmentedControl>
 
-      <button
-        className="btn-mini disabled:opacity-40"
-        onClick={undo}
-        disabled={pastLen === 0}
-        title="Ctrl+Z"
-      >
-        ↶ {t('undo')}
-      </button>
-      <button
-        className="btn-mini disabled:opacity-40"
-        onClick={redo}
-        disabled={futureLen === 0}
-        title="Ctrl+Shift+Z"
-      >
-        ↷ {t('redo')}
-      </button>
+      <div className="m3-segmented" role="group" aria-label="history">
+        <button className="m3-seg" onClick={undo} disabled={pastLen === 0} title="Ctrl+Z">
+          ↶
+        </button>
+        <button className="m3-seg" onClick={redo} disabled={futureLen === 0} title="Ctrl+Shift+Z">
+          ↷
+        </button>
+      </div>
 
-      <button className="btn-mini" onClick={exportPNG}>
+      <button className="m3-btn m3-btn-tonal m3-btn-sm" onClick={exportPNG}>
         {t('pngExport')}
       </button>
-      <button className="btn-mini" onClick={exportJSON}>
+      <button className="m3-btn m3-btn-tonal m3-btn-sm" onClick={exportJSON}>
         {t('save')}
       </button>
-      <button className="btn-mini" onClick={importJSON}>
+      <button className="m3-btn m3-btn-tonal m3-btn-sm" onClick={importJSON}>
         {t('load')}
       </button>
-      <button className="btn-mini" onClick={exportXML} title="Export as human-readable XML">
+      <button
+        className="m3-btn m3-btn-outlined m3-btn-sm"
+        onClick={exportXML}
+        title="Export as human-readable XML"
+      >
         XML ↓
       </button>
-      <button className="btn-mini" onClick={importXML} title="Import from XML">
+      <button
+        className="m3-btn m3-btn-outlined m3-btn-sm"
+        onClick={importXML}
+        title="Import from XML"
+      >
         XML ↑
       </button>
-    </div>
+    </header>
   );
 }
 
 function SegmentedControl({ children }: { children: React.ReactNode }) {
   return (
-    <div className="inline-flex rounded border border-neutral-700 overflow-hidden">
+    <div className="m3-segmented" role="group">
       {children}
     </div>
   );
@@ -197,14 +194,7 @@ function SegmentButton({
   children: React.ReactNode;
 }) {
   return (
-    <button
-      onClick={onClick}
-      className={`px-2 py-1 text-xs transition ${
-        active
-          ? 'bg-blue-600 text-white'
-          : 'bg-neutral-900 text-neutral-300 hover:bg-neutral-800'
-      }`}
-    >
+    <button onClick={onClick} className={`m3-seg ${active ? 'm3-seg-active' : ''}`}>
       {children}
     </button>
   );

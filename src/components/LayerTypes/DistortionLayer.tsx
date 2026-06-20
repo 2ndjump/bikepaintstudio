@@ -27,7 +27,7 @@ export function DistortionLayerEditor({ layer, zoneId }: Props) {
           onChange={(e) =>
             updateLayer(zoneId, layer.id, { kind: e.target.value as DistortionKind })
           }
-          className="bg-neutral-800 text-neutral-100 text-xs rounded px-2 py-1 border border-neutral-700"
+          className="m3-field"
         >
           {KINDS.map((k) => (
             <option key={k.value} value={k.value}>

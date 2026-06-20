@@ -104,8 +104,8 @@ export function Fillets({ anchors }: Props) {
 
       <Dropout hub={rearHub} z={halfStayRear} zone="chainStays" />
       <Dropout hub={rearHub} z={-halfStayRear} zone="chainStays" />
-      <Dropout hub={frontHub} z={halfStayFront} zone="forkLegs" small />
-      <Dropout hub={frontHub} z={-halfStayFront} zone="forkLegs" small />
+      <Dropout hub={frontHub} z={halfStayFront} zone="fork" small />
+      <Dropout hub={frontHub} z={-halfStayFront} zone="fork" small />
     </group>
   );
 }

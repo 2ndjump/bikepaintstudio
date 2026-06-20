@@ -1,37 +1,316 @@
 @import "tailwindcss";
 
+/* ============================================================
+   Material 3 (Material You) — dark scheme tokens
+   ============================================================ */
+:root {
+  /* Primary */
+  --md-primary: #a8c7fa;
+  --md-on-primary: #0a305f;
+  --md-primary-container: #284777;
+  --md-on-primary-container: #d6e3ff;
+
+  /* Secondary / tertiary containers (used for tonal/selected states) */
+  --md-secondary-container: #3b4858;
+  --md-on-secondary-container: #d7e3f7;
+  --md-tertiary-container: #5c3f5d;
+  --md-on-tertiary-container: #fdd7fa;
+
+  /* Surfaces (dark) — increasing elevation */
+  --md-surface: #111418;
+  --md-surface-dim: #111418;
+  --md-surface-container-lowest: #0b0e12;
+  --md-surface-container-low: #191c20;
+  --md-surface-container: #1d2125;
+  --md-surface-container-high: #282a2f;
+  --md-surface-container-highest: #33353a;
+
+  /* Content */
+  --md-on-surface: #e2e2e6;
+  --md-on-surface-variant: #c3c7cf;
+  --md-outline: #8d9199;
+  --md-outline-variant: #42474e;
+
+  --md-error: #ffb4ab;
+
+  /* Shape */
+  --md-radius-xs: 4px;
+  --md-radius-sm: 8px;
+  --md-radius-md: 12px;
+  --md-radius-lg: 16px;
+  --md-radius-xl: 28px;
+  --md-radius-full: 999px;
+}
+
 html, body, #root {
+  width: 100%;
   height: 100%;
   margin: 0;
-  background: #0b0d11;
-  color: #e5e7eb;
-  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  background: var(--md-surface);
+  color: var(--md-on-surface);
+  font-family: "Roboto", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   overscroll-behavior: none;
 }
+body { overflow: hidden; }
 
 canvas {
   display: block;
   touch-action: none;
 }
 
-.btn-mini {
-  background: #1f2937;
-  color: #e5e7eb;
-  font-size: 12px;
-  padding: 4px 10px;
-  border-radius: 4px;
-  border: 1px solid #374151;
-  transition: background 0.1s;
-  cursor: pointer;
+/* ---- Scrollbars ---- */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--md-outline-variant) transparent;
 }
-.btn-mini:hover {
-  background: #374151;
+*::-webkit-scrollbar { width: 8px; height: 8px; }
+*::-webkit-scrollbar-thumb {
+  background: var(--md-outline-variant);
+  border-radius: var(--md-radius-full);
+}
+*::-webkit-scrollbar-thumb:hover { background: var(--md-outline); }
+
+/* Component classes live in the `components` layer so Tailwind utilities
+   (e.g. responsive `lg:hidden`) can still override them. */
+@layer components {
+
+/* ============================================================
+   Typography helpers
+   ============================================================ */
+.m3-title { font-size: 1.125rem; font-weight: 500; letter-spacing: 0; color: var(--md-on-surface); }
+.m3-section-title {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--md-on-surface-variant);
+}
+.m3-label { font-size: 0.75rem; color: var(--md-on-surface-variant); }
+.m3-body { font-size: 0.875rem; color: var(--md-on-surface); }
+
+/* ============================================================
+   Surfaces / cards
+   ============================================================ */
+.m3-card {
+  background: var(--md-surface-container-low);
+  border: 1px solid var(--md-outline-variant);
+  border-radius: var(--md-radius-lg);
+  padding: 0.875rem;
+}
+.m3-card-nested {
+  background: var(--md-surface-container);
+  border: 1px solid var(--md-outline-variant);
+  border-radius: var(--md-radius-md);
 }
 
-input[type="range"] {
-  accent-color: #3b82f6;
-}
-input[type="color"] {
+/* ============================================================
+   Buttons
+   ============================================================ */
+.m3-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  height: 2.25rem;
+  padding: 0 0.9rem;
+  border-radius: var(--md-radius-full);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
   cursor: pointer;
-  padding: 0;
+  border: 1px solid transparent;
+  transition: background-color 0.15s, box-shadow 0.15s, color 0.15s, opacity 0.15s;
+  user-select: none;
 }
+.m3-btn:disabled { opacity: 0.38; cursor: default; pointer-events: none; }
+
+.m3-btn-filled { background: var(--md-primary); color: var(--md-on-primary); }
+.m3-btn-filled:hover { box-shadow: 0 1px 3px rgba(0,0,0,0.5); filter: brightness(1.05); }
+
+.m3-btn-tonal { background: var(--md-secondary-container); color: var(--md-on-secondary-container); }
+.m3-btn-tonal:hover { filter: brightness(1.12); }
+
+.m3-btn-outlined { background: transparent; color: var(--md-primary); border-color: var(--md-outline); }
+.m3-btn-outlined:hover { background: color-mix(in srgb, var(--md-primary) 8%, transparent); }
+
+.m3-btn-text { background: transparent; color: var(--md-primary); padding: 0 0.75rem; }
+.m3-btn-text:hover { background: color-mix(in srgb, var(--md-primary) 8%, transparent); }
+
+/* Small variant (compact toolbars / add-layer row) */
+.m3-btn-sm { height: 1.875rem; padding: 0 0.7rem; font-size: 0.75rem; }
+
+/* Icon button (round) */
+.m3-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: var(--md-radius-full);
+  color: var(--md-on-surface-variant);
+  background: transparent;
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.15s, color 0.15s, opacity 0.15s;
+}
+.m3-icon-btn:hover { background: color-mix(in srgb, var(--md-on-surface) 8%, transparent); color: var(--md-on-surface); }
+.m3-icon-btn:disabled { opacity: 0.38; cursor: default; pointer-events: none; }
+.m3-icon-btn-sm { width: 1.75rem; height: 1.75rem; font-size: 0.75rem; }
+
+/* Legacy alias — keep .btn-mini working with the new look */
+.btn-mini {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: var(--md-secondary-container);
+  color: var(--md-on-secondary-container);
+  font-size: 0.75rem;
+  padding: 0.4rem 0.8rem;
+  border-radius: var(--md-radius-full);
+  border: none;
+  cursor: pointer;
+  transition: filter 0.15s, opacity 0.15s;
+}
+.btn-mini:hover { filter: brightness(1.12); }
+
+/* ============================================================
+   Segmented button (M3)
+   ============================================================ */
+.m3-segmented {
+  display: inline-flex;
+  border: 1px solid var(--md-outline);
+  border-radius: var(--md-radius-full);
+  overflow: hidden;
+  height: 2rem;
+}
+.m3-seg {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 0.8rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--md-on-surface-variant);
+  background: transparent;
+  border: none;
+  border-left: 1px solid var(--md-outline);
+  cursor: pointer;
+  transition: background-color 0.15s, color 0.15s;
+}
+.m3-seg:first-child { border-left: none; }
+.m3-seg:hover { background: color-mix(in srgb, var(--md-on-surface) 8%, transparent); }
+.m3-seg-active { background: var(--md-secondary-container); color: var(--md-on-secondary-container); }
+
+/* ============================================================
+   Chips (zones, choices)
+   ============================================================ */
+.m3-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.75rem;
+  border-radius: var(--md-radius-sm);
+  border: 1px solid var(--md-outline-variant);
+  background: transparent;
+  color: var(--md-on-surface-variant);
+  font-size: 0.8125rem;
+  cursor: pointer;
+  transition: background-color 0.15s, color 0.15s, border-color 0.15s;
+}
+.m3-chip:hover { background: color-mix(in srgb, var(--md-on-surface) 6%, transparent); }
+.m3-chip-active {
+  background: var(--md-secondary-container);
+  color: var(--md-on-secondary-container);
+  border-color: transparent;
+}
+
+/* ============================================================
+   Form fields
+   ============================================================ */
+.m3-field {
+  width: 100%;
+  background: var(--md-surface-container-high);
+  color: var(--md-on-surface);
+  border: 1px solid var(--md-outline-variant);
+  border-radius: var(--md-radius-sm);
+  padding: 0.45rem 0.6rem;
+  font-size: 0.8125rem;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.m3-field:focus { border-color: var(--md-primary); }
+select.m3-field { cursor: pointer; }
+
+} /* end @layer components */
+
+/* ---- Range slider (element base) ---- */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 1.25rem;
+  background: transparent;
+  cursor: pointer;
+}
+input[type="range"]::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: var(--md-radius-full);
+  background: var(--md-surface-container-highest);
+}
+input[type="range"]::-moz-range-track {
+  height: 4px;
+  border-radius: var(--md-radius-full);
+  background: var(--md-surface-container-highest);
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  margin-top: -6px;
+  border-radius: 50%;
+  background: var(--md-primary);
+  border: none;
+  box-shadow: 0 0 0 0 color-mix(in srgb, var(--md-primary) 30%, transparent);
+  transition: box-shadow 0.12s;
+}
+input[type="range"]::-webkit-slider-thumb:hover { box-shadow: 0 0 0 6px color-mix(in srgb, var(--md-primary) 22%, transparent); }
+input[type="range"]::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--md-primary);
+  border: none;
+}
+
+input[type="color"] { cursor: pointer; padding: 0; }
+
+/* ============================================================
+   FAB (mobile control toggle) + panels
+   ============================================================ */
+@layer components {
+.m3-fab {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  height: 3.25rem;
+  padding: 0 1.25rem;
+  border-radius: var(--md-radius-lg);
+  background: var(--md-primary-container);
+  color: var(--md-on-primary-container);
+  font-size: 0.875rem;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.45);
+  transition: filter 0.15s;
+}
+.m3-fab:hover { filter: brightness(1.1); }
+
+.m3-panel {
+  background: var(--md-surface-container-low);
+}
+.m3-scrim { background: rgba(0, 0, 0, 0.5); }
+
+} /* end @layer components */

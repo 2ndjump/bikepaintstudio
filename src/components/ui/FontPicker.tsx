@@ -85,7 +85,7 @@ export function FontPicker({ value, options, onChange }: Props) {
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="w-full flex items-center justify-between gap-2 bg-neutral-800 hover:bg-neutral-700 text-neutral-100 rounded px-2 py-1.5 border border-neutral-700 text-sm"
+        className="m3-field flex items-center justify-between gap-2 text-sm"
         style={{ fontFamily: `'${value}', sans-serif` }}
       >
         <span className="truncate">{value}</span>
@@ -93,15 +93,21 @@ export function FontPicker({ value, options, onChange }: Props) {
       </button>
 
       {open && (
-        <div className="absolute z-50 left-0 right-0 mt-1 rounded border border-neutral-700 bg-neutral-800 shadow-2xl overflow-hidden">
-          <div className="p-1.5 border-b border-neutral-700">
+        <div
+          className="absolute z-50 left-0 right-0 mt-1 rounded-xl shadow-2xl overflow-hidden"
+          style={{
+            background: 'var(--md-surface-container-high)',
+            border: '1px solid var(--md-outline-variant)',
+          }}
+        >
+          <div className="p-1.5" style={{ borderBottom: '1px solid var(--md-outline-variant)' }}>
             <input
               ref={searchRef}
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search fonts…"
-              className="w-full bg-neutral-900 text-neutral-100 text-xs rounded px-2 py-1 outline-none border border-neutral-700 placeholder:text-neutral-500"
+              className="m3-field text-xs"
             />
           </div>
           <div className="max-h-56 overflow-y-auto">

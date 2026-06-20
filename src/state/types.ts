@@ -5,8 +5,7 @@ export type ZoneId =
   | 'seatTube'
   | 'seatStays'
   | 'chainStays'
-  | 'forkLegs'
-  | 'forkCrown'
+  | 'fork'
   | 'frontRim'
   | 'rearRim';
 
@@ -17,8 +16,7 @@ export const ALL_ZONES: ZoneId[] = [
   'seatTube',
   'seatStays',
   'chainStays',
-  'forkLegs',
-  'forkCrown',
+  'fork',
   'frontRim',
   'rearRim',
 ];
@@ -30,8 +28,7 @@ export const ZONE_LABELS: Record<ZoneId, string> = {
   seatTube: 'Seat Tube',
   seatStays: 'Seat Stays',
   chainStays: 'Chain Stays',
-  forkLegs: 'Fork Legs',
-  forkCrown: 'Fork Crown',
+  fork: 'Fork',
   frontRim: 'Front Rim',
   rearRim: 'Rear Rim',
 };
@@ -43,8 +40,7 @@ export const ZONES_PARAMETRIC: ZoneId[] = [
   'seatTube',
   'seatStays',
   'chainStays',
-  'forkLegs',
-  'forkCrown',
+  'fork',
   'frontRim',
   'rearRim',
 ];

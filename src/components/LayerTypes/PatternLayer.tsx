@@ -30,7 +30,7 @@ export function PatternLayerEditor({ layer, zoneId }: Props) {
             pattern: e.target.value as PatternKind,
           })
         }
-        className="w-full bg-neutral-800 text-neutral-100 text-xs rounded px-2 py-1 border border-neutral-700"
+        className="m3-field"
       >
         {PATTERNS.map((p) => (
           <option key={p.value} value={p.value}>

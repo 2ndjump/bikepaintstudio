@@ -3,7 +3,7 @@ import { useDesignStore } from '../../state/designStore';
 import { finishParams } from '../../rendering/finish';
 import { useZoneTexture } from '../../rendering/useZoneTexture';
 import { ChameleonMaterial } from '../../rendering/ChameleonMaterial';
-import type { ZoneId } from '../../state/types';
+import { DEFAULT_CHAMELEON_COLORS, type ZoneId } from '../../state/types';
 
 interface Props {
   zone: ZoneId;
@@ -35,9 +35,11 @@ interface Props {
  * true to the colour the user chose.
  */
 export function ZonePaintedMaterial({ zone, side, baseOnly }: Props) {
-  const finish = useDesignStore((s) => s.zones[zone].finish);
-  const chameleonColors = useDesignStore((s) => s.zones[zone].chameleonColors);
-  const baseColor = useDesignStore((s) => s.zones[zone].baseColor);
+  const finish = useDesignStore((s) => s.zones[zone]?.finish ?? 'matte');
+  const chameleonColors = useDesignStore(
+    (s) => s.zones[zone]?.chameleonColors ?? DEFAULT_CHAMELEON_COLORS,
+  );
+  const baseColor = useDesignStore((s) => s.zones[zone]?.baseColor ?? '#888888');
   const texture = useZoneTexture(zone);
   const fp = finishParams(finish);
 

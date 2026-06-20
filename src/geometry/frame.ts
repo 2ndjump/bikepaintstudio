@@ -273,7 +273,7 @@ export function buildBikeFrame(geo: BikeGeo = ROAD_GEO): FrameGeometryDesc {
     // ── Fork crown ── flows out of the head tube bottom and spreads laterally
     // into the blades. Bottom width must fully cover the blade roots.
     {
-      zone: 'forkCrown',
+      zone: 'fork',
       path: [crownTop.clone(), crownBot.clone()],
       // Top matches the head-tube/steerer diameter at htBot (~0.024, slightly
       // oval fore-aft) for a flush transition, then flares to the wide bottom
@@ -292,7 +292,7 @@ export function buildBikeFrame(geo: BikeGeo = ROAD_GEO): FrameGeometryDesc {
     // bottom edge — enough to be capped, but not poking up into the narrowing
     // cone where they'd overlap through the crown wall.
     ...([1, -1] as const).map((side): TubeDesc => ({
-      zone: 'forkLegs',
+      zone: 'fork',
       path: [
         // Top pushed out to z ±31mm so the blade's outer line sits flush with
         // the crown's lower-diameter edge, and ended right at the crown's

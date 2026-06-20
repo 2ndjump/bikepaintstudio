@@ -49,7 +49,7 @@ export function DecalLayerEditor({ layer, zoneId }: Props) {
         value={layer.text}
         onChange={(e) => updateLayer(zoneId, layer.id, { text: e.target.value })}
         placeholder={t('text')}
-        className="w-full bg-neutral-800 text-neutral-100 text-sm rounded px-2 py-1 border border-neutral-700"
+        className="m3-field text-sm"
       />
       <FontPicker
         value={layer.font}
@@ -62,7 +62,7 @@ export function DecalLayerEditor({ layer, zoneId }: Props) {
           <button
             type="button"
             onClick={() => requestSystemFonts()}
-            className="flex-1 bg-neutral-800 hover:bg-neutral-700 text-neutral-200 text-xs rounded px-2 py-1 border border-neutral-700"
+            className="m3-btn m3-btn-tonal m3-btn-sm flex-1"
           >
             {t('requestSystemFonts')}
           </button>

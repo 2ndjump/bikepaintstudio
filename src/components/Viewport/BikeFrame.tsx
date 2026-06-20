@@ -37,8 +37,8 @@ function buildTubeGeometry(tube: TubeDesc): THREE.BufferGeometry {
     // end that peeks — so matte/satin can stay fully lit.
     caps: false,
     // Hide the UV seam on the underside so decals stay clear of the cut. The
-    // fork legs/crown keep the original wrap (down-projection rotates them ~90°).
-    seamDown: tube.zone !== 'forkLegs' && tube.zone !== 'forkCrown',
+    // fork keeps the original wrap (down-projection rotates its blades ~90°).
+    seamDown: tube.zone !== 'fork',
   });
 }
 
