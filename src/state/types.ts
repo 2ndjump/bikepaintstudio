@@ -138,11 +138,27 @@ export interface DecalLayer extends LayerBase {
   glyphRotation: number;
 }
 
+export type ShapeKind = 'rectangle' | 'triangle' | 'circle';
+
+export interface ShapeLayer extends LayerBase {
+  type: 'shape';
+  shape: ShapeKind;
+  color: string;
+  /** Centre position, 0..1 of the zone canvas. */
+  x: number;
+  y: number;
+  /** Size as a fraction of the canvas' smaller dimension. */
+  width: number;
+  height: number;
+  rotation: number;
+}
+
 export type Layer =
   | SolidColorLayer
   | PatternLayer
   | ImageLayer
-  | DecalLayer;
+  | DecalLayer
+  | ShapeLayer;
 
 export interface ZoneState {
   finish: FinishType;

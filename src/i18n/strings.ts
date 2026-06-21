@@ -18,6 +18,11 @@ export type I18nKey =
   | 'addPattern'
   | 'addImage'
   | 'addText'
+  | 'addShape'
+  | 'shapeRectangle'
+  | 'shapeTriangle'
+  | 'shapeCircle'
+  | 'height'
   | 'tooltipVisibility'
   | 'tooltipExpand'
   | 'tooltipCollapse'
@@ -105,6 +110,11 @@ const STRINGS: Record<I18nKey, Record<Lang, string>> = {
   addPattern: { de: '+ Muster', en: '+ Pattern' },
   addImage: { de: '+ Bild', en: '+ Image' },
   addText: { de: '+ Text', en: '+ Text' },
+  addShape: { de: '+ Form', en: '+ Shape' },
+  shapeRectangle: { de: 'Rechteck', en: 'Rectangle' },
+  shapeTriangle: { de: 'Dreieck', en: 'Triangle' },
+  shapeCircle: { de: 'Kreis', en: 'Circle' },
+  height: { de: 'Höhe', en: 'Height' },
   tooltipVisibility: { de: 'Sichtbarkeit', en: 'Visibility' },
   tooltipExpand: { de: 'Aufklappen', en: 'Expand' },
   tooltipCollapse: { de: 'Zuklappen', en: 'Collapse' },

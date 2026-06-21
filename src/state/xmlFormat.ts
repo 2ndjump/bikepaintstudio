@@ -76,6 +76,18 @@ function layerToXML(layer: Layer, indent: string): string {
         attr('glyphRotation', layer.glyphRotation) +
         `>\n${indent}  <text>${esc(layer.text)}</text>\n${indent}</layer>`
       );
+    case 'shape':
+      return (
+        `${indent}<layer type="shape"${base}` +
+        attr('shape', layer.shape) +
+        attr('color', layer.color) +
+        attr('x', layer.x) +
+        attr('y', layer.y) +
+        attr('width', layer.width) +
+        attr('height', layer.height) +
+        attr('rotation', layer.rotation) +
+        ' />'
+      );
   }
 }
 
@@ -193,6 +205,18 @@ function parseLayer(el: Element): Layer | null {
         glyphRotation: num(el, 'glyphRotation', 0),
       };
     }
+    case 'shape':
+      return {
+        ...base,
+        type: 'shape',
+        shape: str(el, 'shape', 'rectangle') as import('./types').ShapeKind,
+        color: str(el, 'color', '#ffffff'),
+        x: num(el, 'x', 0.5),
+        y: num(el, 'y', 0.5),
+        width: num(el, 'width', 0.4),
+        height: num(el, 'height', 0.4),
+        rotation: num(el, 'rotation', 0),
+      };
     default:
       return null;
   }

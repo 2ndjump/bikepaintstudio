@@ -5,6 +5,7 @@ import type {
   Layer,
   LayerEffect,
   PatternLayer,
+  ShapeLayer,
   SolidColorLayer,
   ZoneId,
 } from '../state/types';
@@ -218,6 +219,37 @@ export class ZoneCompositor {
     else if (layer.type === 'pattern') await this.drawPattern(layer);
     else if (layer.type === 'image') await this.drawImage(layer);
     else if (layer.type === 'decal') await this.drawDecal(layer);
+    else if (layer.type === 'shape') this.drawShape(layer);
+  }
+
+  private drawShape(layer: ShapeLayer) {
+    const ctx = this.ctx;
+    const w = this.canvas.width;
+    const h = this.canvas.height;
+    const base = Math.min(w, h);
+    const sw = base * layer.width;
+    const sh = base * layer.height;
+
+    ctx.save();
+    ctx.translate(w * layer.x, h * layer.y);
+    ctx.rotate((layer.rotation * Math.PI) / 180);
+    ctx.fillStyle = layer.color;
+    if (layer.shape === 'rectangle') {
+      ctx.fillRect(-sw / 2, -sh / 2, sw, sh);
+    } else if (layer.shape === 'circle') {
+      ctx.beginPath();
+      ctx.ellipse(0, 0, sw / 2, sh / 2, 0, 0, Math.PI * 2);
+      ctx.fill();
+    } else {
+      // triangle (apex up)
+      ctx.beginPath();
+      ctx.moveTo(0, -sh / 2);
+      ctx.lineTo(sw / 2, sh / 2);
+      ctx.lineTo(-sw / 2, sh / 2);
+      ctx.closePath();
+      ctx.fill();
+    }
+    ctx.restore();
   }
 
   private effectCanvas?: HTMLCanvasElement;
