@@ -32,20 +32,20 @@ export function FinishPicker() {
 
   return (
     <div className="space-y-3">
-      <div className="space-y-2">
+      <label className="space-y-2 block">
         <div className="m3-section-title">{t('paintFinish')}</div>
-        <div className="grid grid-cols-2 gap-1.5">
+        <select
+          value={finish}
+          onChange={(e) => setFinish(activeZone, e.target.value as FinishType)}
+          className="m3-field"
+        >
           {FINISHES.map((f) => (
-            <button
-              key={f.value}
-              onClick={() => setFinish(activeZone, f.value)}
-              className={`m3-chip justify-center ${finish === f.value ? 'm3-chip-active' : ''}`}
-            >
+            <option key={f.value} value={f.value}>
               {t(f.labelKey)}
-            </button>
+            </option>
           ))}
-        </div>
-      </div>
+        </select>
+      </label>
 
       {finish === 'chameleon' && (
         <div className="grid grid-cols-3 gap-2">
