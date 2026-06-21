@@ -176,7 +176,7 @@ export function DecalLayerEditor({ layer, zoneId }: Props) {
           type="range"
           min={-180}
           max={180}
-          step={1}
+          step={15}
           value={layer.rotation}
           onChange={(e) =>
             updateLayer(zoneId, layer.id, {
@@ -191,7 +191,7 @@ export function DecalLayerEditor({ layer, zoneId }: Props) {
           type="range"
           min={-180}
           max={180}
-          step={1}
+          step={15}
           value={layer.glyphRotation}
           onChange={(e) =>
             updateLayer(zoneId, layer.id, {

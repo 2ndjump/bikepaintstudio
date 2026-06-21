@@ -76,7 +76,7 @@ export function EffectEditor({ layer, zoneId }: Props) {
                 type="range"
                 min={0}
                 max={360}
-                step={1}
+                step={15}
                 value={effect.angle}
                 onChange={(e) =>
                   updateLayer(zoneId, layer.id, {

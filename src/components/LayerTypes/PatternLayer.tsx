@@ -62,7 +62,7 @@ export function PatternLayerEditor({ layer, zoneId }: Props) {
           type="range"
           min={0}
           max={360}
-          step={1}
+          step={15}
           value={layer.rotation}
           onChange={(e) =>
             updateLayer(zoneId, layer.id, {
@@ -75,9 +75,9 @@ export function PatternLayerEditor({ layer, zoneId }: Props) {
         {t('rotationX')} {(layer.rotationX ?? 0).toFixed(0)}°
         <input
           type="range"
-          min={-80}
-          max={80}
-          step={1}
+          min={-75}
+          max={75}
+          step={15}
           value={layer.rotationX ?? 0}
           onChange={(e) =>
             updateLayer(zoneId, layer.id, { rotationX: parseFloat(e.target.value) })
@@ -88,9 +88,9 @@ export function PatternLayerEditor({ layer, zoneId }: Props) {
         {t('rotationY')} {(layer.rotationY ?? 0).toFixed(0)}°
         <input
           type="range"
-          min={-80}
-          max={80}
-          step={1}
+          min={-75}
+          max={75}
+          step={15}
           value={layer.rotationY ?? 0}
           onChange={(e) =>
             updateLayer(zoneId, layer.id, { rotationY: parseFloat(e.target.value) })

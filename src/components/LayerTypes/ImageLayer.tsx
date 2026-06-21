@@ -47,7 +47,7 @@ export function ImageLayerEditor({ layer, zoneId }: Props) {
           label={`${t('rotation')} ${layer.rotation.toFixed(0)}°`}
           min={0}
           max={360}
-          step={1}
+          step={15}
           value={layer.rotation}
           onChange={(v) => updateLayer(zoneId, layer.id, { rotation: v })}
         />
