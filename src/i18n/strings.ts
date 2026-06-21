@@ -19,6 +19,8 @@ export type I18nKey =
   | 'addImage'
   | 'addText'
   | 'tooltipVisibility'
+  | 'tooltipExpand'
+  | 'tooltipCollapse'
   | 'tooltipMoveUp'
   | 'tooltipMoveDown'
   | 'tooltipDelete'
@@ -100,6 +102,8 @@ const STRINGS: Record<I18nKey, Record<Lang, string>> = {
   addImage: { de: '+ Bild', en: '+ Image' },
   addText: { de: '+ Text', en: '+ Text' },
   tooltipVisibility: { de: 'Sichtbarkeit', en: 'Visibility' },
+  tooltipExpand: { de: 'Aufklappen', en: 'Expand' },
+  tooltipCollapse: { de: 'Zuklappen', en: 'Collapse' },
   tooltipMoveUp: { de: 'Nach oben', en: 'Move up' },
   tooltipMoveDown: { de: 'Nach unten', en: 'Move down' },
   tooltipDelete: { de: 'Löschen', en: 'Delete' },

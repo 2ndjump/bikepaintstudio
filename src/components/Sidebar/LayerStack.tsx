@@ -71,6 +71,16 @@ export function LayerStack() {
   const reorderLayer = useDesignStore((s) => s.reorderLayer);
   const t = useT();
   const [duplicatingId, setDuplicatingId] = useState<string | null>(null);
+  const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
+
+  function toggleCollapsed(id: string) {
+    setCollapsed((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
 
   function addPattern() {
     const layer: Layer = {
@@ -163,9 +173,18 @@ export function LayerStack() {
       </div>
 
       <div className="space-y-2">
-        {[...layers].reverse().map((layer) => (
+        {[...layers].reverse().map((layer) => {
+          const isCollapsed = collapsed.has(layer.id);
+          return (
           <div key={layer.id} className="m3-card-nested p-2.5 space-y-2.5">
             <div className="flex items-center gap-1">
+              <button
+                onClick={() => toggleCollapsed(layer.id)}
+                className="m3-icon-btn m3-icon-btn-sm"
+                title={isCollapsed ? t('tooltipExpand') : t('tooltipCollapse')}
+              >
+                {isCollapsed ? '▸' : '▾'}
+              </button>
               <button
                 onClick={() =>
                   updateLayer(activeZone, layer.id, { visible: !layer.visible })
@@ -219,6 +238,8 @@ export function LayerStack() {
               />
             )}
 
+            {!isCollapsed && (
+              <>
             <div className="grid grid-cols-2 gap-2">
               <label className="m3-label flex flex-col gap-1">
                 Blend
@@ -268,8 +289,11 @@ export function LayerStack() {
             <div className="pt-1 border-t border-[var(--md-outline-variant)]">
               <EffectEditor layer={layer} zoneId={activeZone} />
             </div>
+              </>
+            )}
           </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
