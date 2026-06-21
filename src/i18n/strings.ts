@@ -24,6 +24,10 @@ export type I18nKey =
   | 'tooltipMoveUp'
   | 'tooltipMoveDown'
   | 'tooltipDelete'
+  | 'layerShow'
+  | 'layerHide'
+  | 'layerDuplicate'
+  | 'layerOptions'
   | 'blend'
   | 'opacity'
   | 'rimGeometry'
@@ -107,6 +111,10 @@ const STRINGS: Record<I18nKey, Record<Lang, string>> = {
   tooltipMoveUp: { de: 'Nach oben', en: 'Move up' },
   tooltipMoveDown: { de: 'Nach unten', en: 'Move down' },
   tooltipDelete: { de: 'Löschen', en: 'Delete' },
+  layerShow: { de: 'Einblenden', en: 'Show' },
+  layerHide: { de: 'Ausblenden', en: 'Hide' },
+  layerDuplicate: { de: 'Duplizieren', en: 'Duplicate' },
+  layerOptions: { de: 'Optionen', en: 'Options' },
   blend: { de: 'Blend', en: 'Blend' },
   opacity: { de: 'Opacity', en: 'Opacity' },
   rimGeometry: { de: 'Felgen-Geometrie', en: 'Rim Geometry' },

@@ -71,6 +71,7 @@ export function LayerStack() {
   const reorderLayer = useDesignStore((s) => s.reorderLayer);
   const t = useT();
   const [duplicatingId, setDuplicatingId] = useState<string | null>(null);
+  const [menuId, setMenuId] = useState<string | null>(null);
   const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
 
   function toggleCollapsed(id: string) {
@@ -185,43 +186,67 @@ export function LayerStack() {
               >
                 {isCollapsed ? '▸' : '▾'}
               </button>
-              <button
-                onClick={() =>
-                  updateLayer(activeZone, layer.id, { visible: !layer.visible })
-                }
-                className="m3-icon-btn m3-icon-btn-sm"
-                title={t('tooltipVisibility')}
-              >
-                {layer.visible ? '●' : '○'}
-              </button>
               <input
-                className="flex-1 min-w-0 bg-transparent text-sm outline-none border-b border-transparent focus:border-[var(--md-primary)]"
+                className={`flex-1 min-w-0 bg-transparent text-sm outline-none border-b border-transparent focus:border-[var(--md-primary)] ${
+                  layer.visible ? '' : 'opacity-40 line-through'
+                }`}
                 value={layer.name}
                 onChange={(e) =>
                   updateLayer(activeZone, layer.id, { name: e.target.value })
                 }
               />
-              <button
-                className="m3-icon-btn m3-icon-btn-sm"
-                onClick={() => reorderLayer(activeZone, layer.id, 1)}
-                title={t('tooltipMoveUp')}
-              >
-                ▲
-              </button>
-              <button
-                className="m3-icon-btn m3-icon-btn-sm"
-                onClick={() => reorderLayer(activeZone, layer.id, -1)}
-                title={t('tooltipMoveDown')}
-              >
-                ▼
-              </button>
-              <button
-                className="m3-icon-btn m3-icon-btn-sm"
-                onClick={() => setDuplicatingId(duplicatingId === layer.id ? null : layer.id)}
-                title="Duplicate"
-              >
-                ⧉
-              </button>
+
+              {/* Overflow menu: show/hide, reorder, duplicate */}
+              <div className="relative">
+                <button
+                  className="m3-icon-btn m3-icon-btn-sm"
+                  onClick={() => setMenuId(menuId === layer.id ? null : layer.id)}
+                  title={t('layerOptions')}
+                >
+                  ⋮
+                </button>
+                {menuId === layer.id && (
+                  <>
+                    <div className="fixed inset-0 z-40" onClick={() => setMenuId(null)} />
+                    <div className="absolute right-0 z-50 mt-1 min-w-[150px] m3-menu">
+                      <button
+                        className="m3-menu-item"
+                        onClick={() =>
+                          updateLayer(activeZone, layer.id, { visible: !layer.visible })
+                        }
+                      >
+                        <span className="w-4 text-center">{layer.visible ? '○' : '●'}</span>
+                        {layer.visible ? t('layerHide') : t('layerShow')}
+                      </button>
+                      <button
+                        className="m3-menu-item"
+                        onClick={() => reorderLayer(activeZone, layer.id, 1)}
+                      >
+                        <span className="w-4 text-center">▲</span>
+                        {t('tooltipMoveUp')}
+                      </button>
+                      <button
+                        className="m3-menu-item"
+                        onClick={() => reorderLayer(activeZone, layer.id, -1)}
+                      >
+                        <span className="w-4 text-center">▼</span>
+                        {t('tooltipMoveDown')}
+                      </button>
+                      <button
+                        className="m3-menu-item"
+                        onClick={() => {
+                          setDuplicatingId(layer.id);
+                          setMenuId(null);
+                        }}
+                      >
+                        <span className="w-4 text-center">⧉</span>
+                        {t('layerDuplicate')}
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
+
               <button
                 className="m3-icon-btn m3-icon-btn-sm hover:text-[var(--md-error)]"
                 onClick={() => removeLayer(activeZone, layer.id)}
