@@ -56,6 +56,30 @@ export function PatternLayerEditor({ layer, zoneId }: Props) {
           }
         />
       </label>
+      <div className="grid grid-cols-2 gap-2">
+        <label className="text-xs text-neutral-400 flex flex-col gap-1">
+          {t('scaleX')} {(layer.scaleX ?? 1).toFixed(2)}
+          <input
+            type="range"
+            min={0.2}
+            max={4}
+            step={0.05}
+            value={layer.scaleX ?? 1}
+            onChange={(e) => updateLayer(zoneId, layer.id, { scaleX: parseFloat(e.target.value) })}
+          />
+        </label>
+        <label className="text-xs text-neutral-400 flex flex-col gap-1">
+          {t('scaleY')} {(layer.scaleY ?? 1).toFixed(2)}
+          <input
+            type="range"
+            min={0.2}
+            max={4}
+            step={0.05}
+            value={layer.scaleY ?? 1}
+            onChange={(e) => updateLayer(zoneId, layer.id, { scaleY: parseFloat(e.target.value) })}
+          />
+        </label>
+      </div>
       <label className="text-xs text-neutral-400 flex flex-col gap-1">
         {t('rotation')} {layer.rotation.toFixed(0)}°
         <input

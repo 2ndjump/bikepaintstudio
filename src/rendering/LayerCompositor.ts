@@ -291,6 +291,8 @@ export class ZoneCompositor {
     // Out-of-plane X/Y tilt as a shear (perspective-style), then in-plane spin.
     if (rx !== 0 || ry !== 0) ctx.transform(1, Math.tan(rx), Math.tan(ry), 1, 0, 0);
     ctx.rotate((layer.rotation * Math.PI) / 180);
+    // Per-axis stretch of the pattern fill.
+    ctx.scale(layer.scaleX ?? 1, layer.scaleY ?? 1);
     ctx.translate(-cx, -cy);
 
     ctx.fillStyle = pattern;
@@ -308,8 +310,8 @@ export class ZoneCompositor {
       const cy = h * layer.y;
       const base = Math.min(w, h);
       const maxDim = Math.max(img.width, img.height);
-      const targetW = (img.width / maxDim) * base * layer.scale;
-      const targetH = (img.height / maxDim) * base * layer.scale;
+      const targetW = (img.width / maxDim) * base * layer.scaleX;
+      const targetH = (img.height / maxDim) * base * layer.scaleY;
 
       const needsPixelOps =
         layer.dodge > 0.001 ||

@@ -37,6 +37,8 @@ function layerToXML(layer: Layer, indent: string): string {
         attr('pattern', layer.pattern) +
         attr('color', layer.color) +
         attr('scale', layer.scale) +
+        attr('scaleX', layer.scaleX) +
+        attr('scaleY', layer.scaleY) +
         attr('rotation', layer.rotation) +
         attr('rotationX', layer.rotationX) +
         attr('rotationY', layer.rotationY) +
@@ -48,7 +50,8 @@ function layerToXML(layer: Layer, indent: string): string {
         `${indent}<layer type="image"${base}` +
         attr('x', layer.x) +
         attr('y', layer.y) +
-        attr('scale', layer.scale) +
+        attr('scaleX', layer.scaleX) +
+        attr('scaleY', layer.scaleY) +
         attr('rotation', layer.rotation) +
         attr('brightness', layer.brightness) +
         attr('contrast', layer.contrast) +
@@ -161,6 +164,8 @@ function parseLayer(el: Element): Layer | null {
         pattern: str(el, 'pattern', 'hexagons') as import('./types').PatternKind,
         color: str(el, 'color', '#ffffff'),
         scale: num(el, 'scale', 10),
+        scaleX: num(el, 'scaleX', 1),
+        scaleY: num(el, 'scaleY', 1),
         rotation: num(el, 'rotation', 0),
         rotationX: num(el, 'rotationX', 0),
         rotationY: num(el, 'rotationY', 0),
@@ -174,7 +179,8 @@ function parseLayer(el: Element): Layer | null {
         src: srcEl?.textContent ?? '',
         x: num(el, 'x', 0.5),
         y: num(el, 'y', 0.5),
-        scale: num(el, 'scale', 1),
+        scaleX: num(el, 'scaleX', num(el, 'scale', 1)),
+        scaleY: num(el, 'scaleY', num(el, 'scale', 1)),
         rotation: num(el, 'rotation', 0),
         brightness: num(el, 'brightness', 0),
         contrast: num(el, 'contrast', 0),

@@ -18,6 +18,8 @@ import {
 
 function migrateLayer(layer: Layer): Layer {
   if (layer.type === 'image') {
+    // Legacy uniform `scale` → per-axis scaleX/scaleY.
+    const legacyScale = (layer as { scale?: number }).scale;
     return {
       hueShift: 0,
       dodge: 0,
@@ -25,6 +27,8 @@ function migrateLayer(layer: Layer): Layer {
       levelsBlack: 0,
       levelsGamma: 1,
       levelsWhite: 1,
+      scaleX: legacyScale ?? 1,
+      scaleY: legacyScale ?? 1,
       ...layer,
     };
   }
@@ -32,7 +36,7 @@ function migrateLayer(layer: Layer): Layer {
     return { letterSpacing: 0, glyphRotation: 0, ...layer };
   }
   if (layer.type === 'pattern') {
-    return { rotationX: 0, rotationY: 0, ...layer };
+    return { rotationX: 0, rotationY: 0, scaleX: 1, scaleY: 1, ...layer };
   }
   return layer;
 }

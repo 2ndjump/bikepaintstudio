@@ -94,7 +94,11 @@ export interface PatternLayer extends LayerBase {
   type: 'pattern';
   pattern: PatternKind;
   color: string;
+  /** Tile density. */
   scale: number;
+  /** Per-axis stretch of the pattern fill (1 = no stretch). */
+  scaleX: number;
+  scaleY: number;
   rotation: number;
   /** Out-of-plane tilt (degrees) around the X and Y axes — a 3D-style
    *  perspective tilt on top of the in-plane `rotation`. */
@@ -108,7 +112,9 @@ export interface ImageLayer extends LayerBase {
   src: string;
   x: number;
   y: number;
-  scale: number;
+  /** Per-axis scale (1 = natural fit). */
+  scaleX: number;
+  scaleY: number;
   rotation: number;
   brightness: number;
   contrast: number;

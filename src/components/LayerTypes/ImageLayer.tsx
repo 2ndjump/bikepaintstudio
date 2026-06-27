@@ -36,12 +36,20 @@ export function ImageLayerEditor({ layer, zoneId }: Props) {
           onChange={(v) => updateLayer(zoneId, layer.id, { y: v })}
         />
         <Slider
-          label={`${t('scale')} ${layer.scale.toFixed(2)}`}
+          label={`${t('scaleX')} ${layer.scaleX.toFixed(2)}`}
           min={0.05}
           max={3}
           step={0.01}
-          value={layer.scale}
-          onChange={(v) => updateLayer(zoneId, layer.id, { scale: v })}
+          value={layer.scaleX}
+          onChange={(v) => updateLayer(zoneId, layer.id, { scaleX: v })}
+        />
+        <Slider
+          label={`${t('scaleY')} ${layer.scaleY.toFixed(2)}`}
+          min={0.05}
+          max={3}
+          step={0.01}
+          value={layer.scaleY}
+          onChange={(v) => updateLayer(zoneId, layer.id, { scaleY: v })}
         />
         <Slider
           label={`${t('rotation')} ${layer.rotation.toFixed(0)}°`}
