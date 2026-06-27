@@ -87,11 +87,14 @@ export default function App() {
           off-screen no matter how the 3D canvas sizes itself. The left rail is
           display:none below lg, so it drops out of the grid (2 tracks). */}
       <div className="flex-1 min-h-0 overflow-hidden grid grid-cols-[18rem_minmax(0,1fr)] lg:grid-cols-[12rem_minmax(0,1fr)_18rem]">
-        {/* Left zone rail — only on wide windows */}
+        {/* Left sidebar — only on wide windows: global frame paint + zones */}
         <aside
           className="hidden lg:flex flex-col min-h-0 overflow-y-auto p-3 gap-3 m3-panel"
           style={{ borderRight: '1px solid var(--md-outline-variant)' }}
         >
+          <div className="m3-card">
+            <FinishPicker />
+          </div>
           <div className="m3-card">
             <ZoneSelector />
           </div>
@@ -111,11 +114,11 @@ export default function App() {
           className="order-first lg:order-none min-w-0 min-h-0 overflow-y-auto p-3 m3-panel border-[var(--md-outline-variant)] border-r lg:border-r-0 lg:border-l"
         >
           <div className="space-y-3">
-            {/* Global frame paint (finish + base colour) at the top */}
-            <div className="m3-card">
+            {/* On wide screens the paint + zones live in the left sidebar; below
+                lg the left rail is hidden so they appear here instead. */}
+            <div className="lg:hidden m3-card">
               <FinishPicker />
             </div>
-            {/* Zones live here when the left rail is hidden (narrow desktop) */}
             <div className="lg:hidden m3-card">
               <ZoneSelector columns={2} />
             </div>
