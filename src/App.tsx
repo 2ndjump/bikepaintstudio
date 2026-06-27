@@ -133,7 +133,8 @@ export default function App() {
 }
 
 /** The per-zone layer controls (finish + base colour are global, shown
- *  separately at the top of the panel). */
+ *  separately at the top of the panel). The active zone is conveyed by the
+ *  highlighted zone button, so no separate label is needed. */
 function Controls() {
   return (
     <div className="m3-card">
