@@ -7,8 +7,7 @@ import { RimPanel } from './components/Sidebar/RimPanel';
 import { Toolbar } from './components/Toolbar/Toolbar';
 import { preloadCommonFonts } from './fonts/fontLoader';
 import { useDesignStore } from './state/designStore';
-import { ALL_ZONES, ZONE_LABELS } from './state/types';
-import { useT } from './i18n/useT';
+import { ALL_ZONES } from './state/types';
 import { useHistoryShortcuts } from './state/useHistoryShortcuts';
 
 /** True only on small touch devices (phones). Requires BOTH a coarse primary
@@ -136,18 +135,9 @@ export default function App() {
 /** The per-zone layer controls (finish + base colour are global, shown
  *  separately at the top of the panel). */
 function Controls() {
-  const activeZone = useDesignStore((s) => s.activeZone);
-  const t = useT();
-
   return (
-    <div className="space-y-3">
-      <div>
-        <div className="m3-section-title">{t('active')}</div>
-        <div className="m3-body font-medium">{ZONE_LABELS[activeZone]}</div>
-      </div>
-      <div className="m3-card">
-        <LayerStack />
-      </div>
+    <div className="m3-card">
+      <LayerStack />
     </div>
   );
 }
