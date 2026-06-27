@@ -107,7 +107,7 @@ const STRINGS: Record<I18nKey, Record<Lang, string>> = {
   finishGlossy: { de: 'Glanz', en: 'Glossy' },
   finishMetallic: { de: 'Metallic', en: 'Metallic' },
   finishChameleon: { de: 'Chamäleon', en: 'Chameleon' },
-  layers: { de: 'Layer-Stack', en: 'Layers' },
+  layers: { de: 'Layers', en: 'Layers' },
   addColor: { de: '+ Farbe', en: '+ Color' },
   addPattern: { de: '+ Muster', en: '+ Pattern' },
   addImage: { de: '+ Bild', en: '+ Image' },

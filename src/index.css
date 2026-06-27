@@ -158,6 +158,22 @@ canvas {
 .m3-icon-btn:disabled { opacity: 0.38; cursor: default; pointer-events: none; }
 .m3-icon-btn-sm { width: 1.75rem; height: 1.75rem; font-size: 0.75rem; }
 
+/* Round tonal icon button (layer add buttons) */
+.m3-add-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: var(--md-radius-full);
+  background: var(--md-secondary-container);
+  color: var(--md-on-secondary-container);
+  border: none;
+  cursor: pointer;
+  transition: filter 0.15s;
+}
+.m3-add-btn:hover { filter: brightness(1.15); }
+
 /* Legacy alias — keep .btn-mini working with the new look */
 .btn-mini {
   display: inline-flex;

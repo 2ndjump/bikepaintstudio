@@ -232,20 +232,19 @@ export function LayerStack() {
 
   return (
     <div className="space-y-3">
-      <div className="m3-section-title">{t('layers')}</div>
-
-      <div className="flex gap-1.5 flex-wrap">
-        <button className="btn-mini" onClick={addPattern} title={t('addPattern').replace('+ ', '')}>
-          + <PatternIcon />
+      <div className="flex items-center gap-2 flex-wrap">
+        <div className="m3-section-title">{t('layers')}</div>
+        <button className="m3-add-btn" onClick={addPattern} title={t('addPattern').replace('+ ', '')}>
+          <PatternIcon />
         </button>
-        <button className="btn-mini" onClick={addImage} title={t('addImage').replace('+ ', '')}>
-          + <ImageIcon />
+        <button className="m3-add-btn" onClick={addImage} title={t('addImage').replace('+ ', '')}>
+          <ImageIcon />
         </button>
-        <button className="btn-mini" onClick={addDecal} title={t('addText').replace('+ ', '')}>
-          + <TextIcon />
+        <button className="m3-add-btn" onClick={addDecal} title={t('addText').replace('+ ', '')}>
+          <TextIcon />
         </button>
-        <button className="btn-mini" onClick={addShape} title={t('addShape').replace('+ ', '')}>
-          + <ShapeIcon />
+        <button className="m3-add-btn" onClick={addShape} title={t('addShape').replace('+ ', '')}>
+          <ShapeIcon />
         </button>
       </div>
 
