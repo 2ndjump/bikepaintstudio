@@ -153,7 +153,8 @@ export interface ShapeLayer extends LayerBase {
   /** Centre position, 0..1 of the zone canvas. */
   x: number;
   y: number;
-  /** Size as a fraction of the canvas' smaller dimension. */
+  /** Size relative to the part: width = fraction of the zone width (around the
+   *  tube), height = fraction of the zone height (along the part's length). */
   width: number;
   height: number;
   rotation: number;

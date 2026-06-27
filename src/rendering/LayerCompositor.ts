@@ -226,9 +226,10 @@ export class ZoneCompositor {
     const ctx = this.ctx;
     const w = this.canvas.width;
     const h = this.canvas.height;
-    const base = Math.min(w, h);
-    const sw = base * layer.width;
-    const sh = base * layer.height;
+    // Sizes are relative to the part: width spans the zone width (around the
+    // tube), height spans the zone height (along the part's length).
+    const sw = w * layer.width;
+    const sh = h * layer.height;
 
     ctx.save();
     ctx.translate(w * layer.x, h * layer.y);
