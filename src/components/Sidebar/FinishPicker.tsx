@@ -38,20 +38,29 @@ export function FinishPicker({ zone }: { zone?: ZoneId } = {}) {
 
   return (
     <div className="space-y-3">
-      <label className="space-y-2 block">
+      <div className="space-y-2">
         <div className="m3-section-title">{t('paintFinish')}</div>
-        <select
-          value={finish}
-          onChange={(e) => setFinish(target, e.target.value as FinishType)}
-          className="m3-field"
-        >
-          {FINISHES.map((f) => (
-            <option key={f.value} value={f.value}>
-              {t(f.labelKey)}
-            </option>
-          ))}
-        </select>
-      </label>
+        {/* Combined: base-colour swatch + finish dropdown on one row. */}
+        <div className="flex items-center gap-2">
+          <ColorPicker
+            value={baseColor}
+            swatchOnly
+            swatchClassName="h-9 w-9"
+            onChange={(color) => setBaseColor(target, color)}
+          />
+          <select
+            value={finish}
+            onChange={(e) => setFinish(target, e.target.value as FinishType)}
+            className="m3-field flex-1"
+          >
+            {FINISHES.map((f) => (
+              <option key={f.value} value={f.value}>
+                {t(f.labelKey)}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
 
       {finish === 'chameleon' && (
         <div className="grid grid-cols-3 gap-2">
@@ -65,12 +74,6 @@ export function FinishPicker({ zone }: { zone?: ZoneId } = {}) {
           ))}
         </div>
       )}
-
-      <ColorPicker
-        value={baseColor}
-        label={t('baseColor')}
-        onChange={(color) => setBaseColor(target, color)}
-      />
     </div>
   );
 }
