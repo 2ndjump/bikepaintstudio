@@ -92,6 +92,16 @@ function migrateDesign(state: DesignState): DesignState {
   };
 }
 
+/** Apply a transform to every zone (used for whole-frame finish/colour). */
+function mapZones(
+  zones: Record<ZoneId, ZoneState>,
+  fn: (zone: ZoneState) => ZoneState,
+): Record<ZoneId, ZoneState> {
+  return Object.fromEntries(
+    (Object.keys(zones) as ZoneId[]).map((z) => [z, fn(zones[z])]),
+  ) as Record<ZoneId, ZoneState>;
+}
+
 // All frame zones default to matte gray; rims default to matte black.
 const DEFAULT_ZONE_COLORS: Record<ZoneId, string> = {
   headTube: '#888888',
@@ -155,33 +165,34 @@ export const useDesignStore = create<Store>((set, get) => {
 
     setActiveZone: (zone) => set({ activeZone: zone }),
 
-    setFinish: (zone, finish) => {
+    // Finish + base/chameleon colours are global: they apply to the whole
+    // frame (every zone) at once. Per-zone layers stay independent.
+    setFinish: (_zone, finish) => {
       const history = recordHistory();
       set((s) => ({
         history,
-        zones: { ...s.zones, [zone]: { ...s.zones[zone], finish } },
+        zones: mapZones(s.zones, (z) => ({ ...z, finish })),
       }));
     },
 
-    setBaseColor: (zone, color) => {
+    setBaseColor: (_zone, color) => {
       const history = recordHistory();
       set((s) => ({
         history,
-        zones: { ...s.zones, [zone]: { ...s.zones[zone], baseColor: color } },
+        zones: mapZones(s.zones, (z) => ({ ...z, baseColor: color })),
       }));
     },
 
-    setChameleonColor: (zone, index, color) => {
+    setChameleonColor: (_zone, index, color) => {
       const history = recordHistory();
-      set((s) => {
-        const current = s.zones[zone].chameleonColors;
-        const next = [...current] as [string, string, string];
-        next[index] = color;
-        return {
-          history,
-          zones: { ...s.zones, [zone]: { ...s.zones[zone], chameleonColors: next } },
-        };
-      });
+      set((s) => ({
+        history,
+        zones: mapZones(s.zones, (z) => {
+          const next = [...z.chameleonColors] as [string, string, string];
+          next[index] = color;
+          return { ...z, chameleonColors: next };
+        }),
+      }));
     },
 
     updateLayer: (zone, layerId, patch) => {

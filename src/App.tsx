@@ -59,6 +59,9 @@ export default function App() {
           </main>
           <div className="p-3 space-y-3">
             <div className="m3-card">
+              <FinishPicker />
+            </div>
+            <div className="m3-card">
               <ZoneSelector columns={2} />
             </div>
             {isRim && (
@@ -109,6 +112,10 @@ export default function App() {
           className="order-first lg:order-none min-w-0 min-h-0 overflow-y-auto p-3 m3-panel border-[var(--md-outline-variant)] border-r lg:border-r-0 lg:border-l"
         >
           <div className="space-y-3">
+            {/* Global frame paint (finish + base colour) at the top */}
+            <div className="m3-card">
+              <FinishPicker />
+            </div>
             {/* Zones live here when the left rail is hidden (narrow desktop) */}
             <div className="lg:hidden m3-card">
               <ZoneSelector columns={2} />
@@ -126,7 +133,8 @@ export default function App() {
   );
 }
 
-/** The finish + layer controls for the active zone. */
+/** The per-zone layer controls (finish + base colour are global, shown
+ *  separately at the top of the panel). */
 function Controls() {
   const activeZone = useDesignStore((s) => s.activeZone);
   const t = useT();
@@ -136,9 +144,6 @@ function Controls() {
       <div>
         <div className="m3-section-title">{t('active')}</div>
         <div className="m3-body font-medium">{ZONE_LABELS[activeZone]}</div>
-      </div>
-      <div className="m3-card">
-        <FinishPicker />
       </div>
       <div className="m3-card">
         <LayerStack />
