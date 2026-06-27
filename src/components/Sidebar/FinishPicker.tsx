@@ -4,9 +4,11 @@ import { useT } from '../../i18n/useT';
 import type { I18nKey } from '../../i18n/strings';
 import { ColorPicker } from '../ui/ColorPicker';
 
-// Finish + colours are global (whole frame); read from one canonical zone so
-// the control is stable regardless of which zone is active.
-const REF_ZONE: ZoneId = 'topTube';
+// Without a `zone`, the picker controls the whole frame (finish/colour apply to
+// all frame zones); it reads from one canonical frame zone so it's stable
+// regardless of the active zone. With a `zone` (a rim), it controls just that
+// rim. The store setters decide frame-global vs per-rim from the passed zone.
+const FRAME_REF_ZONE: ZoneId = 'topTube';
 
 const FINISHES: { value: FinishType; labelKey: I18nKey }[] = [
   { value: 'matte', labelKey: 'finishMatte' },
@@ -22,11 +24,12 @@ const CHAMELEON_LABELS: Record<0 | 1 | 2, I18nKey> = {
   2: 'chameleonColorC',
 };
 
-export function FinishPicker() {
-  const finish = useDesignStore((s) => s.zones[REF_ZONE]?.finish ?? 'matte');
-  const baseColor = useDesignStore((s) => s.zones[REF_ZONE]?.baseColor ?? '#888888');
+export function FinishPicker({ zone }: { zone?: ZoneId } = {}) {
+  const target = zone ?? FRAME_REF_ZONE;
+  const finish = useDesignStore((s) => s.zones[target]?.finish ?? 'matte');
+  const baseColor = useDesignStore((s) => s.zones[target]?.baseColor ?? '#888888');
   const chameleonColors = useDesignStore(
-    (s) => s.zones[REF_ZONE]?.chameleonColors ?? DEFAULT_CHAMELEON_COLORS,
+    (s) => s.zones[target]?.chameleonColors ?? DEFAULT_CHAMELEON_COLORS,
   );
   const setFinish = useDesignStore((s) => s.setFinish);
   const setBaseColor = useDesignStore((s) => s.setBaseColor);
@@ -39,7 +42,7 @@ export function FinishPicker() {
         <div className="m3-section-title">{t('paintFinish')}</div>
         <select
           value={finish}
-          onChange={(e) => setFinish(REF_ZONE, e.target.value as FinishType)}
+          onChange={(e) => setFinish(target, e.target.value as FinishType)}
           className="m3-field"
         >
           {FINISHES.map((f) => (
@@ -57,7 +60,7 @@ export function FinishPicker() {
               key={idx}
               value={chameleonColors[idx]}
               label={t(CHAMELEON_LABELS[idx])}
-              onChange={(color) => setChameleonColor(REF_ZONE, idx, color)}
+              onChange={(color) => setChameleonColor(target, idx, color)}
             />
           ))}
         </div>
@@ -66,7 +69,7 @@ export function FinishPicker() {
       <ColorPicker
         value={baseColor}
         label={t('baseColor')}
-        onChange={(color) => setBaseColor(REF_ZONE, color)}
+        onChange={(color) => setBaseColor(target, color)}
       />
     </div>
   );

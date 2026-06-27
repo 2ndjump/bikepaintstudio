@@ -92,13 +92,25 @@ function migrateDesign(state: DesignState): DesignState {
   };
 }
 
-/** Apply a transform to every zone (used for whole-frame finish/colour). */
-function mapZones(
+function isRimZone(z: ZoneId): boolean {
+  return z === 'frontRim' || z === 'rearRim';
+}
+
+/**
+ * Apply a finish/colour change. Rim zones are independent (only that rim is
+ * changed); frame zones are global — changing one updates the whole frame
+ * (every non-rim zone) at once.
+ */
+function applyFrameOrRim(
   zones: Record<ZoneId, ZoneState>,
+  target: ZoneId,
   fn: (zone: ZoneState) => ZoneState,
 ): Record<ZoneId, ZoneState> {
+  if (isRimZone(target)) {
+    return { ...zones, [target]: fn(zones[target]) };
+  }
   return Object.fromEntries(
-    (Object.keys(zones) as ZoneId[]).map((z) => [z, fn(zones[z])]),
+    (Object.keys(zones) as ZoneId[]).map((z) => [z, isRimZone(z) ? zones[z] : fn(zones[z])]),
   ) as Record<ZoneId, ZoneState>;
 }
 
@@ -165,29 +177,30 @@ export const useDesignStore = create<Store>((set, get) => {
 
     setActiveZone: (zone) => set({ activeZone: zone }),
 
-    // Finish + base/chameleon colours are global: they apply to the whole
-    // frame (every zone) at once. Per-zone layers stay independent.
-    setFinish: (_zone, finish) => {
+    // Finish + base/chameleon colours apply to the whole FRAME (all non-rim
+    // zones) at once; rim zones are changed individually. Per-zone layers stay
+    // independent regardless.
+    setFinish: (zone, finish) => {
       const history = recordHistory();
       set((s) => ({
         history,
-        zones: mapZones(s.zones, (z) => ({ ...z, finish })),
+        zones: applyFrameOrRim(s.zones, zone, (z) => ({ ...z, finish })),
       }));
     },
 
-    setBaseColor: (_zone, color) => {
+    setBaseColor: (zone, color) => {
       const history = recordHistory();
       set((s) => ({
         history,
-        zones: mapZones(s.zones, (z) => ({ ...z, baseColor: color })),
+        zones: applyFrameOrRim(s.zones, zone, (z) => ({ ...z, baseColor: color })),
       }));
     },
 
-    setChameleonColor: (_zone, index, color) => {
+    setChameleonColor: (zone, index, color) => {
       const history = recordHistory();
       set((s) => ({
         history,
-        zones: mapZones(s.zones, (z) => {
+        zones: applyFrameOrRim(s.zones, zone, (z) => {
           const next = [...z.chameleonColors] as [string, string, string];
           next[index] = color;
           return { ...z, chameleonColors: next };
