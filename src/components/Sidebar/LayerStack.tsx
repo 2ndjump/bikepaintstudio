@@ -11,6 +11,50 @@ import { useT } from '../../i18n/useT';
 
 const EMPTY_LAYERS: Layer[] = [];
 
+const ICON = { width: 15, height: 15, viewBox: '0 0 16 16' } as const;
+
+/** Pattern: a 2×2 grid of tiles. */
+function PatternIcon() {
+  return (
+    <svg {...ICON} fill="currentColor" aria-hidden="true">
+      <rect x="2" y="2" width="4.5" height="4.5" rx="0.8" />
+      <rect x="9.5" y="2" width="4.5" height="4.5" rx="0.8" />
+      <rect x="2" y="9.5" width="4.5" height="4.5" rx="0.8" />
+      <rect x="9.5" y="9.5" width="4.5" height="4.5" rx="0.8" />
+    </svg>
+  );
+}
+
+/** Image: framed picture with sun + mountain. */
+function ImageIcon() {
+  return (
+    <svg {...ICON} fill="none" stroke="currentColor" strokeWidth="1.3" aria-hidden="true">
+      <rect x="2" y="3" width="12" height="10" rx="1.6" />
+      <circle cx="5.5" cy="6.3" r="1.1" fill="currentColor" stroke="none" />
+      <path d="M3 12 L6.5 8.2 L9 10.6 L11 8.8 L13 11" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+/** Text: a capital T. */
+function TextIcon() {
+  return (
+    <svg {...ICON} fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" aria-hidden="true">
+      <path d="M4 4 H12" />
+      <path d="M8 4 V12.5" />
+    </svg>
+  );
+}
+
+/** Shape: a triangle. */
+function ShapeIcon() {
+  return (
+    <svg {...ICON} fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round" aria-hidden="true">
+      <path d="M8 3 L13.5 12.5 H2.5 Z" />
+    </svg>
+  );
+}
+
 const BLEND_MODES: BlendMode[] = [
   'normal',
   'multiply',
@@ -191,10 +235,18 @@ export function LayerStack() {
       <div className="m3-section-title">{t('layers')}</div>
 
       <div className="flex gap-1.5 flex-wrap">
-        <button className="btn-mini" onClick={addPattern}>{t('addPattern')}</button>
-        <button className="btn-mini" onClick={addImage}>{t('addImage')}</button>
-        <button className="btn-mini" onClick={addDecal}>{t('addText')}</button>
-        <button className="btn-mini" onClick={addShape}>{t('addShape')}</button>
+        <button className="btn-mini" onClick={addPattern} title={t('addPattern').replace('+ ', '')}>
+          + <PatternIcon />
+        </button>
+        <button className="btn-mini" onClick={addImage} title={t('addImage').replace('+ ', '')}>
+          + <ImageIcon />
+        </button>
+        <button className="btn-mini" onClick={addDecal} title={t('addText').replace('+ ', '')}>
+          + <TextIcon />
+        </button>
+        <button className="btn-mini" onClick={addShape} title={t('addShape').replace('+ ', '')}>
+          + <ShapeIcon />
+        </button>
       </div>
 
       <div className="space-y-2">
