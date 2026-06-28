@@ -12,7 +12,7 @@ interface Props {
 export function ZoneSelector({ columns = 1 }: Props) {
   const activeZone = useDesignStore((s) => s.activeZone);
   const setActiveZone = useDesignStore((s) => s.setActiveZone);
-  const setBaseColor = useDesignStore((s) => s.setBaseColor);
+  const setZoneBaseColor = useDesignStore((s) => s.setZoneBaseColor);
   const zones = useDesignStore((s) => s.zones);
   const t = useT();
 
@@ -37,7 +37,7 @@ export function ZoneSelector({ columns = 1 }: Props) {
                 value={color}
                 swatchOnly
                 swatchClassName="h-6 w-6"
-                onChange={(c) => setBaseColor(z, c)}
+                onChange={(c) => setZoneBaseColor(z, c)}
               />
               <button
                 onClick={() => setActiveZone(z)}

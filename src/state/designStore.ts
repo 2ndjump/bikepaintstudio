@@ -142,6 +142,9 @@ interface DesignActions {
   setActiveZone(zone: ZoneId): void;
   setFinish(zone: ZoneId, finish: FinishType): void;
   setBaseColor(zone: ZoneId, color: string): void;
+  /** Set the base colour of a single zone only (overrides the global frame
+   *  colour for that zone). */
+  setZoneBaseColor(zone: ZoneId, color: string): void;
   setChameleonColor(zone: ZoneId, index: 0 | 1 | 2, color: string): void;
   updateLayer(zone: ZoneId, layerId: string, patch: Partial<Layer>): void;
   addLayer(zone: ZoneId, layer: Layer): void;
@@ -193,6 +196,15 @@ export const useDesignStore = create<Store>((set, get) => {
       set((s) => ({
         history,
         zones: applyFrameOrRim(s.zones, zone, (z) => ({ ...z, baseColor: color })),
+      }));
+    },
+
+    // Per-zone override: only this zone's base colour changes.
+    setZoneBaseColor: (zone, color) => {
+      const history = recordHistory();
+      set((s) => ({
+        history,
+        zones: { ...s.zones, [zone]: { ...s.zones[zone], baseColor: color } },
       }));
     },
 
