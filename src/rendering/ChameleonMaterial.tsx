@@ -9,11 +9,17 @@ interface Props {
   side?: THREE.Side;
 }
 
-const FRAGMENT_INJECT = /* glsl */ `
-  float chamFresnel = pow(1.0 - clamp(dot(normalize(vNormal), normalize(vViewPosition)), 0.0, 1.0), 2.2);
-  vec3 chamAB = mix(uChamA, uChamB, smoothstep(0.0, 0.55, chamFresnel));
-  vec3 chamMix = mix(chamAB, uChamC, smoothstep(0.45, 1.0, chamFresnel));
-  diffuseColor.rgb *= chamMix * 1.35;
+// View-angle (Fresnel-style) blend A -> B -> C across the surface. A linear
+// ramp (no exponent) keeps colour A from dominating, so the mid (B) shows on
+// the broad flanks of each tube and C appears toward the grazing silhouette.
+// The multiplier compensates for the reduced scene light budget so the shift
+// stays as visible as before.
+const CHAM_COLOR_INJECT = /* glsl */ `
+  float chamNdV = clamp(dot(normalize(vNormal), normalize(vViewPosition)), 0.0, 1.0);
+  float chamFresnel = 1.0 - chamNdV;
+  vec3 chamAB = mix(uChamA, uChamB, smoothstep(0.05, 0.5, chamFresnel));
+  vec3 chamMix = mix(chamAB, uChamC, smoothstep(0.5, 0.9, chamFresnel));
+  diffuseColor.rgb *= chamMix * 1.8;
 `;
 
 export function ChameleonMaterial({ texture, fp, colors, side }: Props) {
@@ -48,7 +54,7 @@ export function ChameleonMaterial({ texture, fp, colors, side }: Props) {
           '#include <common>',
           '#include <common>\nuniform vec3 uChamA;\nuniform vec3 uChamB;\nuniform vec3 uChamC;',
         )
-        .replace('#include <color_fragment>', `#include <color_fragment>\n${FRAGMENT_INJECT}`);
+        .replace('#include <color_fragment>', `#include <color_fragment>\n${CHAM_COLOR_INJECT}`);
     };
 
     return m;

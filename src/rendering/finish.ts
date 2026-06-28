@@ -36,7 +36,7 @@ export function finishParams(finish: FinishType): FinishParams {
         iridescenceIOR: 1.3,
         sheen: 0,
         specularIntensity: 0.30,
-        envMapIntensity: 0.45,
+        envMapIntensity: 0.35,
       };
     case 'satin':
       return {
@@ -48,7 +48,7 @@ export function finishParams(finish: FinishType): FinishParams {
         iridescenceIOR: 1.3,
         sheen: 0,
         specularIntensity: 0.50,
-        envMapIntensity: 0.60,
+        envMapIntensity: 0.50,
       };
     case 'glossy':
       // Car-paint layering: colored base coat stays fairly rough (color
@@ -62,7 +62,9 @@ export function finishParams(finish: FinishType): FinishParams {
         iridescenceIOR: 1.3,
         sheen: 0,
         specularIntensity: 0.65,
-        envMapIntensity: 0.85,
+        // Bumped to offset the lower scene environmentIntensity so the
+        // clearcoat reflections stay crisp (effective env ≈ prior level).
+        envMapIntensity: 1.6,
       };
     case 'metallic':
       return {
@@ -74,19 +76,21 @@ export function finishParams(finish: FinishType): FinishParams {
         iridescenceIOR: 1.3,
         sheen: 0,
         specularIntensity: 1.0,
-        envMapIntensity: 1.1,
+        // metalness=1 takes ALL its colour from the env reflection, so it
+        // needs a strong env to not go dark after the scene env cut.
+        envMapIntensity: 2.2,
       };
     case 'chameleon':
       return {
-        roughness: 0.20,
-        metalness: 0.30,
+        roughness: 0.22,
+        metalness: 0.25,
         clearcoat: 1.0,
         clearcoatRoughness: 0.10,
         iridescence: 1.0,
         iridescenceIOR: 1.8,
         sheen: 0,
         specularIntensity: 1.0,
-        envMapIntensity: 0.90,
+        envMapIntensity: 1.6,
       };
   }
 }

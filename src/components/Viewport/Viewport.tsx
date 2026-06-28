@@ -47,14 +47,19 @@ export function Viewport() {
     >
       {solidColor && <color attach="background" args={[solidColor]} />}
 
-      <ambientLight intensity={0.25} />
-      <directionalLight position={[3, 5, 2]} intensity={0.7} />
-      <directionalLight position={[-2.5, 3, -3.5]} intensity={0.25} />
+      {/* Light budget tuned for COLOUR FIDELITY: neutral fill (ambient + IBL)
+          is kept low because it lifts every channel equally and desaturates
+          the picked colour (dark colours wash toward the env grey). The
+          directional key multiplies the albedo, so it preserves hue and does
+          the shading. Goal: a tube's broad mid-tone reads as the picked hex. */}
+      <ambientLight intensity={0.05} />
+      <directionalLight position={[3, 5, 2]} intensity={0.62} />
+      <directionalLight position={[-2.5, 3, -3.5]} intensity={0.18} />
       {/* Ground bounce: lifts downward-facing surfaces (crown shoulder, BB
           shell underside) so they don't read as black holes. */}
-      <directionalLight position={[0.5, -3, 1]} intensity={0.18} />
+      <directionalLight position={[0.5, -3, 1]} intensity={0.12} />
 
-      <Environment preset="studio" background={useHdriBackground} environmentIntensity={0.7} />
+      <Environment preset="studio" background={useHdriBackground} environmentIntensity={0.22} />
 
       <DebugExpose />
       <BikeFrame geo={geo} />

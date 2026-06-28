@@ -187,10 +187,12 @@ export interface DesignState {
   rim: RimParams;
 }
 
+// Brighter, saturated defaults so the chameleon shift reads clearly (a dark
+// navy as colour A made the broad faces — where A dominates — look near-black).
 export const DEFAULT_CHAMELEON_COLORS: [string, string, string] = [
-  '#1e3a8a',
-  '#a855f7',
-  '#14b8a6',
+  '#3b82f6',
+  '#c026d3',
+  '#22d3ee',
 ];
 
 export function makeDefaultZoneState(color = '#888888'): ZoneState {

@@ -19,11 +19,21 @@ export function ShapeLayerEditor({ layer, zoneId }: Props) {
   const updateLayer = useDesignStore((s) => s.updateLayer);
   const t = useT();
 
+  function changeShape(shape: ShapeKind) {
+    // Keep the layer name in sync with the shape unless the user renamed it.
+    const defaultLabels = SHAPES.map((s) => t(s.labelKey));
+    const patch: Partial<ShapeLayer> = { shape };
+    if (defaultLabels.includes(layer.name)) {
+      patch.name = t(SHAPES.find((s) => s.value === shape)!.labelKey);
+    }
+    updateLayer(zoneId, layer.id, patch);
+  }
+
   return (
     <div className="space-y-2">
       <select
         value={layer.shape}
-        onChange={(e) => updateLayer(zoneId, layer.id, { shape: e.target.value as ShapeKind })}
+        onChange={(e) => changeShape(e.target.value as ShapeKind)}
         className="m3-field"
       >
         {SHAPES.map((s) => (
