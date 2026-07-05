@@ -194,9 +194,11 @@ export function buildFrameModel(): FrameModel {
     const mid = a.clone().lerp(BB, 0.55).add(new THREE.Vector3(0, -16, 0));
     mapped.downTube.push(
       loftTube(
-        // BB end nudged up so it meets the shell a touch higher / cleaner.
-        [a, mid, new THREE.Vector3(4, 9, 0)],
-        (t) => 27 + 6 * Math.sin(t * Math.PI), // deeper in-plane (aero) — reads much thicker from the side
+        // End plunged into the BB shell so the tube fully overlaps it (no gap).
+        [a, mid, new THREE.Vector3(2, 3, 0)],
+        // Fat aero mid, but tapered at the BB so the end (⌀38) buries cleanly
+        // inside the smaller BB shell (⌀47) instead of overhanging it.
+        (t) => 23 - 4 * t + 8 * Math.sin(t * Math.PI),
         () => 0.62, // narrower laterally
         90,
         56,
