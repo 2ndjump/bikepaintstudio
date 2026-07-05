@@ -103,9 +103,9 @@ export function buildFrameModel(): FrameModel {
     [19.05, 54],
     [19.05, 95],
     [14.3, 152],
-    [14.3, 256],
-    [13.6, 260],
-  ].map((p) => new THREE.Vector2(p[0], p[1]));
+    [14.3, 234],
+    [13.6, 238],
+  ].map((p) => new THREE.Vector2(p[0], p[1])); // shortened to match the shorter head tube
   plain.fork!.push(bake(new THREE.LatheGeometry(profile, 64)));
 
   // Uni-crown loft: one continuous curve dropout → crown → dropout (mapped).
@@ -160,18 +160,18 @@ export function buildFrameModel(): FrameModel {
 
   // Steerer bore cap (dark).
   const bore = new THREE.CylinderGeometry(11.5, 11.5, 2, 48);
-  bore.translate(0, 259.5, 0);
+  bore.translate(0, 237.5, 0);
   dark.push(bake(bore));
 
   // ---------- Head-tube axis in frame world (from the placed fork) ----------
   const HB = new THREE.Vector3(0, 58, 0).applyMatrix4(M); // head tube bottom
   const dHead = new THREE.Vector3(0, 158, 0).applyMatrix4(M).sub(HB).normalize();
-  const HT = HB.clone().addScaledVector(dHead, 160); // head tube top
+  const HT = HB.clone().addScaledVector(dHead, 138); // head tube top (shortened)
 
   // ---------- Frame skeleton ----------
   const BB = new THREE.Vector3(0, 0, 0);
   const dSeat = new THREE.Vector3(-Math.cos(STA), Math.sin(STA), 0);
-  const SC = BB.clone().addScaledVector(dSeat, 540); // seat cluster
+  const SC = BB.clone().addScaledVector(dSeat, 510); // seat cluster (lowered → shorter seat tube)
 
   // Head tube — slightly conical. Chunky enough that the uniform down tube plugs
   // fully into it (no overhang at the join).
@@ -181,9 +181,9 @@ export function buildFrameModel(): FrameModel {
     mapped.headTube.push(loftTube([a, a.clone().lerp(b, 0.5), b], (t) => 29 - 3 * t, () => 1.0, 40, 48).geo);
   }
 
-  // Top tube — gently sloped, tapering to the seat cluster.
+  // Top tube — gently sloped, tapering to the seat cluster. Sits a bit lower now.
   {
-    const a = HB.clone().addScaledVector(dHead, 132);
+    const a = HB.clone().addScaledVector(dHead, 108);
     const b = SC.clone().add(new THREE.Vector3(14, -14, 0));
     const mid = a.clone().lerp(b, 0.5).add(new THREE.Vector3(0, -6, 0));
     mapped.topTube.push(loftTube([a, mid, b], (t) => 16 - 3.5 * t, () => 0.85, 90, 40).geo);
