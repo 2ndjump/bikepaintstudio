@@ -23,12 +23,19 @@ function getOrCreateTexture(zoneId: ZoneId): THREE.CanvasTexture {
   return tex;
 }
 
-export function useZoneTexture(zoneId: ZoneId): THREE.CanvasTexture {
+/**
+ * @param compose  Whether this consumer actually renders the layer texture.
+ *   Pass `false` for base-colour-only meshes: they don't use the map, and
+ *   driving the (per-zone, non-re-entrant) compositor from several meshes at
+ *   once races on the shared canvas and can leave a zone's texture stuck.
+ */
+export function useZoneTexture(zoneId: ZoneId, compose = true): THREE.CanvasTexture {
   const layers = useDesignStore((s) => s.zones[zoneId]?.layers ?? EMPTY_LAYERS);
   const baseColor = useDesignStore((s) => s.zones[zoneId]?.baseColor ?? '#888888');
   const [texture] = useState(() => getOrCreateTexture(zoneId));
 
   useEffect(() => {
+    if (!compose) return;
     const compositor = getCompositor(zoneId);
     let cancelled = false;
     compositor.render(layers, baseColor).then(() => {
@@ -38,7 +45,7 @@ export function useZoneTexture(zoneId: ZoneId): THREE.CanvasTexture {
     return () => {
       cancelled = true;
     };
-  }, [layers, baseColor, zoneId, texture]);
+  }, [layers, baseColor, zoneId, texture, compose]);
 
   return texture;
 }

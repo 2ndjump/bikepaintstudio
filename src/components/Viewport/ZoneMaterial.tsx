@@ -40,7 +40,8 @@ export function ZonePaintedMaterial({ zone, side, baseOnly }: Props) {
     (s) => s.zones[zone]?.chameleonColors ?? DEFAULT_CHAMELEON_COLORS,
   );
   const baseColor = useDesignStore((s) => s.zones[zone]?.baseColor ?? '#888888');
-  const texture = useZoneTexture(zone);
+  // base-only meshes don't use the composited map, so don't drive the compositor.
+  const texture = useZoneTexture(zone, !baseOnly);
   const fp = finishParams(finish);
 
   // baseOnly: flat base colour, no layer texture map. Otherwise the composited

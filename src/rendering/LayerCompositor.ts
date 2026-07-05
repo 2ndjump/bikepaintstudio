@@ -146,6 +146,9 @@ export class ZoneCompositor {
   canvas: HTMLCanvasElement;
   ctx: CanvasRenderingContext2D;
   zoneId: ZoneId;
+  /** Serialises render() calls: the async body mutates this.ctx, so overlapping
+   *  runs on the same compositor would corrupt the shared canvas. */
+  private queue: Promise<unknown> = Promise.resolve();
 
   constructor(zoneId: ZoneId) {
     this.zoneId = zoneId;
@@ -158,7 +161,13 @@ export class ZoneCompositor {
     this.ctx = ctx;
   }
 
-  async render(layers: Layer[], baseColor: string): Promise<HTMLCanvasElement> {
+  render(layers: Layer[], baseColor: string): Promise<HTMLCanvasElement> {
+    const run = this.queue.catch(() => {}).then(() => this.renderNow(layers, baseColor));
+    this.queue = run;
+    return run;
+  }
+
+  private async renderNow(layers: Layer[], baseColor: string): Promise<HTMLCanvasElement> {
     const ctx = this.ctx;
     const w = this.canvas.width;
     const h = this.canvas.height;
