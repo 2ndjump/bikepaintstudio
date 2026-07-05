@@ -173,11 +173,12 @@ export function buildFrameModel(): FrameModel {
   const dSeat = new THREE.Vector3(-Math.cos(STA), Math.sin(STA), 0);
   const SC = BB.clone().addScaledVector(dSeat, 540); // seat cluster
 
-  // Head tube — slightly conical.
+  // Head tube — slightly conical. Chunky enough that the uniform down tube plugs
+  // fully into it (no overhang at the join).
   {
     const a = HB.clone().addScaledVector(dHead, -4);
     const b = HT.clone();
-    mapped.headTube.push(loftTube([a, a.clone().lerp(b, 0.5), b], (t) => 27 - 3 * t, () => 1.0, 40, 48).geo);
+    mapped.headTube.push(loftTube([a, a.clone().lerp(b, 0.5), b], (t) => 29 - 3 * t, () => 1.0, 40, 48).geo);
   }
 
   // Top tube — gently sloped, tapering to the seat cluster.
@@ -196,9 +197,7 @@ export function buildFrameModel(): FrameModel {
       loftTube(
         // End plunged into the BB shell so the tube fully overlaps it (no gap).
         [a, mid, new THREE.Vector3(2, 3, 0)],
-        // Fat aero mid, but tapered at the BB so the end (⌀38) buries cleanly
-        // inside the smaller BB shell (⌀47) instead of overhanging it.
-        (t) => 23 - 4 * t + 8 * Math.sin(t * Math.PI),
+        () => 26, // uniform thickness the whole length (⌀52 in-plane)
         () => 0.62, // narrower laterally
         90,
         56,
@@ -213,7 +212,7 @@ export function buildFrameModel(): FrameModel {
     const b = SC.clone().addScaledVector(dSeat, 16);
     mapped.seatTube.push(loftTube([a, a.clone().lerp(b, 0.5), b], (t) => 17 - 1.5 * t, () => 0.95, 60, 40).geo);
 
-    const bbShell = new THREE.CylinderGeometry(23.5, 23.5, 68, 48);
+    const bbShell = new THREE.CylinderGeometry(28, 28, 68, 48);
     bbShell.rotateX(Math.PI / 2);
     plain.seatTube!.push(bbShell);
 
