@@ -358,10 +358,12 @@ export class ZoneCompositor {
     const cy = h * layer.y;
 
     ctx.translate(cx, cy);
-    // +90° baseline so a stored rotation of 0 reads ALONG the tube (the zone
-    // canvas runs lengthwise vertically); the slider then turns left/right
-    // from that neutral orientation.
-    ctx.rotate(((layer.rotation + 90) * Math.PI) / 180);
+    // Baseline so a stored rotation of 0 reads in the natural orientation for
+    // the surface: +90° on tubes (text runs ALONG the lengthwise canvas), but
+    // 0° on rims (upright along the wheel circumference). The slider then turns
+    // left/right from that neutral.
+    const isRim = this.zoneId === 'frontRim' || this.zoneId === 'rearRim';
+    ctx.rotate(((layer.rotation + (isRim ? 0 : 90)) * Math.PI) / 180);
 
     const base = Math.min(w, h);
     const px = layer.size * 0.01 * base;
