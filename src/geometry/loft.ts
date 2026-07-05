@@ -41,7 +41,10 @@ export function loftTube(
     const r = radiusFn(t);
     const d = r * depthFn(t);
     for (let j = 0; j <= radial; j++) {
-      const a = (j / radial) * Math.PI * 2;
+      // +π so the UV seam sits at the BACK (−side) of the tube and the visible
+      // front (+side ≈ +x) maps to u≈0.5 — a shape/decal centred there stays
+      // continuous instead of being split by the seam.
+      const a = (j / radial) * Math.PI * 2 + Math.PI;
       let cA = Math.cos(a);
       let sA = Math.sin(a);
       if (exponent !== 2) {
