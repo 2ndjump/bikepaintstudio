@@ -123,10 +123,18 @@ export function subscribeFonts(fn: () => void): () => void {
 
 export function getAllFontOptions(): FontEntry[] {
   if (cachedEntries) return cachedEntries;
+  const seen = new Set<string>();
   const entries: FontEntry[] = [];
-  for (const f of CURATED_GOOGLE_FONTS) entries.push({ family: f, source: 'google' });
-  for (const f of systemFonts) entries.push({ family: f, source: 'system' });
-  for (const f of uploadedFonts) entries.push({ family: f, source: 'upload' });
+  const add = (family: string, source: FontSource) => {
+    const key = family.toLowerCase();
+    if (seen.has(key)) return; // dedupe (curated list has a few repeats)
+    seen.add(key);
+    entries.push({ family, source });
+  };
+  for (const f of CURATED_GOOGLE_FONTS) add(f, 'google');
+  for (const f of systemFonts) add(f, 'system');
+  for (const f of uploadedFonts) add(f, 'upload');
+  entries.sort((a, b) => a.family.localeCompare(b.family, undefined, { sensitivity: 'base' }));
   cachedEntries = entries;
   return entries;
 }

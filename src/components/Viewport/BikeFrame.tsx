@@ -1,13 +1,15 @@
 import { useEffect, useMemo } from 'react';
 import * as THREE from 'three';
-import { buildFrameModel, FRAME_ZONES, MODEL_SCALE } from '../../geometry/frameModel';
+import { buildFrameModel, FRAME_ZONES, MODEL_SCALE, type FrameZone } from '../../geometry/frameModel';
 import { ZonePaintedMaterial } from './ZoneMaterial';
 
 /**
  * The full procedural frameset (frame tubes + fork + hardware), built once in
  * millimetres by frameModel.ts and rendered inside a group scaled to metres.
- * Each paint zone is one merged mesh sharing the zone's painted material; the
- * alloy thru-axle and dark bores/caps use their own metal materials.
+ * Each paint zone renders as a mapped tube mesh (base colour + layers) plus, for
+ * a few zones, a base-only primitive mesh (BB shell, dropouts, steerer) so the
+ * layer texture never smears across those chunky junctions. The alloy thru-axle
+ * and dark bores/caps use their own metal materials.
  */
 export function BikeFrame() {
   const model = useMemo(() => buildFrameModel(), []);
@@ -15,17 +17,25 @@ export function BikeFrame() {
   useEffect(
     () => () => {
       FRAME_ZONES.forEach((z) => model.zones[z].dispose());
+      Object.values(model.zonesPlain).forEach((g) => g?.dispose());
       model.alu.dispose();
       model.dark.dispose();
     },
     [model],
   );
 
+  const plainZones = Object.keys(model.zonesPlain) as FrameZone[];
+
   return (
     <group scale={[MODEL_SCALE, MODEL_SCALE, MODEL_SCALE]}>
       {FRAME_ZONES.map((z) => (
         <mesh key={z} name={`zone:${z}`} geometry={model.zones[z]} castShadow receiveShadow>
           <ZonePaintedMaterial zone={z} side={THREE.DoubleSide} />
+        </mesh>
+      ))}
+      {plainZones.map((z) => (
+        <mesh key={`plain:${z}`} geometry={model.zonesPlain[z]} castShadow receiveShadow>
+          <ZonePaintedMaterial zone={z} baseOnly />
         </mesh>
       ))}
       <mesh geometry={model.alu} castShadow receiveShadow>

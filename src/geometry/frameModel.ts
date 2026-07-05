@@ -12,8 +12,15 @@ import { loftTube } from './loft';
  * head-angle rig transform, exactly as the source does — so the head-tube axis
  * is derived FROM the fork placement, keeping crown/head-tube/tubes coherent.
  *
- * Geometry is merged per paint zone (headTube…fork) plus two hardware buckets:
- * `alu` (thru-axle + lever) and `dark` (BB caps + steerer bore).
+ * Per paint zone the geometry is split into two buckets:
+ *  - `zones[z]`      the tube lofts, painted with the zone's composited texture
+ *                    (base colour + layers/decals/shapes).
+ *  - `zonesPlain[z]` chunky junction primitives (BB shell, dropouts, steerer)
+ *                    painted with the zone's BASE COLOUR only. Their UVs don't
+ *                    match the tube wrap, so mapping the layer texture onto them
+ *                    would smear/bleed decals & shapes across them (e.g. a shape
+ *                    at the top of the seat tube leaking onto the BB shell).
+ * Plus two hardware buckets: `alu` (thru-axle + lever) and `dark` (bores/caps).
  */
 
 export type FrameZone =
@@ -36,7 +43,10 @@ export const FRAME_ZONES: FrameZone[] = [
 ];
 
 export interface FrameModel {
+  /** Tube lofts, painted with the zone's composited (base + layers) texture. */
   zones: Record<FrameZone, THREE.BufferGeometry>;
+  /** Junction primitives, painted with the zone's flat base colour only. */
+  zonesPlain: Partial<Record<FrameZone, THREE.BufferGeometry>>;
   /** Bright alloy hardware (thru-axle, lever). */
   alu: THREE.BufferGeometry;
   /** Dark bore/caps (BB caps, steerer bore). */
@@ -57,7 +67,7 @@ export const FRONT_HUB = new THREE.Vector3(FRONT_AXLE.x, FRONT_AXLE.y, 0).multip
 export const REAR_HUB = new THREE.Vector3(REAR_AXLE_X, 75, 0).multiplyScalar(MODEL_SCALE);
 
 export function buildFrameModel(): FrameModel {
-  const painted: Record<FrameZone, THREE.BufferGeometry[]> = {
+  const mapped: Record<FrameZone, THREE.BufferGeometry[]> = {
     headTube: [],
     topTube: [],
     downTube: [],
@@ -65,6 +75,11 @@ export function buildFrameModel(): FrameModel {
     seatStays: [],
     chainStays: [],
     fork: [],
+  };
+  const plain: Partial<Record<FrameZone, THREE.BufferGeometry[]>> = {
+    fork: [],
+    seatTube: [],
+    chainStays: [],
   };
   const alu: THREE.BufferGeometry[] = [];
   const dark: THREE.BufferGeometry[] = [];
@@ -79,8 +94,9 @@ export function buildFrameModel(): FrameModel {
   const M = new THREE.Matrix4().makeTranslation(rigPos.x, rigPos.y, rigPos.z).multiply(M0);
   const bake = (g: THREE.BufferGeometry) => g.applyMatrix4(M);
 
-  // ---------- Fork (painted zone "fork") ----------
-  // Tapered steerer (1 1/8" → 1 1/2"), uncut above the head tube.
+  // ---------- Fork ----------
+  // Tapered steerer (1 1/8" → 1 1/2"), uncut above the head tube. Base-only:
+  // hidden in the head tube, lathe UVs don't match the blade wrap.
   const profile = [
     [22.0, 46],
     [20.5, 52],
@@ -90,9 +106,9 @@ export function buildFrameModel(): FrameModel {
     [14.3, 256],
     [13.6, 260],
   ].map((p) => new THREE.Vector2(p[0], p[1]));
-  painted.fork.push(bake(new THREE.LatheGeometry(profile, 64)));
+  plain.fork!.push(bake(new THREE.LatheGeometry(profile, 64)));
 
-  // Uni-crown loft: one continuous curve dropout → crown → dropout.
+  // Uni-crown loft: one continuous curve dropout → crown → dropout (mapped).
   const wU = (t: number) => Math.abs(t - 0.5) * 2;
   const legR = (t: number) => 12.5 + 13 * Math.pow(1 - wU(t), 2.0);
   const legD = (t: number) => 1.02 + 0.2 * wU(t);
@@ -111,19 +127,19 @@ export function buildFrameModel(): FrameModel {
     [58, -318, 37],
     [56, -386, 47],
   ];
-  painted.fork.push(bake(loftTube(forkPts, legR, legD, 260, 48).geo));
+  mapped.fork.push(bake(loftTube(forkPts, legR, legD, 260, 48).geo));
 
-  // Dropouts + axle bosses (organic, painted).
+  // Dropouts + axle bosses (organic, base-only).
   for (const s of [-1, 1]) {
     const drop = new THREE.SphereGeometry(16.5, 48, 32);
     drop.scale(0.62, 1.3, 1.05);
     drop.rotateX(0.15);
     drop.translate(s * 57, -386, 47);
-    painted.fork.push(bake(drop));
+    plain.fork!.push(bake(drop));
     const boss = new THREE.SphereGeometry(12.5, 40, 28);
     boss.scale(0.42, 1, 1);
     boss.translate(s * 64, -391, 49);
-    painted.fork.push(bake(boss));
+    plain.fork!.push(bake(boss));
   }
 
   // 12 mm thru-axle + lever (alloy).
@@ -161,7 +177,7 @@ export function buildFrameModel(): FrameModel {
   {
     const a = HB.clone().addScaledVector(dHead, -4);
     const b = HT.clone();
-    painted.headTube.push(loftTube([a, a.clone().lerp(b, 0.5), b], (t) => 27 - 3 * t, () => 1.0, 40, 48).geo);
+    mapped.headTube.push(loftTube([a, a.clone().lerp(b, 0.5), b], (t) => 27 - 3 * t, () => 1.0, 40, 48).geo);
   }
 
   // Top tube — gently sloped, tapering to the seat cluster.
@@ -169,32 +185,27 @@ export function buildFrameModel(): FrameModel {
     const a = HB.clone().addScaledVector(dHead, 132);
     const b = SC.clone().add(new THREE.Vector3(14, -14, 0));
     const mid = a.clone().lerp(b, 0.5).add(new THREE.Vector3(0, -6, 0));
-    painted.topTube.push(loftTube([a, mid, b], (t) => 16 - 3.5 * t, () => 0.85, 90, 40).geo);
+    mapped.topTube.push(loftTube([a, mid, b], (t) => 16 - 3.5 * t, () => 0.85, 90, 40).geo);
   }
 
   // Down tube — voluminous, aero-vertical.
   {
     const a = HB.clone().addScaledVector(dHead, 38); // junction sits a touch higher on the head tube
     const mid = a.clone().lerp(BB, 0.55).add(new THREE.Vector3(0, -14, 0));
-    painted.downTube.push(
+    mapped.downTube.push(
       loftTube([a, mid, new THREE.Vector3(4, 2, 0)], (t) => 20 + 4 * Math.sin(t * Math.PI), () => 0.78, 90, 40).geo,
     );
   }
 
-  // Seat tube + seat cluster + BB shell.
+  // Seat tube (mapped) + BB shell (base-only). Seat clamp/cluster removed.
   {
     const a = BB.clone().addScaledVector(dSeat, -8);
     const b = SC.clone().addScaledVector(dSeat, 16);
-    painted.seatTube.push(loftTube([a, a.clone().lerp(b, 0.5), b], (t) => 17 - 1.5 * t, () => 0.95, 60, 40).geo);
-
-    const cluster = new THREE.SphereGeometry(20, 40, 28);
-    cluster.scale(0.85, 0.95, 0.75);
-    cluster.translate(SC.x, SC.y, SC.z);
-    painted.seatTube.push(cluster);
+    mapped.seatTube.push(loftTube([a, a.clone().lerp(b, 0.5), b], (t) => 17 - 1.5 * t, () => 0.95, 60, 40).geo);
 
     const bbShell = new THREE.CylinderGeometry(23.5, 23.5, 68, 48);
     bbShell.rotateX(Math.PI / 2);
-    painted.seatTube.push(bbShell);
+    plain.seatTube!.push(bbShell);
 
     for (const s of [-1, 1]) {
       const cap = new THREE.CylinderGeometry(20, 20, 2, 40);
@@ -204,22 +215,21 @@ export function buildFrameModel(): FrameModel {
     }
   }
 
-  // Chain stays + rear dropouts.
+  // Chain stays (mapped) + rear dropouts (base-only).
   for (const s of [-1, 1]) {
     const pts = [
-      // Root reaches into the BB shell (was x -24) and is pulled inward along z
-      // (was 26/24) so the ends bury inside the shell instead of overlapping at
-      // its outer rim.
+      // Root reaches into the BB shell and is pulled inward along z so the ends
+      // bury inside the shell instead of overlapping at its outer rim.
       [-8, -3, s * 18],
       [-160, 28, s * 52],
       [-320, 58, s * 64],
       [REAR_AXLE_X + 6, 73, s * 66],
     ];
-    painted.chainStays.push(loftTube(pts, (t) => 11.5 - 3 * t, () => 0.9, 90, 32).geo);
+    mapped.chainStays.push(loftTube(pts, (t) => 11.5 - 3 * t, () => 0.9, 90, 32).geo);
     const drop = new THREE.SphereGeometry(13, 40, 28);
     drop.scale(1.3, 1.05, 0.5);
     drop.translate(REAR_AXLE_X, 75, s * 66);
-    painted.chainStays.push(drop);
+    plain.chainStays!.push(drop);
   }
 
   // Seat stays — DROPPED: they join the seat tube low (~61% up), well below the
@@ -232,13 +242,21 @@ export function buildFrameModel(): FrameModel {
       new THREE.Vector3(-345, 150, s * 56),
       new THREE.Vector3(REAR_AXLE_X + 8, 82, s * 64),
     ];
-    painted.seatStays.push(loftTube(pts, (t) => 8.5 - 2 * t, () => 0.9, 90, 32).geo);
+    mapped.seatStays.push(loftTube(pts, (t) => 8.5 - 2 * t, () => 0.9, 90, 32).geo);
   }
 
   const zones = {} as Record<FrameZone, THREE.BufferGeometry>;
-  for (const z of FRAME_ZONES) zones[z] = mergeGeometries(painted[z], false)!;
+  for (const z of FRAME_ZONES) zones[z] = mergeGeometries(mapped[z], false)!;
+
+  const zonesPlain: Partial<Record<FrameZone, THREE.BufferGeometry>> = {};
+  for (const z of Object.keys(plain) as FrameZone[]) {
+    const arr = plain[z]!;
+    if (arr.length) zonesPlain[z] = mergeGeometries(arr, false)!;
+  }
+
   return {
     zones,
+    zonesPlain,
     alu: mergeGeometries(alu, false)!,
     dark: mergeGeometries(dark, false)!,
   };

@@ -48,7 +48,15 @@ function remapLatheUVToSidewalls(geo: THREE.BufferGeometry): void {
   const uv = geo.attributes.uv;
   if (!uv) return;
   for (let i = 0; i < uv.count; i++) {
-    const v = uv.getY(i);
+    const v = uv.getY(i); // original lathe V: 0 = −lateral spoke bed … 1 = +lateral
+
+    // The rim is a surface of revolution, so both lateral sidewalls sample the
+    // same circumferential U — text/decals therefore read correctly on the
+    // −lateral face but mirrored on the +lateral (lit) face. Flip U on the
+    // +lateral half so both faces read the same way. The flip seam falls in the
+    // bead channel (v ≈ 0.5), which is hidden under the tire.
+    if (v > 0.45) uv.setX(i, 1 - uv.getX(i));
+
     let nv: number;
     if (v < 0.4) {
       nv = v / 0.4;
