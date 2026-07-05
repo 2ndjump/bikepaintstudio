@@ -190,7 +190,7 @@ export function buildFrameModel(): FrameModel {
 
   // Down tube — big aero member with a rounded-rectangle (squircle) section.
   {
-    const a = HB.clone().addScaledVector(dHead, 38); // junction sits a touch higher on the head tube
+    const a = HB.clone().addScaledVector(dHead, 55); // down tube meets the head tube higher up
     const mid = a.clone().lerp(BB, 0.55).add(new THREE.Vector3(0, -16, 0));
     mapped.downTube.push(
       loftTube(
