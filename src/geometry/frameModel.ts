@@ -188,12 +188,19 @@ export function buildFrameModel(): FrameModel {
     mapped.topTube.push(loftTube([a, mid, b], (t) => 16 - 3.5 * t, () => 0.85, 90, 40).geo);
   }
 
-  // Down tube — voluminous, aero-vertical.
+  // Down tube — big aero member with a rounded-rectangle (squircle) section.
   {
     const a = HB.clone().addScaledVector(dHead, 38); // junction sits a touch higher on the head tube
-    const mid = a.clone().lerp(BB, 0.55).add(new THREE.Vector3(0, -14, 0));
+    const mid = a.clone().lerp(BB, 0.55).add(new THREE.Vector3(0, -16, 0));
     mapped.downTube.push(
-      loftTube([a, mid, new THREE.Vector3(4, 2, 0)], (t) => 20 + 4 * Math.sin(t * Math.PI), () => 0.78, 90, 40).geo,
+      loftTube(
+        [a, mid, new THREE.Vector3(4, 2, 0)],
+        (t) => 27 + 6 * Math.sin(t * Math.PI), // deeper in-plane (aero) — reads much thicker from the side
+        () => 0.62, // narrower laterally
+        90,
+        56,
+        3.2, // rounded-rectangle cross-section
+      ).geo,
     );
   }
 

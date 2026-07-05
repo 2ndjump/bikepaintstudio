@@ -6,6 +6,9 @@ import * as THREE from 'three';
  * near-Z half-axis (fore/aft). The cross-section is oriented against the global
  * Z axis, so tubes lying in the XY plane keep a consistent lateral profile.
  *
+ * `exponent` shapes the cross-section: 2 = ellipse (default), higher values
+ * (≈3–4) give a rounded rectangle / squircle (aero tube).
+ *
  * Produces position + uv (u around, v along) + smooth normals, with flat end
  * caps. Shared by the whole procedural frameset (see frameModel.ts).
  */
@@ -15,6 +18,7 @@ export function loftTube(
   depthFn: (t: number) => number,
   segs = 140,
   radial = 48,
+  exponent = 2,
 ): { geo: THREE.BufferGeometry; curve: THREE.CatmullRomCurve3 } {
   const vecs = points.map((p) =>
     p instanceof THREE.Vector3 ? p.clone() : new THREE.Vector3(p[0], p[1], p[2]),
@@ -38,10 +42,18 @@ export function loftTube(
     const d = r * depthFn(t);
     for (let j = 0; j <= radial; j++) {
       const a = (j / radial) * Math.PI * 2;
+      let cA = Math.cos(a);
+      let sA = Math.sin(a);
+      if (exponent !== 2) {
+        // Superellipse: signed |cos|^(2/n) / |sin|^(2/n) — n>2 rounds toward a rectangle.
+        const e = 2 / exponent;
+        cA = Math.sign(cA) * Math.pow(Math.abs(cA), e);
+        sA = Math.sign(sA) * Math.pow(Math.abs(sA), e);
+      }
       pos.push(
-        c.x + side.x * Math.cos(a) * r + fore.x * Math.sin(a) * d,
-        c.y + side.y * Math.cos(a) * r + fore.y * Math.sin(a) * d,
-        c.z + side.z * Math.cos(a) * r + fore.z * Math.sin(a) * d,
+        c.x + side.x * cA * r + fore.x * sA * d,
+        c.y + side.y * cA * r + fore.y * sA * d,
+        c.z + side.z * cA * r + fore.z * sA * d,
       );
       uv.push(j / radial, t);
     }
