@@ -2,7 +2,6 @@ import { useDesignStore } from '../../state/designStore';
 import type { DesignState } from '../../state/types';
 import { useUIStore, type BackgroundMode, type Lang } from '../../state/uiStore';
 import { useT } from '../../i18n/useT';
-import { designToXML, xmlToDesign } from '../../state/xmlFormat';
 
 export function Toolbar() {
   const state = useDesignStore();
@@ -47,42 +46,6 @@ export function Toolbar() {
           useDesignStore.getState().loadDesign(data);
         } catch (e) {
           console.error('Invalid design JSON', e);
-        }
-      };
-      reader.readAsText(file);
-    };
-    input.click();
-  }
-
-  function exportXML() {
-    const snapshot: DesignState = {
-      activeZone: state.activeZone,
-      zones: state.zones,
-      rim: state.rim,
-    };
-    const blob = new Blob([designToXML(snapshot)], { type: 'application/xml' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'bike-design.xml';
-    a.click();
-    URL.revokeObjectURL(url);
-  }
-
-  function importXML() {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'application/xml,.xml';
-    input.onchange = () => {
-      const file = input.files?.[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = () => {
-        try {
-          const data = xmlToDesign(reader.result as string);
-          useDesignStore.getState().loadDesign(data);
-        } catch (e) {
-          console.error('Invalid design XML', e);
         }
       };
       reader.readAsText(file);
@@ -156,20 +119,6 @@ export function Toolbar() {
       </button>
       <button className="m3-btn m3-btn-tonal m3-btn-sm" onClick={importJSON}>
         {t('load')}
-      </button>
-      <button
-        className="m3-btn m3-btn-outlined m3-btn-sm"
-        onClick={exportXML}
-        title="Export as human-readable XML"
-      >
-        XML ↓
-      </button>
-      <button
-        className="m3-btn m3-btn-outlined m3-btn-sm"
-        onClick={importXML}
-        title="Import from XML"
-      >
-        XML ↑
       </button>
     </header>
   );
