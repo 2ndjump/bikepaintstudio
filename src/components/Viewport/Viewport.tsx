@@ -1,14 +1,16 @@
 import { Canvas, useThree } from '@react-three/fiber';
-import { ContactShadows, Environment, OrbitControls } from '@react-three/drei';
+import { OrbitControls } from '@react-three/drei';
 import * as THREE from 'three';
 import { BikeFrame } from './BikeFrame';
+import { StudioEnvironment } from './StudioEnvironment';
 import { Wheel } from './Wheel';
-import { buildBikeFrame, ROAD_GEO } from '../../geometry/frame';
-import { useEffect, useMemo } from 'react';
+import { ROAD_GEO } from '../../geometry/frame';
+import { FRONT_HUB, REAR_HUB } from '../../geometry/frameModel';
+import { useEffect } from 'react';
 import { useUIStore } from '../../state/uiStore';
 
 const BG_COLORS: Record<'dark' | 'light', string> = {
-  dark: '#0b0d11',
+  dark: '#0e0f12', // studio spec flat background
   light: '#f2f3f5',
 };
 
@@ -23,68 +25,82 @@ function DebugExpose() {
 export function Viewport() {
   const background = useUIStore((s) => s.background);
   const geo = ROAD_GEO;
-  const frame = useMemo(() => buildBikeFrame(geo), [geo]);
-  const useHdriBackground = background === 'studio';
-  const solidColor = useHdriBackground ? null : BG_COLORS[background];
-  const shadowOpacity = background === 'light' ? 0.35 : 0.5;
+  const solidColor = BG_COLORS[background];
 
   // Ground plane sits at the bottom of the wheels.
-  const groundY = frame.rearHub.y - geo.wheelRadius - 0.002;
+  const groundY = REAR_HUB.y - geo.wheelRadius - 0.002;
 
   return (
     <Canvas
-      shadows
+      shadows="soft"
       camera={{ position: [1.7, 0.75, 1.9], fov: 33 }}
       gl={{
         antialias: true,
         preserveDrawingBuffer: true,
-        // Khronos PBR-neutral: realistic highlight rolloff with accurate
-        // mid-tone colors — exactly what a paint configurator needs.
-        toneMapping: THREE.NeutralToneMapping,
-        toneMappingExposure: 1.0,
+        // Studio paint spec: ACES filmic tone mapping for realistic highlight
+        // rolloff on the glossy/metallic reflections.
+        toneMapping: THREE.ACESFilmicToneMapping,
+        toneMappingExposure: 1.05,
       }}
       dpr={[1, 2]}
     >
-      {solidColor && <color attach="background" args={[solidColor]} />}
+      <color attach="background" args={[solidColor]} />
+      {/* Atmospheric depth. Spec fog (near 1400 / far 3200 mm) is authored for a
+          ~400 mm object; scaled proportionally to this metre-scale bike + camera
+          distance so the bike stays clear and only the ground rim fades to bg. */}
+      <fog attach="fog" args={[solidColor, 3.8, 8.8]} />
 
-      {/* Light budget tuned for COLOUR FIDELITY: neutral fill (ambient + IBL)
-          is kept low because it lifts every channel equally and desaturates
-          the picked colour (dark colours wash toward the env grey). The
-          directional key multiplies the albedo, so it preserves hue and does
-          the shading. Goal: a tube's broad mid-tone reads as the picked hex. */}
-      <ambientLight intensity={0.05} />
-      <directionalLight position={[3, 5, 2]} intensity={0.62} />
-      <directionalLight position={[-2.5, 3, -3.5]} intensity={0.18} />
-      {/* Ground bounce: lifts downward-facing surfaces (crown shoulder, BB
-          shell underside) so they don't read as black holes. */}
-      <directionalLight position={[0.5, -3, 1]} intensity={0.12} />
+      {/* Studio light rig (based on the spec). Physically-correct light units
+          (r155+); directional intensities are scale-independent, positions keep
+          the spec's direction. The key is pushed out along its direction so its
+          shadow-camera frustum comfortably covers the whole bike.
+          Deviation from the raw spec (approved): the hemisphere sky is
+          neutralised (was 0x3d4250) and the cool rim dialled back (was 2.51) so
+          a neutral base colour reads neutral instead of periwinkle — the cool
+          back-left accent + warm fill mood is kept. */}
+      <hemisphereLight color={0x4c4e52} groundColor={0x0a0a0c} intensity={2.1} />
+      <directionalLight
+        color={0xffffff}
+        intensity={3.0}
+        position={[1.15, 1.43, 1.32]}
+        castShadow
+        shadow-mapSize-width={2048}
+        shadow-mapSize-height={2048}
+        shadow-bias={-0.0004}
+        shadow-camera-near={0.1}
+        shadow-camera-far={6}
+        shadow-camera-left={-1.6}
+        shadow-camera-right={1.6}
+        shadow-camera-top={1.6}
+        shadow-camera-bottom={-1.6}
+      />
+      <directionalLight color={0xd9e6ff} intensity={1.0} position={[-0.5, 0.26, -0.42]} />
+      <directionalLight color={0xffe7c4} intensity={1.4} position={[-0.26, -0.08, 0.46]} />
 
-      <Environment preset="studio" background={useHdriBackground} environmentIntensity={0.22} />
+      <StudioEnvironment />
 
       <DebugExpose />
-      <BikeFrame geo={geo} />
+      <BikeFrame />
       <Wheel
-        position={[frame.frontHub.x, frame.frontHub.y, frame.frontHub.z]}
+        position={[FRONT_HUB.x, FRONT_HUB.y, FRONT_HUB.z]}
         zone="frontRim"
         tireWidth={geo.tireWidth}
         wheelRadius={geo.wheelRadius}
       />
       <Wheel
-        position={[frame.rearHub.x, frame.rearHub.y, frame.rearHub.z]}
+        position={[REAR_HUB.x, REAR_HUB.y, REAR_HUB.z]}
         zone="rearRim"
         tireWidth={geo.tireWidth}
         wheelRadius={geo.wheelRadius}
       />
 
-      {/* Soft grounding shadow (no shadow-map = no tube self-shadow seams). */}
-      <ContactShadows
-        position={[0.09, groundY, 0]}
-        opacity={shadowOpacity}
-        scale={3.2}
-        blur={2.4}
-        far={0.9}
-        resolution={512}
-      />
+      {/* Invisible shadow-catcher floor: a ShadowMaterial circle that shows only
+          the key light's soft cast shadow (spec: opacity 0.38). Radius scaled
+          from the spec's 900 mm to this scene. */}
+      <mesh position={[0.09, groundY, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
+        <circleGeometry args={[2.5, 64]} />
+        <shadowMaterial opacity={0.38} />
+      </mesh>
 
       <OrbitControls
         makeDefault

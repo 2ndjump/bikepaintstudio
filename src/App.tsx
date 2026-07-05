@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Viewport } from './components/Viewport/Viewport';
 import { ZoneSelector } from './components/Sidebar/ZoneSelector';
+import { PalettePanel } from './components/Sidebar/PalettePanel';
 import { FinishPicker } from './components/Sidebar/FinishPicker';
 import { LayerStack } from './components/Sidebar/LayerStack';
 import { RimPanel } from './components/Sidebar/RimPanel';
@@ -57,8 +58,11 @@ export default function App() {
             <Viewport />
           </main>
           <div className="p-3 space-y-3">
-            <div className="m3-card">
+            <div className="m3-card space-y-3">
               <FinishPicker />
+              <div className="pt-3" style={{ borderTop: '1px solid var(--md-outline-variant)' }}>
+                <PalettePanel />
+              </div>
             </div>
             <div className="m3-card">
               <ZoneSelector columns={2} />
@@ -86,17 +90,20 @@ export default function App() {
           size, while the panel track is fixed — the menu can never be pushed
           off-screen no matter how the 3D canvas sizes itself. The left rail is
           display:none below lg, so it drops out of the grid (2 tracks). */}
-      <div className="flex-1 min-h-0 overflow-hidden grid grid-cols-[18rem_minmax(0,1fr)] lg:grid-cols-[12rem_minmax(0,1fr)_18rem]">
+      <div className="flex-1 min-h-0 overflow-hidden grid grid-cols-[18rem_minmax(0,1fr)] lg:grid-cols-[18rem_minmax(0,1fr)_18rem]">
         {/* Left sidebar — only on wide windows: global frame paint + zones */}
         <aside
           className="hidden lg:flex flex-col min-h-0 overflow-y-auto p-3 gap-3 m3-panel"
           style={{ borderRight: '1px solid var(--md-outline-variant)' }}
         >
-          <div className="m3-card">
+          <div className="m3-card space-y-3">
             <FinishPicker />
+            <div className="pt-3" style={{ borderTop: '1px solid var(--md-outline-variant)' }}>
+              <PalettePanel />
+            </div>
           </div>
           <div className="m3-card">
-            <ZoneSelector />
+            <ZoneSelector columns={2} />
           </div>
           {isRim && (
             <div className="m3-card">
@@ -116,8 +123,11 @@ export default function App() {
           <div className="space-y-3">
             {/* On wide screens the paint + zones live in the left sidebar; below
                 lg the left rail is hidden so they appear here instead. */}
-            <div className="lg:hidden m3-card">
+            <div className="lg:hidden m3-card space-y-3">
               <FinishPicker />
+              <div className="pt-3" style={{ borderTop: '1px solid var(--md-outline-variant)' }}>
+                <PalettePanel />
+              </div>
             </div>
             <div className="lg:hidden m3-card">
               <ZoneSelector columns={2} />

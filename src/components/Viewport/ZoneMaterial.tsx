@@ -51,28 +51,17 @@ export function ZonePaintedMaterial({ zone, side, baseOnly }: Props) {
     return <ChameleonMaterial texture={texture} fp={fp} colors={chameleonColors} side={side} />;
   }
 
-  if (finish === 'glossy' || finish === 'metallic') {
-    return (
-      <meshPhysicalMaterial
-        {...paint}
-        roughness={fp.roughness}
-        metalness={fp.metalness}
-        clearcoat={fp.clearcoat}
-        clearcoatRoughness={fp.clearcoatRoughness}
-        specularIntensity={fp.specularIntensity}
-        envMapIntensity={fp.envMapIntensity}
-        side={side ?? THREE.FrontSide}
-      />
-    );
-  }
-
-  // matte / satin — lit, diffuse. Roughness/metalness from the finish give the
-  // soft sheen difference between matte and satin.
+  // All four standard finishes are a single shared MeshPhysicalMaterial recipe:
+  // matt/satin/gloss/metallic differ only by roughness/metalness/clearcoat/
+  // clearcoatRoughness/envMapIntensity (see finish.ts). matt has clearcoat 0.0
+  // so the clearcoat layer is a no-op there.
   return (
-    <meshStandardMaterial
+    <meshPhysicalMaterial
       {...paint}
       roughness={fp.roughness}
       metalness={fp.metalness}
+      clearcoat={fp.clearcoat}
+      clearcoatRoughness={fp.clearcoatRoughness}
       envMapIntensity={fp.envMapIntensity}
       side={side ?? THREE.FrontSide}
     />

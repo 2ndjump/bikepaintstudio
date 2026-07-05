@@ -145,10 +145,8 @@ export function buildBikeFrame(geo: BikeGeo = ROAD_GEO): FrameGeometryDesc {
   const seatstayAttach = stTop.clone().multiplyScalar(0.80);
   seatstayAttach.x -= 0.004;
 
-  // Fork crown.
-  const crownTop = htBot.clone().addScaledVector(htAxis, -0.004);
-  // Crown extended further down so its wide bottom reaches and caps the
-  // (shortened) leg tops cleanly, instead of the legs poking up into the cone.
+  // Fork crown anchor (kept for the anchors record; the fork itself is now a
+  // separate model positioned from frontHub + htBot/htAxis).
   const crownBot = htBot.clone().addScaledVector(htAxis, -0.050);
 
   const tubes: TubeDesc[] = [
@@ -270,49 +268,9 @@ export function buildBikeFrame(geo: BikeGeo = ROAD_GEO): FrameGeometryDesc {
       shapeExponent: 2,
     })),
 
-    // ── Fork crown ── flows out of the head tube bottom and spreads laterally
-    // into the blades. Bottom width must fully cover the blade roots.
-    {
-      zone: 'fork',
-      path: [crownTop.clone(), crownBot.clone()],
-      // Top matches the head-tube/steerer diameter at htBot (~0.024, slightly
-      // oval fore-aft) for a flush transition, then flares to the wide bottom
-      // that caps the leg tops.
-      radiusStart: 0.0240,
-      radiusEnd: 0.030,
-      csStart: { x: 1.0, z: 1.05 },
-      csEnd: { x: 1.52, z: 0.85 },
-      radialSegments: 24,
-      tubularSegments: 10,
-      shapeExponent: 2.2,
-    },
-
-    // ── Fork legs ── beefy airfoil blades. Tops spread apart (z ±26mm) for a
-    // wide gap between the blades. Tops sit just 3mm into the crown's widest
-    // bottom edge — enough to be capped, but not poking up into the narrowing
-    // cone where they'd overlap through the crown wall.
-    ...([1, -1] as const).map((side): TubeDesc => ({
-      zone: 'fork',
-      path: [
-        // Top pushed out to z ±31mm so the blade's outer line sits flush with
-        // the crown's lower-diameter edge, and ended right at the crown's
-        // bottom edge (-1mm) so it doesn't poke up into the tapering wall.
-        new THREE.Vector3(crownBot.x - 0.002, crownBot.y - 0.001, 0.031 * side),
-        new THREE.Vector3(
-          crownBot.x + (frontHub.x - crownBot.x) * 0.55 - 0.004,
-          crownBot.y + (frontHub.y - crownBot.y) * 0.55,
-          (0.031 + halfStayFront) * 0.56 * side,
-        ),
-        new THREE.Vector3(frontHub.x - 0.002, frontHub.y + 0.004, halfStayFront * side),
-      ],
-      radiusStart: 0.016,
-      radiusEnd: 0.0115,
-      csStart: { x: 0.86, z: 1.32 },
-      csEnd: { x: 0.78, z: 1.20 },
-      radialSegments: 16,
-      tubularSegments: 22,
-      shapeExponent: 2.2,
-    })),
+    // ── Fork ── the crown + blades are now a separate full-carbon uni-crown
+    // model (see components/Viewport/Fork.tsx + geometry/fork.ts), positioned
+    // from the anchors below. No fork tubes are emitted here.
   ];
 
   const anchors: FrameAnchors = {

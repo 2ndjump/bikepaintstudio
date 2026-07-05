@@ -6,6 +6,11 @@ export type I18nKey =
   | 'load'
   | 'pngExport'
   | 'zones'
+  | 'rims'
+  | 'hasLayers'
+  | 'palette'
+  | 'removeColor'
+  | 'paletteEmpty'
   | 'paintFinish'
   | 'baseColor'
   | 'finishMatte'
@@ -62,7 +67,6 @@ export type I18nKey =
   | 'letterRotation'
   | 'bgDark'
   | 'bgLight'
-  | 'bgStudio'
   | 'backgroundLabel'
   | 'undo'
   | 'redo'
@@ -100,6 +104,11 @@ const STRINGS: Record<I18nKey, Record<Lang, string>> = {
   load: { de: 'Laden', en: 'Load' },
   pngExport: { de: 'PNG Export', en: 'Export PNG' },
   zones: { de: 'Zonen', en: 'Zones' },
+  rims: { de: 'Felgen', en: 'Rims' },
+  hasLayers: { de: 'Ebenen vorhanden', en: 'Has layers' },
+  palette: { de: 'Palette', en: 'Palette' },
+  removeColor: { de: 'Entfernen', en: 'Remove' },
+  paletteEmpty: { de: 'Noch keine Farben', en: 'No colours yet' },
   paintFinish: { de: 'Lack-Finish', en: 'Paint Finish' },
   baseColor: { de: 'Grundfarbe', en: 'Base Color' },
   finishMatte: { de: 'Matt', en: 'Matte' },
@@ -156,7 +165,6 @@ const STRINGS: Record<I18nKey, Record<Lang, string>> = {
   letterRotation: { de: 'Buchstaben-Rotation', en: 'Letter rotation' },
   bgDark: { de: 'Dunkel', en: 'Dark' },
   bgLight: { de: 'Hell', en: 'Light' },
-  bgStudio: { de: 'Studio', en: 'Studio' },
   backgroundLabel: { de: 'Hintergrund', en: 'Background' },
   undo: { de: 'Rückgängig', en: 'Undo' },
   redo: { de: 'Wiederh.', en: 'Redo' },

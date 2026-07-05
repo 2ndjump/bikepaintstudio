@@ -104,10 +104,9 @@ export function Toolbar() {
     }, 'image/png');
   }
 
-  const bgOptions: { value: BackgroundMode; labelKey: 'bgDark' | 'bgLight' | 'bgStudio' }[] = [
+  const bgOptions: { value: BackgroundMode; labelKey: 'bgDark' | 'bgLight' }[] = [
     { value: 'dark', labelKey: 'bgDark' },
     { value: 'light', labelKey: 'bgLight' },
-    { value: 'studio', labelKey: 'bgStudio' },
   ];
 
   const langOptions: Lang[] = ['de', 'en'];

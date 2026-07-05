@@ -1,57 +1,39 @@
 import { useEffect, useMemo } from 'react';
 import * as THREE from 'three';
-import { buildBikeFrame, type BikeGeo, type TubeDesc } from '../../geometry/frame';
-import { buildVariableTubeFromPath } from '../../geometry/variableTube';
+import { buildFrameModel, FRAME_ZONES, MODEL_SCALE } from '../../geometry/frameModel';
 import { ZonePaintedMaterial } from './ZoneMaterial';
-import { Fillets } from './Fillets';
 
-interface Props {
-  geo: BikeGeo;
-}
+/**
+ * The full procedural frameset (frame tubes + fork + hardware), built once in
+ * millimetres by frameModel.ts and rendered inside a group scaled to metres.
+ * Each paint zone is one merged mesh sharing the zone's painted material; the
+ * alloy thru-axle and dark bores/caps use their own metal materials.
+ */
+export function BikeFrame() {
+  const model = useMemo(() => buildFrameModel(), []);
 
-export function BikeFrame({ geo }: Props) {
-  const frame = useMemo(() => buildBikeFrame(geo), [geo]);
-
-  return (
-    <group>
-      {frame.tubes.map((t, i) => (
-        <ZonedTube key={i} tube={t} />
-      ))}
-      <Fillets anchors={frame.anchors} />
-    </group>
+  useEffect(
+    () => () => {
+      FRAME_ZONES.forEach((z) => model.zones[z].dispose());
+      model.alu.dispose();
+      model.dark.dispose();
+    },
+    [model],
   );
-}
 
-function buildTubeGeometry(tube: TubeDesc): THREE.BufferGeometry {
-  return buildVariableTubeFromPath(tube.path, {
-    tubularSegments: tube.tubularSegments ?? Math.max(32, tube.path.length * 14),
-    radialSegments: tube.radialSegments ?? 16,
-    radiusStart: tube.radiusStart,
-    radiusEnd: tube.radiusEnd ?? tube.radiusStart,
-    csStart: tube.csStart,
-    csEnd: tube.csEnd,
-    shapeExponent: tube.shapeExponent,
-    // No end caps: the dark cap disc was the source of the "see-through"
-    // notch under lighting. Without caps the buried ends are covered by the
-    // partner tube, and DoubleSide (below) renders the lit inner wall on any
-    // end that peeks — so matte/satin can stay fully lit.
-    caps: false,
-    // Hide the UV seam on the underside so decals stay clear of the cut. The
-    // fork keeps the original wrap (down-projection rotates its blades ~90°).
-    seamDown: tube.zone !== 'fork',
-  });
-}
-
-function ZonedTube({ tube }: { tube: TubeDesc }) {
-  const geometry = useMemo(() => buildTubeGeometry(tube), [tube]);
-  useEffect(() => () => geometry.dispose(), [geometry]);
-
-  // castShadow stays OFF: per-tube shadow casting self-shadows the
-  // neighboring tube at every junction and reads as a dark seam
-  // (see DEVELOPMENT_NOTES.md).
   return (
-    <mesh name={`tube:${tube.zone}`} geometry={geometry} receiveShadow>
-      <ZonePaintedMaterial zone={tube.zone} side={THREE.DoubleSide} />
-    </mesh>
+    <group scale={[MODEL_SCALE, MODEL_SCALE, MODEL_SCALE]}>
+      {FRAME_ZONES.map((z) => (
+        <mesh key={z} name={`zone:${z}`} geometry={model.zones[z]} castShadow receiveShadow>
+          <ZonePaintedMaterial zone={z} side={THREE.DoubleSide} />
+        </mesh>
+      ))}
+      <mesh geometry={model.alu} castShadow receiveShadow>
+        <meshStandardMaterial color="#8f9299" roughness={0.3} metalness={1} envMapIntensity={1} />
+      </mesh>
+      <mesh geometry={model.dark} castShadow receiveShadow>
+        <meshStandardMaterial color="#0a0a0b" roughness={0.8} metalness={0.2} />
+      </mesh>
+    </group>
   );
 }

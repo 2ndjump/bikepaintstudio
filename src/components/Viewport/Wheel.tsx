@@ -66,19 +66,19 @@ export function Wheel({ position, zone, tireWidth = 0.014, wheelRadius = 0.339 }
 
   return (
     <group position={position} rotation={[Math.PI / 2, 0, 0]}>
-      <mesh geometry={rimGeo} receiveShadow>
+      <mesh geometry={rimGeo} castShadow receiveShadow>
         <ZonePaintedMaterial zone={zone} side={THREE.DoubleSide} />
       </mesh>
 
-      <mesh geometry={tireGeo} rotation={[Math.PI / 2, 0, 0]} receiveShadow>
+      <mesh geometry={tireGeo} rotation={[Math.PI / 2, 0, 0]} castShadow receiveShadow>
         <meshStandardMaterial color="#181818" roughness={0.88} metalness={0} />
       </mesh>
 
-      <mesh geometry={hubGeo}>
+      <mesh geometry={hubGeo} castShadow receiveShadow>
         <meshStandardMaterial color="#1b1b1b" roughness={0.35} metalness={0.8} />
       </mesh>
 
-      <mesh geometry={mergedSpokes}>
+      <mesh geometry={mergedSpokes} castShadow receiveShadow>
         <meshStandardMaterial color="#2a2a2a" roughness={0.45} metalness={0.85} />
       </mesh>
 
@@ -86,6 +86,8 @@ export function Wheel({ position, zone, tireWidth = 0.014, wheelRadius = 0.339 }
       <mesh
         position={[rimInner - valveLen / 2, 0, 0]}
         rotation={[0, 0, Math.PI / 2]}
+        castShadow
+        receiveShadow
       >
         <cylinderGeometry args={[0.0022, 0.0022, valveLen, 12]} />
         <meshStandardMaterial color="#9a9a9a" roughness={0.35} metalness={0.9} />
