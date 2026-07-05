@@ -189,6 +189,9 @@ export function LayerStack() {
   }
 
   function addDecal() {
+    // On rims the readable orientation runs along the circumference, so text
+    // defaults to -90° there (upright on the wheel) instead of 0°.
+    const isRim = activeZone === 'frontRim' || activeZone === 'rearRim';
     const layer: Layer = {
       id: newLayerId('decal'),
       name: 'Text',
@@ -202,7 +205,7 @@ export function LayerStack() {
       letterSpacing: 0,
       x: 0.5,
       y: 0.5,
-      rotation: 0,
+      rotation: isRim ? -90 : 0,
       glyphRotation: 0,
       visible: true,
       opacity: 1,
