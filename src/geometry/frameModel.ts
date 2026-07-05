@@ -194,7 +194,8 @@ export function buildFrameModel(): FrameModel {
     const mid = a.clone().lerp(BB, 0.55).add(new THREE.Vector3(0, -16, 0));
     mapped.downTube.push(
       loftTube(
-        [a, mid, new THREE.Vector3(4, 2, 0)],
+        // BB end nudged up so it meets the shell a touch higher / cleaner.
+        [a, mid, new THREE.Vector3(4, 9, 0)],
         (t) => 27 + 6 * Math.sin(t * Math.PI), // deeper in-plane (aero) — reads much thicker from the side
         () => 0.62, // narrower laterally
         90,
