@@ -156,7 +156,10 @@ export function ColorPicker({
                     <button
                       key={c}
                       type="button"
-                      onClick={() => commit(c)}
+                      onClick={() => {
+                        commit(c);
+                        setOpen(false);
+                      }}
                       title={c}
                       className="h-5 w-5 rounded-md border border-neutral-600 hover:scale-110 transition-transform"
                       style={{ backgroundColor: c }}
