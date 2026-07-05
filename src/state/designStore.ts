@@ -16,6 +16,10 @@ import {
   snapshotDesign,
 } from './history';
 
+// Defaults fill in fields that legacy persisted layers may lack; the spread
+// then overrides them with whatever the stored layer actually has. `layer` is
+// spread as Partial because at runtime those fields may be absent even though
+// the type says otherwise.
 function migrateLayer(layer: Layer): Layer {
   if (layer.type === 'image') {
     // Legacy uniform `scale` → per-axis scaleX/scaleY.
@@ -29,14 +33,20 @@ function migrateLayer(layer: Layer): Layer {
       levelsWhite: 1,
       scaleX: legacyScale ?? 1,
       scaleY: legacyScale ?? 1,
-      ...layer,
-    };
+      ...(layer as Partial<typeof layer>),
+    } as Layer;
   }
   if (layer.type === 'decal') {
-    return { letterSpacing: 0, glyphRotation: 0, ...layer };
+    return { letterSpacing: 0, glyphRotation: 0, ...(layer as Partial<typeof layer>) } as Layer;
   }
   if (layer.type === 'pattern') {
-    return { rotationX: 0, rotationY: 0, scaleX: 1, scaleY: 1, ...layer };
+    return {
+      rotationX: 0,
+      rotationY: 0,
+      scaleX: 1,
+      scaleY: 1,
+      ...(layer as Partial<typeof layer>),
+    } as Layer;
   }
   return layer;
 }
