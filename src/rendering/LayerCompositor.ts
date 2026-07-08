@@ -289,6 +289,12 @@ export class ZoneCompositor {
     const tile = await renderPattern(layer);
     const pattern = ctx.createPattern(tile, 'repeat');
     if (!pattern) return;
+    // The tile is rendered at a fixed high resolution; scale it down to the
+    // requested on-surface size here (layer.scale) via the pattern's own
+    // transform, so the fill overdraw below still covers the canvas.
+    const target = Math.max(32, layer.scale * 8);
+    const f = target / tile.width;
+    pattern.setTransform?.(new DOMMatrix([f, 0, 0, f, 0, 0]));
     const w = this.canvas.width;
     const h = this.canvas.height;
     const cx = w / 2;

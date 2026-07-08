@@ -88,7 +88,14 @@ export type PatternKind =
   | 'carbon'
   | 'smoke'
   | 'thread'
-  | 'splashes';
+  | 'splashes'
+  | 'topo'
+  | 'marble'
+  | 'voronoi'
+  | 'camo'
+  | 'digicamo'
+  | 'circuit'
+  | 'mesh';
 
 export interface PatternLayer extends LayerBase {
   type: 'pattern';

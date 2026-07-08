@@ -88,6 +88,13 @@ export type I18nKey =
   | 'patternSmoke'
   | 'patternThread'
   | 'patternSplashes'
+  | 'patternTopo'
+  | 'patternMarble'
+  | 'patternVoronoi'
+  | 'patternCamo'
+  | 'patternDigiCamo'
+  | 'patternCircuit'
+  | 'patternMesh'
   | 'patternSource'
   | 'patternProcedural'
   | 'patternTexture'
@@ -186,6 +193,13 @@ const STRINGS: Record<I18nKey, Record<Lang, string>> = {
   patternSmoke: { de: 'Rauch', en: 'Smoke' },
   patternThread: { de: 'Fäden', en: 'Thread' },
   patternSplashes: { de: 'Splashes', en: 'Splashes' },
+  patternTopo: { de: 'Höhenlinien', en: 'Topographic' },
+  patternMarble: { de: 'Marmor', en: 'Marble' },
+  patternVoronoi: { de: 'Craquelé', en: 'Voronoi' },
+  patternCamo: { de: 'Camouflage', en: 'Camo' },
+  patternDigiCamo: { de: 'Digital-Camo', en: 'Digital camo' },
+  patternCircuit: { de: 'Circuit', en: 'Circuit' },
+  patternMesh: { de: 'Gitter', en: 'Mesh' },
   patternSource: { de: 'Quelle', en: 'Source' },
   patternProcedural: { de: 'Procedural', en: 'Procedural' },
   patternTexture: { de: 'Textur', en: 'Texture' },

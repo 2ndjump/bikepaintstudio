@@ -16,6 +16,13 @@ const PATTERNS: { value: PatternKind; labelKey: I18nKey }[] = [
   { value: 'smoke', labelKey: 'patternSmoke' },
   { value: 'thread', labelKey: 'patternThread' },
   { value: 'splashes', labelKey: 'patternSplashes' },
+  { value: 'topo', labelKey: 'patternTopo' },
+  { value: 'marble', labelKey: 'patternMarble' },
+  { value: 'voronoi', labelKey: 'patternVoronoi' },
+  { value: 'camo', labelKey: 'patternCamo' },
+  { value: 'digicamo', labelKey: 'patternDigiCamo' },
+  { value: 'circuit', labelKey: 'patternCircuit' },
+  { value: 'mesh', labelKey: 'patternMesh' },
 ];
 
 export function PatternLayerEditor({ layer, zoneId }: Props) {
