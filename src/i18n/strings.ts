@@ -27,6 +27,16 @@ export type I18nKey =
   | 'shapeRectangle'
   | 'shapeTriangle'
   | 'shapeCircle'
+  | 'shapeDiamond'
+  | 'shapePentagon'
+  | 'shapeHexagon'
+  | 'shapeStar'
+  | 'shapeHeart'
+  | 'shapeRing'
+  | 'shapeCross'
+  | 'shapeArrow'
+  | 'shapeLightning'
+  | 'shapeChevron'
   | 'height'
   | 'tooltipVisibility'
   | 'tooltipExpand'
@@ -132,6 +142,16 @@ const STRINGS: Record<I18nKey, Record<Lang, string>> = {
   shapeRectangle: { de: 'Rechteck', en: 'Rectangle' },
   shapeTriangle: { de: 'Dreieck', en: 'Triangle' },
   shapeCircle: { de: 'Kreis', en: 'Circle' },
+  shapeDiamond: { de: 'Raute', en: 'Diamond' },
+  shapePentagon: { de: 'Fünfeck', en: 'Pentagon' },
+  shapeHexagon: { de: 'Sechseck', en: 'Hexagon' },
+  shapeStar: { de: 'Stern', en: 'Star' },
+  shapeHeart: { de: 'Herz', en: 'Heart' },
+  shapeRing: { de: 'Ring', en: 'Ring' },
+  shapeCross: { de: 'Kreuz', en: 'Cross' },
+  shapeArrow: { de: 'Pfeil', en: 'Arrow' },
+  shapeLightning: { de: 'Blitz', en: 'Lightning' },
+  shapeChevron: { de: 'Chevron', en: 'Chevron' },
   height: { de: 'Höhe', en: 'Height' },
   tooltipVisibility: { de: 'Sichtbarkeit', en: 'Visibility' },
   tooltipExpand: { de: 'Aufklappen', en: 'Expand' },

@@ -11,8 +11,18 @@ interface Props {
 
 const SHAPES: { value: ShapeKind; labelKey: I18nKey }[] = [
   { value: 'rectangle', labelKey: 'shapeRectangle' },
-  { value: 'triangle', labelKey: 'shapeTriangle' },
   { value: 'circle', labelKey: 'shapeCircle' },
+  { value: 'triangle', labelKey: 'shapeTriangle' },
+  { value: 'diamond', labelKey: 'shapeDiamond' },
+  { value: 'pentagon', labelKey: 'shapePentagon' },
+  { value: 'hexagon', labelKey: 'shapeHexagon' },
+  { value: 'star', labelKey: 'shapeStar' },
+  { value: 'heart', labelKey: 'shapeHeart' },
+  { value: 'ring', labelKey: 'shapeRing' },
+  { value: 'cross', labelKey: 'shapeCross' },
+  { value: 'arrow', labelKey: 'shapeArrow' },
+  { value: 'lightning', labelKey: 'shapeLightning' },
+  { value: 'chevron', labelKey: 'shapeChevron' },
 ];
 
 export function ShapeLayerEditor({ layer, zoneId }: Props) {

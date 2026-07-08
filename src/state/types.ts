@@ -151,7 +151,20 @@ export interface DecalLayer extends LayerBase {
   glyphRotation: number;
 }
 
-export type ShapeKind = 'rectangle' | 'triangle' | 'circle';
+export type ShapeKind =
+  | 'rectangle'
+  | 'triangle'
+  | 'circle'
+  | 'diamond'
+  | 'pentagon'
+  | 'hexagon'
+  | 'star'
+  | 'heart'
+  | 'ring'
+  | 'cross'
+  | 'arrow'
+  | 'lightning'
+  | 'chevron';
 
 export interface ShapeLayer extends LayerBase {
   type: 'shape';
