@@ -3,11 +3,14 @@ import { OrbitControls } from '@react-three/drei';
 import * as THREE from 'three';
 import { BikeFrame } from './BikeFrame';
 import { StudioEnvironment } from './StudioEnvironment';
+import { DividerHandles } from './DividerHandles';
 import { Wheel } from './Wheel';
 import { ROAD_GEO } from '../../geometry/frame';
 import { FRONT_HUB, REAR_HUB } from '../../geometry/frameModel';
 import { useEffect } from 'react';
 import { useUIStore } from '../../state/uiStore';
+import { useDesignStore } from '../../state/designStore';
+import { syncDividerUniforms } from '../../rendering/dividers';
 
 const BG_COLORS: Record<'dark' | 'light', string> = {
   dark: '#0e0f12', // studio spec flat background
@@ -19,6 +22,15 @@ function DebugExpose() {
   useEffect(() => {
     (window as unknown as { __r3f: unknown }).__r3f = state;
   }, [state]);
+  return null;
+}
+
+/** Push the global colour dividers into the shared shader uniforms. */
+function DividerSync() {
+  const dividers = useDesignStore((s) => s.dividers);
+  useEffect(() => {
+    syncDividerUniforms(dividers);
+  }, [dividers]);
   return null;
 }
 
@@ -80,6 +92,8 @@ export function Viewport() {
       <StudioEnvironment />
 
       <DebugExpose />
+      <DividerSync />
+      <DividerHandles />
       <BikeFrame />
       <Wheel
         position={[FRONT_HUB.x, FRONT_HUB.y, FRONT_HUB.z]}

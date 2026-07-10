@@ -3,6 +3,7 @@ import {
   ALL_ZONES,
   DEFAULT_CHAMELEON_COLORS,
   type DesignState,
+  type Divider,
   type FinishType,
   type Layer,
   type ZoneId,
@@ -99,6 +100,7 @@ function migrateDesign(state: DesignState): DesignState {
       width: state.rim?.width ?? 25,
       spokeCount: state.rim?.spokeCount ?? 20,
     },
+    dividers: Array.isArray(state.dividers) ? state.dividers : [],
   };
 }
 
@@ -162,6 +164,9 @@ interface DesignActions {
   reorderLayer(zone: ZoneId, layerId: string, direction: -1 | 1): void;
   duplicateLayer(zone: ZoneId, layerId: string, options: DuplicateOptions): void;
   setRim(patch: Partial<DesignState['rim']>): void;
+  addDivider(): void;
+  updateDivider(id: string, patch: Partial<Divider>): void;
+  removeDivider(id: string): void;
   loadDesign(state: DesignState): void;
   undo(): void;
   redo(): void;
@@ -186,6 +191,7 @@ export const useDesignStore = create<Store>((set, get) => {
     activeZone: 'topTube',
     zones: buildInitialZones(),
     rim: { depth: 50, width: 25, spokeCount: 20 },
+    dividers: [],
     history: makeEmptyHistory(),
 
     setActiveZone: (zone) => set({ activeZone: zone }),
@@ -327,6 +333,34 @@ export const useDesignStore = create<Store>((set, get) => {
       set((s) => ({ history, rim: { ...s.rim, ...patch } }));
     },
 
+    // Global colour dividers (world-space cut lines). New ones default to a
+    // slightly tilted line across the mid of the bike, tinting below it.
+    addDivider: () => {
+      const history = recordHistory();
+      const divider: Divider = {
+        id: newLayerId('div'),
+        color: '#1565c0',
+        ax: -0.5,
+        ay: 0.24,
+        bx: 0.72,
+        by: 0.30,
+      };
+      set((s) => ({ history, dividers: [...s.dividers, divider] }));
+    },
+
+    updateDivider: (id, patch) => {
+      const history = recordHistory();
+      set((s) => ({
+        history,
+        dividers: s.dividers.map((d) => (d.id === id ? { ...d, ...patch } : d)),
+      }));
+    },
+
+    removeDivider: (id) => {
+      const history = recordHistory();
+      set((s) => ({ history, dividers: s.dividers.filter((d) => d.id !== id) }));
+    },
+
     loadDesign: (state) => {
       const history = recordHistory();
       const migrated = migrateDesign(state);
@@ -335,6 +369,7 @@ export const useDesignStore = create<Store>((set, get) => {
         activeZone: migrated.activeZone,
         zones: migrated.zones,
         rim: migrated.rim,
+        dividers: migrated.dividers,
       });
     },
 
@@ -347,6 +382,7 @@ export const useDesignStore = create<Store>((set, get) => {
         activeZone: prev.activeZone,
         zones: prev.zones,
         rim: prev.rim,
+        dividers: prev.dividers,
         history: {
           past: s.history.past.slice(0, -1),
           future: [...s.history.future, current],
@@ -363,6 +399,7 @@ export const useDesignStore = create<Store>((set, get) => {
         activeZone: next.activeZone,
         zones: next.zones,
         rim: next.rim,
+        dividers: next.dividers,
         history: {
           past: [...s.history.past, current],
           future: s.history.future.slice(0, -1),

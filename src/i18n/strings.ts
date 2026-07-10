@@ -8,6 +8,10 @@ export type I18nKey =
   | 'zones'
   | 'rims'
   | 'hasLayers'
+  | 'dividers'
+  | 'addDivider'
+  | 'dividersEmpty'
+  | 'dividerLabel'
   | 'palette'
   | 'removeColor'
   | 'paletteEmpty'
@@ -123,6 +127,10 @@ const STRINGS: Record<I18nKey, Record<Lang, string>> = {
   pngExport: { de: 'PNG Export', en: 'Export PNG' },
   zones: { de: 'Zonen', en: 'Zones' },
   rims: { de: 'Felgen', en: 'Rims' },
+  dividers: { de: 'Divider', en: 'Dividers' },
+  addDivider: { de: 'Divider hinzufügen', en: 'Add divider' },
+  dividersEmpty: { de: 'Kein Divider', en: 'No dividers' },
+  dividerLabel: { de: 'Divider', en: 'Divider' },
   hasLayers: { de: 'Ebenen vorhanden', en: 'Has layers' },
   palette: { de: 'Palette', en: 'Palette' },
   removeColor: { de: 'Entfernen', en: 'Remove' },

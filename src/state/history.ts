@@ -25,5 +25,6 @@ export function snapshotDesign(state: DesignState): DesignState {
     activeZone: state.activeZone,
     zones: structuredClone(state.zones),
     rim: { ...state.rim },
+    dividers: structuredClone(state.dividers),
   };
 }

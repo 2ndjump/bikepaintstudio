@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Viewport } from './components/Viewport/Viewport';
 import { ZoneSelector } from './components/Sidebar/ZoneSelector';
 import { PalettePanel } from './components/Sidebar/PalettePanel';
+import { DividerPanel } from './components/Sidebar/DividerPanel';
 import { FinishPicker } from './components/Sidebar/FinishPicker';
 import { LayerStack } from './components/Sidebar/LayerStack';
 import { RimPanel } from './components/Sidebar/RimPanel';
@@ -67,6 +68,9 @@ export default function App() {
             <div className="m3-card">
               <ZoneSelector columns={2} />
             </div>
+            <div className="m3-card">
+              <DividerPanel />
+            </div>
             {isRim && (
               <div className="m3-card">
                 <RimPanel />
@@ -105,6 +109,9 @@ export default function App() {
           <div className="m3-card">
             <ZoneSelector columns={2} />
           </div>
+          <div className="m3-card">
+            <DividerPanel />
+          </div>
           {isRim && (
             <div className="m3-card">
               <RimPanel />
@@ -131,6 +138,9 @@ export default function App() {
             </div>
             <div className="lg:hidden m3-card">
               <ZoneSelector columns={2} />
+            </div>
+            <div className="lg:hidden m3-card">
+              <DividerPanel />
             </div>
             {isRim && (
               <div className="lg:hidden m3-card">

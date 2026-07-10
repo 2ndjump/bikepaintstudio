@@ -204,10 +204,26 @@ export interface RimParams {
   spokeCount: number;
 }
 
+/**
+ * A global colour divider: a world-space line (in the scene's XY side profile,
+ * metres) that tints everything BELOW it across all bike parts. Dividers apply
+ * in order, so several make horizontal colour bands.
+ */
+export interface Divider {
+  id: string;
+  color: string;
+  ax: number;
+  ay: number;
+  bx: number;
+  by: number;
+}
+
 export interface DesignState {
   activeZone: ZoneId;
   zones: Record<ZoneId, ZoneState>;
   rim: RimParams;
+  /** Global colour dividers (world-space), applied over every zone's paint. */
+  dividers: Divider[];
 }
 
 // Brighter, saturated defaults so the chameleon shift reads clearly (a dark

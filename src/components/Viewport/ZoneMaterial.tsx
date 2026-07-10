@@ -3,6 +3,7 @@ import { useDesignStore } from '../../state/designStore';
 import { finishParams } from '../../rendering/finish';
 import { useZoneTexture } from '../../rendering/useZoneTexture';
 import { ChameleonMaterial } from '../../rendering/ChameleonMaterial';
+import { applyDividerShader } from '../../rendering/dividers';
 import { DEFAULT_CHAMELEON_COLORS, type ZoneId } from '../../state/types';
 
 interface Props {
@@ -65,6 +66,7 @@ export function ZonePaintedMaterial({ zone, side, baseOnly }: Props) {
       clearcoatRoughness={fp.clearcoatRoughness}
       envMapIntensity={fp.envMapIntensity}
       side={side ?? THREE.FrontSide}
+      onBeforeCompile={applyDividerShader}
     />
   );
 }
