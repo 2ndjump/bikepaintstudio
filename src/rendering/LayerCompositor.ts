@@ -553,7 +553,9 @@ export class ZoneCompositor {
 
     const base = Math.min(w, h);
     const px = layer.size * 0.01 * base;
-    const fontSpec = `700 ${px}px "${layer.font}", sans-serif`;
+    const weight = layer.bold ? 700 : 400;
+    const style = layer.italic ? 'italic ' : '';
+    const fontSpec = `${style}${weight} ${px}px "${layer.font}", sans-serif`;
 
     try {
       await document.fonts.load(fontSpec);
@@ -596,6 +598,33 @@ export class ZoneCompositor {
       ctx.fillText(chars[i], 0, 0);
       ctx.restore();
       cursor += s + gap;
+    }
+
+    // Underline / strikethrough: horizontal rules across the whole text, drawn
+    // in the text's local frame (they follow the baseline, not per-glyph spin).
+    if (layer.underline || layer.strikethrough) {
+      const lineW = Math.max(1, px * 0.07);
+      const x0 = -total / 2;
+      const x1 = total / 2;
+      const rule = (y: number) => {
+        if (layer.outlineWidth > 0) {
+          ctx.strokeStyle = layer.outlineColor;
+          ctx.lineWidth = lineW + layer.outlineWidth * 2;
+          ctx.beginPath();
+          ctx.moveTo(x0, y);
+          ctx.lineTo(x1, y);
+          ctx.stroke();
+        }
+        ctx.strokeStyle = layer.color;
+        ctx.lineWidth = lineW;
+        ctx.beginPath();
+        ctx.moveTo(x0, y);
+        ctx.lineTo(x1, y);
+        ctx.stroke();
+      };
+      // middle baseline: glyph centre ≈ y 0, descenders ≈ y px*0.4.
+      if (layer.strikethrough) rule(0);
+      if (layer.underline) rule(px * 0.42);
     }
   }
 

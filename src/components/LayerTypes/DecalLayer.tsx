@@ -11,6 +11,7 @@ import {
   type FontEntry,
 } from '../../fonts/fontLoader';
 import { useT } from '../../i18n/useT';
+import type { I18nKey } from '../../i18n/strings';
 import { ColorPicker } from '../ui/ColorPicker';
 import { FontPicker } from '../ui/FontPicker';
 
@@ -18,6 +19,14 @@ interface Props {
   layer: DecalLayer;
   zoneId: ZoneId;
 }
+
+type StyleKey = 'bold' | 'italic' | 'underline' | 'strikethrough';
+const STYLE_TOGGLES: { key: StyleKey; label: string; tip: I18nKey; cls: string }[] = [
+  { key: 'bold', label: 'B', tip: 'textBold', cls: 'font-bold' },
+  { key: 'italic', label: 'I', tip: 'textItalic', cls: 'italic' },
+  { key: 'underline', label: 'U', tip: 'textUnderline', cls: 'underline' },
+  { key: 'strikethrough', label: 'S', tip: 'textStrikethrough', cls: 'line-through' },
+];
 
 function useFontOptions(): FontEntry[] {
   return useSyncExternalStore(subscribeFonts, getAllFontOptions, getAllFontOptions);
@@ -51,6 +60,30 @@ export function DecalLayerEditor({ layer, zoneId }: Props) {
         placeholder={t('text')}
         className="m3-field text-sm"
       />
+      <div className="flex gap-1">
+        {STYLE_TOGGLES.map(({ key, label, tip, cls }) => {
+          const on = !!layer[key];
+          return (
+            <button
+              key={key}
+              type="button"
+              title={t(tip)}
+              aria-pressed={on}
+              onClick={() =>
+                updateLayer(zoneId, layer.id, { [key]: !on } as Partial<DecalLayer>)
+              }
+              className={`flex-1 rounded border py-1 text-sm ${cls} ${
+                on
+                  ? 'border-[var(--md-primary)] text-[var(--md-primary)]'
+                  : 'border-[var(--md-outline-variant)] text-neutral-400 hover:text-neutral-200'
+              }`}
+            >
+              {label}
+            </button>
+          );
+        })}
+      </div>
+
       <FontPicker
         value={layer.font}
         options={fontOptions}

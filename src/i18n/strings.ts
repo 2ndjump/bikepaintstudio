@@ -79,6 +79,10 @@ export type I18nKey =
   | 'contrast'
   | 'saturation'
   | 'text'
+  | 'textBold'
+  | 'textItalic'
+  | 'textUnderline'
+  | 'textStrikethrough'
   | 'outline'
   | 'size'
   | 'outlineWidth'
@@ -202,6 +206,10 @@ const STRINGS: Record<I18nKey, Record<Lang, string>> = {
   contrast: { de: 'Kontrast', en: 'Contrast' },
   saturation: { de: 'Sättig.', en: 'Sat.' },
   text: { de: 'Text', en: 'Text' },
+  textBold: { de: 'Fett', en: 'Bold' },
+  textItalic: { de: 'Kursiv', en: 'Italic' },
+  textUnderline: { de: 'Unterstrichen', en: 'Underline' },
+  textStrikethrough: { de: 'Durchgestrichen', en: 'Strikethrough' },
   outline: { de: 'Outline', en: 'Outline' },
   size: { de: 'Größe', en: 'Size' },
   outlineWidth: { de: 'Outline Breite', en: 'Outline Width' },

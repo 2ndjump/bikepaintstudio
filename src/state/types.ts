@@ -156,6 +156,11 @@ export interface DecalLayer extends LayerBase {
   /** Per-letter rotation (degrees) about each glyph's own centre. Combined
    *  with `rotation` this allows e.g. upright vertically-stacked text. */
   glyphRotation: number;
+  /** Type-style toggles (all default off). */
+  bold?: boolean;
+  italic?: boolean;
+  underline?: boolean;
+  strikethrough?: boolean;
 }
 
 export type ShapeKind =
