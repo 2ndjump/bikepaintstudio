@@ -248,10 +248,13 @@ export class ZoneCompositor {
       ctx.restore();
 
       // Accumulate coverage (opacity only, ignoring blend mode) so the alpha
-      // reflects how opaquely this layer sits over the base.
-      cov.globalCompositeOperation = 'source-over';
-      cov.globalAlpha = layer.opacity;
-      cov.drawImage(off.canvas, 0, 0);
+      // reflects how opaquely this layer sits over the base. Layers marked
+      // "behind divider" are excluded, so the divider paints over them.
+      if (!layer.behindDivider) {
+        cov.globalCompositeOperation = 'source-over';
+        cov.globalAlpha = layer.opacity;
+        cov.drawImage(off.canvas, 0, 0);
+      }
 
       // A non-clip layer becomes the mask base for the clip layers above it.
       if (!layer.clip) clipMask = this.snapshotClipMask(off.canvas);
