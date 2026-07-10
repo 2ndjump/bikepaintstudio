@@ -75,22 +75,60 @@ interface CompileShader {
   fragmentShader: string;
 }
 
-/** onBeforeCompile hook: tint fragments below each divider line (world XY). */
-export function applyDividerShader(shader: CompileShader): void {
-  shader.uniforms.uDivCount = dividerUniforms.uDivCount;
-  shader.uniforms.uDivN = dividerUniforms.uDivN;
-  shader.uniforms.uDivOff = dividerUniforms.uDivOff;
-  shader.uniforms.uDivColor = dividerUniforms.uDivColor;
-  shader.uniforms.uDivSoft = dividerUniforms.uDivSoft;
-
+function injectVertex(shader: CompileShader): void {
   shader.vertexShader = shader.vertexShader
     .replace('#include <common>', '#include <common>\nvarying vec3 vWorldPosDiv;')
     .replace(
       '#include <begin_vertex>',
       '#include <begin_vertex>\nvWorldPosDiv = (modelMatrix * vec4(transformed, 1.0)).xyz;',
     );
+}
 
+function wireUniforms(shader: CompileShader): void {
+  shader.uniforms.uDivCount = dividerUniforms.uDivCount;
+  shader.uniforms.uDivN = dividerUniforms.uDivN;
+  shader.uniforms.uDivOff = dividerUniforms.uDivOff;
+  shader.uniforms.uDivColor = dividerUniforms.uDivColor;
+  shader.uniforms.uDivSoft = dividerUniforms.uDivSoft;
+}
+
+/**
+ * onBeforeCompile for base-colour-only meshes (no layer map): tint fragments
+ * below each divider line (world XY).
+ */
+export function applyDividerShader(shader: CompileShader): void {
+  wireUniforms(shader);
+  injectVertex(shader);
   shader.fragmentShader = shader.fragmentShader
     .replace('#include <common>', '#include <common>' + FRAG_HEAD)
     .replace('#include <map_fragment>', '#include <map_fragment>' + FRAG_BODY);
+}
+
+const FRAG_HEAD_MAPPED = FRAG_HEAD + '\nuniform sampler2D uDivCoverage;';
+
+// Recolour only the base coat: scale the divider mix by (1 - layer coverage) so
+// the layer stack stays fully visible on top of the divider colour.
+const FRAG_BODY_MAPPED = /* glsl */ `
+float divCov = texture2D(uDivCoverage, vMapUv).a;
+for (int di = 0; di < DIV_MAX; di++) {
+  if (di >= uDivCount) break;
+  float sd = dot(vWorldPosDiv.xy, uDivN[di]) - uDivOff[di];
+  float m = (1.0 - smoothstep(-uDivSoft, uDivSoft, sd)) * (1.0 - divCov);
+  diffuseColor.rgb = mix(diffuseColor.rgb, uDivColor[di], m);
+}
+`;
+
+/**
+ * onBeforeCompile for mapped meshes: the dividers sit UNDER the layer stack —
+ * they recolour the base coat but not the layers (via a coverage texture read
+ * from `material.userData.divCoverage`).
+ */
+export function applyDividerShaderMapped(this: THREE.Material, shader: CompileShader): void {
+  wireUniforms(shader);
+  const coverage = (this.userData?.divCoverage as THREE.Texture | undefined) ?? null;
+  shader.uniforms.uDivCoverage = { value: coverage };
+  injectVertex(shader);
+  shader.fragmentShader = shader.fragmentShader
+    .replace('#include <common>', '#include <common>' + FRAG_HEAD_MAPPED)
+    .replace('#include <map_fragment>', '#include <map_fragment>' + FRAG_BODY_MAPPED);
 }

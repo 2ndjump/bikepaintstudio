@@ -145,6 +145,11 @@ function applyLevelsAndDodgeBurn(data: ImageData, layer: ImageLayer): void {
 export class ZoneCompositor {
   canvas: HTMLCanvasElement;
   ctx: CanvasRenderingContext2D;
+  /** Layer coverage (the layer stack over transparent): alpha = how much the
+   *  layers hide the base. Used so global dividers only recolour the base coat,
+   *  leaving the layers on top. Same UV layout as `canvas`. */
+  coverageCanvas: HTMLCanvasElement;
+  private coverageCtx: CanvasRenderingContext2D;
   zoneId: ZoneId;
   /** Serialises render() calls: the async body mutates this.ctx, so overlapping
    *  runs on the same compositor would corrupt the shared canvas. */
@@ -159,6 +164,13 @@ export class ZoneCompositor {
     const ctx = this.canvas.getContext('2d', { willReadFrequently: true });
     if (!ctx) throw new Error('Canvas 2D context not available');
     this.ctx = ctx;
+
+    this.coverageCanvas = document.createElement('canvas');
+    this.coverageCanvas.width = dims.w;
+    this.coverageCanvas.height = dims.h;
+    const covCtx = this.coverageCanvas.getContext('2d');
+    if (!covCtx) throw new Error('Canvas 2D context not available');
+    this.coverageCtx = covCtx;
   }
 
   render(layers: Layer[], baseColor: string): Promise<HTMLCanvasElement> {
@@ -181,6 +193,15 @@ export class ZoneCompositor {
     // Opaque base fill the user-managed layer stack composites on top of.
     ctx.fillStyle = baseColor;
     ctx.fillRect(0, 0, w, h);
+
+    // Coverage: the same layer stack over transparent, so its alpha records how
+    // much the base is hidden (for divider-under-layers). Reset it here.
+    const cov = this.coverageCtx;
+    cov.setTransform(1, 0, 0, 1, 0, 0);
+    cov.globalCompositeOperation = 'source-over';
+    cov.globalAlpha = 1;
+    cov.filter = 'none';
+    cov.clearRect(0, 0, w, h);
 
     // The alpha of the most recent non-clip layer's content — clip layers are
     // masked to it ("clip to layer below" / clipping-mask groups).
@@ -225,6 +246,12 @@ export class ZoneCompositor {
       ctx.filter = 'none';
       ctx.drawImage(off.canvas, 0, 0);
       ctx.restore();
+
+      // Accumulate coverage (opacity only, ignoring blend mode) so the alpha
+      // reflects how opaquely this layer sits over the base.
+      cov.globalCompositeOperation = 'source-over';
+      cov.globalAlpha = layer.opacity;
+      cov.drawImage(off.canvas, 0, 0);
 
       // A non-clip layer becomes the mask base for the clip layers above it.
       if (!layer.clip) clipMask = this.snapshotClipMask(off.canvas);

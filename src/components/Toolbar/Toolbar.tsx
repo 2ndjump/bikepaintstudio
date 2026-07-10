@@ -20,6 +20,7 @@ export function Toolbar() {
       activeZone: state.activeZone,
       zones: state.zones,
       rim: state.rim,
+      dividers: state.dividers,
     };
     const blob = new Blob([JSON.stringify(snapshot, null, 2)], {
       type: 'application/json',

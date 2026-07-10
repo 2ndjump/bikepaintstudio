@@ -3,7 +3,7 @@ import { useDesignStore } from '../../state/designStore';
 import { finishParams } from '../../rendering/finish';
 import { useZoneTexture } from '../../rendering/useZoneTexture';
 import { ChameleonMaterial } from '../../rendering/ChameleonMaterial';
-import { applyDividerShader } from '../../rendering/dividers';
+import { applyDividerShader, applyDividerShaderMapped } from '../../rendering/dividers';
 import { DEFAULT_CHAMELEON_COLORS, type ZoneId } from '../../state/types';
 
 interface Props {
@@ -42,17 +42,25 @@ export function ZonePaintedMaterial({ zone, side, baseOnly }: Props) {
   );
   const baseColor = useDesignStore((s) => s.zones[zone]?.baseColor ?? '#888888');
   // base-only meshes don't use the composited map, so don't drive the compositor.
-  const texture = useZoneTexture(zone, !baseOnly);
+  const tex = useZoneTexture(zone, !baseOnly);
   const fp = finishParams(finish);
   // Global colour dividers apply to the frame only, not the rims/wheels.
   const useDivider = zone !== 'frontRim' && zone !== 'rearRim';
 
   // baseOnly: flat base colour, no layer texture map. Otherwise the composited
   // canvas (base + layers) is the colour map.
-  const paint = baseOnly ? { color: baseColor } : { map: texture };
+  const paint = baseOnly ? { color: baseColor } : { map: tex.map };
+
+  // Dividers sit UNDER the layers: mapped meshes use the coverage-aware shader
+  // (recolour the base coat only); base-only meshes have no layers to preserve.
+  const dividerProps = !useDivider
+    ? {}
+    : baseOnly
+      ? { onBeforeCompile: applyDividerShader }
+      : { onBeforeCompile: applyDividerShaderMapped, userData: { divCoverage: tex.coverage } };
 
   if (finish === 'chameleon' && !baseOnly) {
-    return <ChameleonMaterial texture={texture} fp={fp} colors={chameleonColors} side={side} />;
+    return <ChameleonMaterial texture={tex.map} fp={fp} colors={chameleonColors} side={side} />;
   }
 
   // All four standard finishes are a single shared MeshPhysicalMaterial recipe:
@@ -68,7 +76,7 @@ export function ZonePaintedMaterial({ zone, side, baseOnly }: Props) {
       clearcoatRoughness={fp.clearcoatRoughness}
       envMapIntensity={fp.envMapIntensity}
       side={side ?? THREE.FrontSide}
-      {...(useDivider ? { onBeforeCompile: applyDividerShader } : {})}
+      {...dividerProps}
     />
   );
 }
