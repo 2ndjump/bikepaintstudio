@@ -2,6 +2,7 @@ import { Html, Line } from '@react-three/drei';
 import { useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useDesignStore } from '../../state/designStore';
+import { useUIStore } from '../../state/uiStore';
 
 // The divider line lives in the scene's XY plane (z = 0, the bike centreline).
 const PLANE = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
@@ -17,6 +18,7 @@ const _hit = new THREE.Vector3();
 export function DividerHandles() {
   const dividers = useDesignStore((s) => s.dividers);
   const updateDivider = useDesignStore((s) => s.updateDivider);
+  const activeId = useUIStore((s) => s.activeDividerId);
   const camera = useThree((s) => s.camera);
   const gl = useThree((s) => s.gl);
   const controls = useThree((s) => s.controls) as { enabled: boolean } | null;
@@ -44,9 +46,13 @@ export function DividerHandles() {
     window.addEventListener('pointerup', onUp);
   }
 
+  // Only the divider being edited shows its guide line + handles; the colour
+  // cut itself is always applied (in the shader).
+  const shown = dividers.filter((d) => d.id === activeId);
+
   return (
     <>
-      {dividers.map((d) => {
+      {shown.map((d) => {
         // Extend the drawn line well past the handles so it reads as a full cut.
         const dx = d.bx - d.ax;
         const dy = d.by - d.ay;

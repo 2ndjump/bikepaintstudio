@@ -1,18 +1,28 @@
 import { useDesignStore } from '../../state/designStore';
+import { useUIStore } from '../../state/uiStore';
 import { useT } from '../../i18n/useT';
 import { ColorPicker } from '../ui/ColorPicker';
 
 /**
  * Global colour dividers: world-space cut lines that tint everything below them
- * across all bike parts. The line itself is positioned by dragging its handles
- * on the viewport (see DividerHandles); here you add/colour/remove them.
+ * across the frame. Click a divider to edit it — only then does its guide line +
+ * handles appear on the viewport (drag the handles to position the line).
  */
 export function DividerPanel() {
   const dividers = useDesignStore((s) => s.dividers);
   const addDivider = useDesignStore((s) => s.addDivider);
   const updateDivider = useDesignStore((s) => s.updateDivider);
   const removeDivider = useDesignStore((s) => s.removeDivider);
+  const activeId = useUIStore((s) => s.activeDividerId);
+  const setActiveId = useUIStore((s) => s.setActiveDividerId);
   const t = useT();
+
+  function add() {
+    addDivider();
+    const ds = useDesignStore.getState().dividers;
+    const last = ds[ds.length - 1];
+    if (last) setActiveId(last.id); // select the new one so its handles show
+  }
 
   return (
     <div className="space-y-2">
@@ -20,7 +30,7 @@ export function DividerPanel() {
         <span>{t('dividers')}</span>
         <button
           type="button"
-          onClick={addDivider}
+          onClick={add}
           className="m3-icon-btn m3-icon-btn-sm"
           title={t('addDivider')}
           aria-label={t('addDivider')}
@@ -34,27 +44,46 @@ export function DividerPanel() {
       )}
 
       <div className="space-y-1.5">
-        {dividers.map((d, i) => (
-          <div key={d.id} className="flex items-center gap-2">
-            <ColorPicker
-              value={d.color}
-              swatchOnly
-              swatchClassName="h-6 w-6"
-              onChange={(c) => updateDivider(d.id, { color: c })}
-            />
-            <span className="flex-1 min-w-0 text-xs text-neutral-300">
-              {t('dividerLabel')} {i + 1}
-            </span>
-            <button
-              type="button"
-              onClick={() => removeDivider(d.id)}
-              className="m3-icon-btn m3-icon-btn-sm hover:text-[var(--md-error)]"
-              title={t('tooltipDelete')}
+        {dividers.map((d, i) => {
+          const active = d.id === activeId;
+          return (
+            <div
+              key={d.id}
+              className={`flex items-center gap-2 rounded-md px-1 py-0.5 ${
+                active ? 'ring-1 ring-[var(--md-primary)]' : ''
+              }`}
             >
-              ✕
-            </button>
-          </div>
-        ))}
+              <ColorPicker
+                value={d.color}
+                swatchOnly
+                swatchClassName="h-6 w-6"
+                onChange={(c) => updateDivider(d.id, { color: c })}
+              />
+              <button
+                type="button"
+                onClick={() => setActiveId(active ? null : d.id)}
+                title={t('dividerEdit')}
+                className={`flex-1 min-w-0 text-left text-xs truncate bg-transparent ${
+                  active ? 'text-[var(--md-primary)]' : 'text-neutral-300'
+                }`}
+              >
+                {t('dividerLabel')} {i + 1}
+                {active && <span className="text-neutral-500"> · {t('dividerEditing')}</span>}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  removeDivider(d.id);
+                  if (active) setActiveId(null);
+                }}
+                className="m3-icon-btn m3-icon-btn-sm hover:text-[var(--md-error)]"
+                title={t('tooltipDelete')}
+              >
+                ✕
+              </button>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

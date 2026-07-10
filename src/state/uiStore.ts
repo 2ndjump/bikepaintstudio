@@ -11,18 +11,23 @@ interface UIState {
   background: BackgroundMode;
   /** Session-scoped favourite colours, shown as quick-picks in every ColorPicker. */
   palette: string[];
+  /** Divider currently being edited — only its guide line + handles are shown. */
+  activeDividerId: string | null;
   setLang(lang: Lang): void;
   setBackground(background: BackgroundMode): void;
   addPaletteColor(color: string): void;
   removePaletteColor(color: string): void;
+  setActiveDividerId(id: string | null): void;
 }
 
 export const useUIStore = create<UIState>((set) => ({
   lang: 'de',
   background: 'dark',
   palette: DEFAULT_PALETTE,
+  activeDividerId: null,
   setLang: (lang) => set({ lang }),
   setBackground: (background) => set({ background }),
+  setActiveDividerId: (activeDividerId) => set({ activeDividerId }),
   addPaletteColor: (color) =>
     set((s) => {
       const c = color.toLowerCase();
