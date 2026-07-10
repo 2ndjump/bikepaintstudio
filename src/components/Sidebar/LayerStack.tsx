@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { Fragment, useState } from 'react';
 import { useDesignStore, newLayerId } from '../../state/designStore';
 import type { DuplicateOptions } from '../../state/designStore';
 import type { BlendMode, Layer } from '../../state/types';
@@ -51,6 +51,26 @@ function ShapeIcon() {
   return (
     <svg {...ICON} fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round" aria-hidden="true">
       <path d="M8 3 L13.5 12.5 H2.5 Z" />
+    </svg>
+  );
+}
+
+/** Chain link — connects a layer to the one below (clipping mask). */
+function LinkIcon() {
+  return (
+    <svg
+      width="13"
+      height="13"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.4"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+      <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
     </svg>
   );
 }
@@ -249,12 +269,19 @@ export function LayerStack() {
       </div>
 
       <div className="space-y-2">
-        {[...layers].reverse().map((layer, ri) => {
+        {[...layers].reverse().map((layer, ri, rev) => {
           // A layer can clip to the one below it unless it's the bottom layer.
-          const hasBelow = ri < layers.length - 1;
+          const hasBelow = ri < rev.length - 1;
+          const isClipped = !!layer.clip && hasBelow; // this layer clips downward
+          const isBase = ri > 0 && !!rev[ri - 1].clip; // the layer above clips to it
+          const inClipGroup = isClipped || isBase;
           const isCollapsed = collapsed.has(layer.id);
           return (
-          <div key={layer.id} className="m3-card-nested p-2.5 space-y-2.5">
+          <Fragment key={layer.id}>
+          <div
+            className="m3-card-nested p-2.5 space-y-2.5"
+            style={inClipGroup ? { boxShadow: 'inset 3px 0 0 var(--md-primary)' } : undefined}
+          >
             <div className="flex items-center gap-1">
               <button
                 onClick={() => toggleCollapsed(layer.id)}
@@ -319,17 +346,6 @@ export function LayerStack() {
                         <span className="w-4 text-center">⧉</span>
                         {t('layerDuplicate')}
                       </button>
-                      {hasBelow && (
-                        <button
-                          className="m3-menu-item"
-                          onClick={() =>
-                            updateLayer(activeZone, layer.id, { clip: !layer.clip })
-                          }
-                        >
-                          <span className="w-4 text-center">{layer.clip ? '☑' : '☐'}</span>
-                          {t('layerClip')}
-                        </button>
-                      )}
                     </div>
                   </>
                 )}
@@ -408,6 +424,32 @@ export function LayerStack() {
               </>
             )}
           </div>
+
+          {/* Link connector to the layer below: toggles the clipping mask.
+              Accent when connected; both cards get an accent rail (inClipGroup). */}
+          {hasBelow && (
+            <div className="relative flex justify-center -my-1.5">
+              <button
+                type="button"
+                onClick={() => updateLayer(activeZone, layer.id, { clip: !layer.clip })}
+                title={t('layerClip')}
+                aria-pressed={!!layer.clip}
+                className={`relative z-10 flex h-6 w-6 items-center justify-center rounded-full border transition ${
+                  layer.clip
+                    ? 'border-[var(--md-primary)] text-[var(--md-primary)]'
+                    : 'border-[var(--md-outline-variant)] text-neutral-500 opacity-50 hover:opacity-100'
+                }`}
+                style={{
+                  background: layer.clip
+                    ? 'color-mix(in srgb, var(--md-primary) 16%, var(--md-surface-container-high))'
+                    : 'var(--md-surface-container-high)',
+                }}
+              >
+                <LinkIcon />
+              </button>
+            </div>
+          )}
+          </Fragment>
           );
         })}
       </div>
