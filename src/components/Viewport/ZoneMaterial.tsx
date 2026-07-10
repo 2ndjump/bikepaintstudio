@@ -44,6 +44,8 @@ export function ZonePaintedMaterial({ zone, side, baseOnly }: Props) {
   // base-only meshes don't use the composited map, so don't drive the compositor.
   const texture = useZoneTexture(zone, !baseOnly);
   const fp = finishParams(finish);
+  // Global colour dividers apply to the frame only, not the rims/wheels.
+  const useDivider = zone !== 'frontRim' && zone !== 'rearRim';
 
   // baseOnly: flat base colour, no layer texture map. Otherwise the composited
   // canvas (base + layers) is the colour map.
@@ -66,7 +68,7 @@ export function ZonePaintedMaterial({ zone, side, baseOnly }: Props) {
       clearcoatRoughness={fp.clearcoatRoughness}
       envMapIntensity={fp.envMapIntensity}
       side={side ?? THREE.FrontSide}
-      onBeforeCompile={applyDividerShader}
+      {...(useDivider ? { onBeforeCompile: applyDividerShader } : {})}
     />
   );
 }
