@@ -134,7 +134,7 @@ export function LayerStack() {
   const addLayer = useDesignStore((s) => s.addLayer);
   const removeLayer = useDesignStore((s) => s.removeLayer);
   const reorderLayer = useDesignStore((s) => s.reorderLayer);
-  const dividerCount = useDesignStore((s) => s.dividers.length);
+  const hasDividers = useDesignStore((s) => s.dividers.length > 0);
   const t = useT();
   const [duplicatingId, setDuplicatingId] = useState<string | null>(null);
   const [menuId, setMenuId] = useState<string | null>(null);
@@ -347,6 +347,19 @@ export function LayerStack() {
                         <span className="w-4 text-center">⧉</span>
                         {t('layerDuplicate')}
                       </button>
+                      {hasDividers && (
+                        <button
+                          className="m3-menu-item"
+                          onClick={() =>
+                            updateLayer(activeZone, layer.id, {
+                              belowDivider: !layer.belowDivider,
+                            })
+                          }
+                        >
+                          <span className="w-4 text-center">{layer.belowDivider ? '●' : '○'}</span>
+                          {t('layerBelowDivider')}
+                        </button>
+                      )}
                     </div>
                   </>
                 )}
@@ -405,36 +418,6 @@ export function LayerStack() {
                 />
               </label>
             </div>
-
-            {/* Stack position relative to the global colour dividers: in front
-                (on top, default) or behind (the divider paints over it). */}
-            {dividerCount > 0 && (
-              <label className="m3-label flex items-center justify-between gap-2">
-                {t('dividerStack')}
-                <div className="flex rounded-md overflow-hidden border border-[var(--md-outline-variant)]">
-                  {([false, true] as const).map((behind) => {
-                    const active = !!layer.behindDivider === behind;
-                    return (
-                      <button
-                        key={String(behind)}
-                        type="button"
-                        onClick={() =>
-                          updateLayer(activeZone, layer.id, { behindDivider: behind })
-                        }
-                        aria-pressed={active}
-                        className={`px-2.5 py-1 text-xs transition ${
-                          active
-                            ? 'bg-[var(--md-primary)] text-[var(--md-on-primary)]'
-                            : 'text-neutral-400 hover:text-neutral-200'
-                        }`}
-                      >
-                        {behind ? t('behindDivider') : t('inFrontOfDivider')}
-                      </button>
-                    );
-                  })}
-                </div>
-              </label>
-            )}
 
             {layer.type === 'pattern' && (
               <PatternLayerEditor layer={layer} zoneId={activeZone} />

@@ -14,9 +14,6 @@ export type I18nKey =
   | 'dividerLabel'
   | 'dividerEdit'
   | 'dividerEditing'
-  | 'dividerStack'
-  | 'inFrontOfDivider'
-  | 'behindDivider'
   | 'palette'
   | 'removeColor'
   | 'paletteEmpty'
@@ -57,6 +54,7 @@ export type I18nKey =
   | 'layerHide'
   | 'layerDuplicate'
   | 'layerClip'
+  | 'layerBelowDivider'
   | 'layerOptions'
   | 'blend'
   | 'opacity'
@@ -138,9 +136,6 @@ const STRINGS: Record<I18nKey, Record<Lang, string>> = {
   dividerLabel: { de: 'Divider', en: 'Divider' },
   dividerEdit: { de: 'Linie bearbeiten', en: 'Edit line' },
   dividerEditing: { de: 'Griffe im Bild ziehen', en: 'Drag the handles' },
-  dividerStack: { de: 'Divider', en: 'Divider' },
-  inFrontOfDivider: { de: 'Vor', en: 'Front' },
-  behindDivider: { de: 'Hinter', en: 'Behind' },
   hasLayers: { de: 'Ebenen vorhanden', en: 'Has layers' },
   palette: { de: 'Palette', en: 'Palette' },
   removeColor: { de: 'Entfernen', en: 'Remove' },
@@ -182,6 +177,7 @@ const STRINGS: Record<I18nKey, Record<Lang, string>> = {
   layerHide: { de: 'Ausblenden', en: 'Hide' },
   layerDuplicate: { de: 'Duplizieren', en: 'Duplicate' },
   layerClip: { de: 'An Ebene darunter anheften', en: 'Clip to layer below' },
+  layerBelowDivider: { de: 'Unter dem Divider', en: 'Below divider' },
   layerOptions: { de: 'Optionen', en: 'Options' },
   blend: { de: 'Blend', en: 'Blend' },
   opacity: { de: 'Opacity', en: 'Opacity' },

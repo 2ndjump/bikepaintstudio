@@ -78,10 +78,10 @@ export interface LayerBase {
   /** Clip to the layer directly below: this layer only shows where that layer
    *  is opaque (e.g. a pattern confined to a shape). */
   clip?: boolean;
-  /** Sit BEHIND the global colour dividers: the divider paints over this layer
-   *  (so it's hidden in a divider's coloured region) instead of on top of it.
-   *  Default (false) = in front of the dividers. */
-  behindDivider?: boolean;
+  /** Sit UNDER the global colour dividers: the divider colour paints over this
+   *  layer (below its line) instead of leaving it on top. Default (absent) =
+   *  above the dividers. */
+  belowDivider?: boolean;
 }
 
 export interface SolidColorLayer extends LayerBase {
