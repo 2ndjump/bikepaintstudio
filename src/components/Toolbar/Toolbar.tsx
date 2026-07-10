@@ -16,11 +16,12 @@ export function Toolbar() {
   const futureLen = useDesignStore((s) => s.history.future.length);
 
   function exportJSON() {
-    const snapshot: DesignState = {
+    const snapshot: DesignState & { palette: string[] } = {
       activeZone: state.activeZone,
       zones: state.zones,
       rim: state.rim,
       dividers: state.dividers,
+      palette: useUIStore.getState().palette,
     };
     const blob = new Blob([JSON.stringify(snapshot, null, 2)], {
       type: 'application/json',
@@ -43,8 +44,11 @@ export function Toolbar() {
       const reader = new FileReader();
       reader.onload = () => {
         try {
-          const data = JSON.parse(reader.result as string) as DesignState;
+          const data = JSON.parse(reader.result as string) as DesignState & {
+            palette?: string[];
+          };
           useDesignStore.getState().loadDesign(data);
+          if (Array.isArray(data.palette)) useUIStore.getState().setPalette(data.palette);
         } catch (e) {
           console.error('Invalid design JSON', e);
         }

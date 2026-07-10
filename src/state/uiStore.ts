@@ -17,6 +17,7 @@ interface UIState {
   setBackground(background: BackgroundMode): void;
   addPaletteColor(color: string): void;
   removePaletteColor(color: string): void;
+  setPalette(palette: string[]): void;
   setActiveDividerId(id: string | null): void;
 }
 
@@ -36,4 +37,5 @@ export const useUIStore = create<UIState>((set) => ({
     }),
   removePaletteColor: (color) =>
     set((s) => ({ palette: s.palette.filter((x) => x.toLowerCase() !== color.toLowerCase()) })),
+  setPalette: (palette) => set({ palette }),
 }));
