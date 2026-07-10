@@ -182,44 +182,76 @@ export class ZoneCompositor {
     ctx.fillStyle = baseColor;
     ctx.fillRect(0, 0, w, h);
 
+    // The alpha of the most recent non-clip layer's content — clip layers are
+    // masked to it ("clip to layer below" / clipping-mask groups).
+    let clipMask: HTMLCanvasElement | null = null;
+
     for (const layer of layers) {
       if (!layer.visible) continue;
 
-      const effect = layer.effect;
-      if (effect && effect.amount > 0) {
-        // Render the layer to its own offscreen canvas, apply the effect to
-        // just that layer's pixels, then composite the result.
-        const off = this.getEffectCanvas();
-        const offCtx = off.ctx;
-        const prevCtx = this.ctx;
-        this.ctx = offCtx;
-        offCtx.setTransform(1, 0, 0, 1, 0, 0);
-        offCtx.globalAlpha = 1;
-        offCtx.globalCompositeOperation = 'source-over';
-        offCtx.filter = 'none';
-        offCtx.clearRect(0, 0, w, h);
-        await this.drawLayerContent(layer);
-        this.ctx = prevCtx;
+      // Render this layer's content to an isolated offscreen (so effects,
+      // clipping and blending compose cleanly).
+      const off = this.getEffectCanvas();
+      const offCtx = off.ctx;
+      const prevCtx = this.ctx;
+      this.ctx = offCtx;
+      offCtx.setTransform(1, 0, 0, 1, 0, 0);
+      offCtx.globalAlpha = 1;
+      offCtx.globalCompositeOperation = 'source-over';
+      offCtx.filter = 'none';
+      offCtx.clearRect(0, 0, w, h);
+      await this.drawLayerContent(layer);
+      this.ctx = prevCtx;
 
-        applyEffect(off.canvas, offCtx, effect);
-
-        ctx.save();
-        ctx.globalAlpha = layer.opacity;
-        ctx.globalCompositeOperation = BLEND_MODE_MAP[layer.blendMode];
-        ctx.filter = 'none';
-        ctx.drawImage(off.canvas, 0, 0);
-        ctx.restore();
-        continue;
+      if (layer.effect && layer.effect.amount > 0) {
+        applyEffect(off.canvas, offCtx, layer.effect);
       }
 
+      // Clip to the layer below (mask by its alpha) when requested.
+      if (layer.clip && clipMask) {
+        offCtx.setTransform(1, 0, 0, 1, 0, 0);
+        offCtx.globalAlpha = 1;
+        offCtx.globalCompositeOperation = 'destination-in';
+        offCtx.filter = 'none';
+        offCtx.drawImage(clipMask, 0, 0);
+        offCtx.globalCompositeOperation = 'source-over';
+      }
+
+      // Composite onto the main canvas with the layer's opacity + blend.
       ctx.save();
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.globalAlpha = layer.opacity;
       ctx.globalCompositeOperation = BLEND_MODE_MAP[layer.blendMode];
-      await this.drawLayerContent(layer);
+      ctx.filter = 'none';
+      ctx.drawImage(off.canvas, 0, 0);
       ctx.restore();
+
+      // A non-clip layer becomes the mask base for the clip layers above it.
+      if (!layer.clip) clipMask = this.snapshotClipMask(off.canvas);
     }
 
     return this.canvas;
+  }
+
+  private clipMaskCanvas?: HTMLCanvasElement;
+
+  /** Copy a layer's content into a persistent canvas so it survives as the clip
+   *  base while the shared offscreen is reused for the next layer. */
+  private snapshotClipMask(src: HTMLCanvasElement): HTMLCanvasElement {
+    if (!this.clipMaskCanvas) {
+      this.clipMaskCanvas = document.createElement('canvas');
+      this.clipMaskCanvas.width = this.canvas.width;
+      this.clipMaskCanvas.height = this.canvas.height;
+    }
+    const c = this.clipMaskCanvas;
+    const cx = c.getContext('2d')!;
+    cx.setTransform(1, 0, 0, 1, 0, 0);
+    cx.globalCompositeOperation = 'source-over';
+    cx.globalAlpha = 1;
+    cx.filter = 'none';
+    cx.clearRect(0, 0, c.width, c.height);
+    cx.drawImage(src, 0, 0);
+    return c;
   }
 
   /** Draw a layer's content (no blend/opacity — caller sets those). */

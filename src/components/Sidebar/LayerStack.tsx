@@ -249,7 +249,9 @@ export function LayerStack() {
       </div>
 
       <div className="space-y-2">
-        {[...layers].reverse().map((layer) => {
+        {[...layers].reverse().map((layer, ri) => {
+          // A layer can clip to the one below it unless it's the bottom layer.
+          const hasBelow = ri < layers.length - 1;
           const isCollapsed = collapsed.has(layer.id);
           return (
           <div key={layer.id} className="m3-card-nested p-2.5 space-y-2.5">
@@ -317,6 +319,17 @@ export function LayerStack() {
                         <span className="w-4 text-center">⧉</span>
                         {t('layerDuplicate')}
                       </button>
+                      {hasBelow && (
+                        <button
+                          className="m3-menu-item"
+                          onClick={() =>
+                            updateLayer(activeZone, layer.id, { clip: !layer.clip })
+                          }
+                        >
+                          <span className="w-4 text-center">{layer.clip ? '☑' : '☐'}</span>
+                          {t('layerClip')}
+                        </button>
+                      )}
                     </div>
                   </>
                 )}

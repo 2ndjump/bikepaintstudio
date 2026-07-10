@@ -75,6 +75,9 @@ export interface LayerBase {
   blendMode: BlendMode;
   /** Optional per-layer effect (blur/smear). Absent = no effect. */
   effect?: LayerEffect;
+  /** Clip to the layer directly below: this layer only shows where that layer
+   *  is opaque (e.g. a pattern confined to a shape). */
+  clip?: boolean;
 }
 
 export interface SolidColorLayer extends LayerBase {

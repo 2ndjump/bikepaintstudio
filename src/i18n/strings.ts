@@ -47,6 +47,7 @@ export type I18nKey =
   | 'layerShow'
   | 'layerHide'
   | 'layerDuplicate'
+  | 'layerClip'
   | 'layerOptions'
   | 'blend'
   | 'opacity'
@@ -162,6 +163,7 @@ const STRINGS: Record<I18nKey, Record<Lang, string>> = {
   layerShow: { de: 'Einblenden', en: 'Show' },
   layerHide: { de: 'Ausblenden', en: 'Hide' },
   layerDuplicate: { de: 'Duplizieren', en: 'Duplicate' },
+  layerClip: { de: 'An Ebene darunter anheften', en: 'Clip to layer below' },
   layerOptions: { de: 'Optionen', en: 'Options' },
   blend: { de: 'Blend', en: 'Blend' },
   opacity: { de: 'Opacity', en: 'Opacity' },
