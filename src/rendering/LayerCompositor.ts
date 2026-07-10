@@ -10,6 +10,7 @@ import type {
   ZoneId,
 } from '../state/types';
 import { renderPattern } from './patterns';
+import { getZoneAspect } from './zoneMetrics';
 
 /** Apply a blur/smear effect to a canvas's own pixels, in place. Opacity/blend
  *  are handled by the caller when compositing the result. */
@@ -544,6 +545,16 @@ export class ZoneCompositor {
     const cy = h * layer.y;
 
     ctx.translate(cx, cy);
+    // Correct for the zone canvas's aspect vs the tube's real surface aspect, so
+    // glyphs keep their proportions instead of stretching along the tube. The
+    // canvas maps u→width over the circumference and v→height over the length;
+    // scaling the length (canvas-y) axis by (world-per-px-x / world-per-px-y)
+    // makes the drawing isotropic on the surface. Unset (rims) = no correction.
+    const aspect = getZoneAspect(this.zoneId);
+    if (aspect !== undefined) {
+      const ky = (aspect * h) / w;
+      if (isFinite(ky) && ky > 0) ctx.scale(1, ky);
+    }
     // Baseline so a stored rotation of 0 reads in the natural orientation for
     // the surface: +90° on tubes (text runs ALONG the lengthwise canvas), but
     // 0° on rims (upright along the wheel circumference). The slider then turns

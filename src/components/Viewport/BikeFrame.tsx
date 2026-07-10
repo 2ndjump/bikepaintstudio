@@ -1,6 +1,8 @@
 import { useEffect, useMemo } from 'react';
 import * as THREE from 'three';
 import { buildFrameModel, FRAME_ZONES, MODEL_SCALE, type FrameZone } from '../../geometry/frameModel';
+import { measureUVScale } from '../../geometry/loft';
+import { setZoneAspect } from '../../rendering/zoneMetrics';
 import { ZonePaintedMaterial } from './ZoneMaterial';
 
 /**
@@ -12,7 +14,16 @@ import { ZonePaintedMaterial } from './ZoneMaterial';
  * and dark bores/caps use their own metal materials.
  */
 export function BikeFrame() {
-  const model = useMemo(() => buildFrameModel(), []);
+  const model = useMemo(() => {
+    const m = buildFrameModel();
+    // Measure each tube's real surface aspect so decals stay undistorted on the
+    // fixed-aspect zone canvases (see LayerCompositor.drawDecal).
+    FRAME_ZONES.forEach((z) => {
+      const { su, sv } = measureUVScale(m.zones[z]);
+      if (sv > 0) setZoneAspect(z, su / sv);
+    });
+    return m;
+  }, []);
 
   useEffect(
     () => () => {
