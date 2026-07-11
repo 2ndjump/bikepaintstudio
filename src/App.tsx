@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Viewport } from './components/Viewport/Viewport';
+import { ToolSelector } from './components/Viewport/ToolSelector';
 import { ZoneSelector } from './components/Sidebar/ZoneSelector';
 import { PalettePanel } from './components/Sidebar/PalettePanel';
 import { DividerPanel } from './components/Sidebar/DividerPanel';
@@ -57,6 +58,7 @@ export default function App() {
         <div className="flex-1 flex flex-col min-h-0 overflow-y-auto">
           <main className="relative w-full shrink-0 min-h-[55vh]">
             <Viewport />
+            <ToolSelector />
           </main>
           <div className="p-3 space-y-3">
             <div className="m3-card space-y-3">
@@ -121,6 +123,7 @@ export default function App() {
 
         <main className="relative min-w-0 min-h-0 overflow-hidden">
           <Viewport />
+          <ToolSelector />
         </main>
 
         {/* Control menu — on the right at lg, collapses to the LEFT when narrow */}

@@ -4,6 +4,7 @@ import * as THREE from 'three';
 import { BikeFrame } from './BikeFrame';
 import { StudioEnvironment } from './StudioEnvironment';
 import { DividerHandles } from './DividerHandles';
+import { EditControls } from './EditControls';
 import { Wheel } from './Wheel';
 import { ROAD_GEO } from '../../geometry/frame';
 import { FRONT_HUB, REAR_HUB } from '../../geometry/frameModel';
@@ -36,6 +37,7 @@ function DividerSync() {
 
 export function Viewport() {
   const background = useUIStore((s) => s.background);
+  const tool = useUIStore((s) => s.tool);
   const geo = ROAD_GEO;
   const solidColor = BG_COLORS[background];
 
@@ -93,6 +95,7 @@ export function Viewport() {
 
       <DebugExpose />
       <DividerSync />
+      <EditControls />
       <DividerHandles />
       <BikeFrame />
       <Wheel
@@ -118,6 +121,7 @@ export function Viewport() {
 
       <OrbitControls
         makeDefault
+        enabled={tool === 'camera'}
         enablePan
         minDistance={0.5}
         maxDistance={20}
