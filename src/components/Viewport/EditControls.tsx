@@ -92,7 +92,8 @@ export function EditControls() {
     let drag: Drag | null = null;
 
     const onDown = (e: PointerEvent) => {
-      if (e.button !== 0) return;
+      // Left drag = move; right drag or Shift+left drag = rotate.
+      if (e.button !== 0 && e.button !== 2) return;
       const hit = raycast(e.clientX, e.clientY, zoneMeshes());
       if (!hit || !hit.uv) return;
       const zone = hit.object.name.slice(5) as ZoneId;
@@ -116,7 +117,7 @@ export function EditControls() {
       useDesignStore.getState().setActiveZone(zone);
       useUIStore.getState().setActiveDividerId(null);
 
-      const rotate = e.shiftKey;
+      const rotate = e.shiftKey || e.button === 2;
       drag = {
         zone,
         layerId: best.id,
@@ -173,14 +174,19 @@ export function EditControls() {
       }
     };
 
+    // Suppress the browser context menu so a right-drag rotate isn't interrupted.
+    const onContextMenu = (e: Event) => e.preventDefault();
+
     dom.addEventListener('pointerdown', onDown);
     window.addEventListener('pointermove', onMove);
     window.addEventListener('pointerup', onUp);
+    dom.addEventListener('contextmenu', onContextMenu);
     dom.style.cursor = 'crosshair';
     return () => {
       dom.removeEventListener('pointerdown', onDown);
       window.removeEventListener('pointermove', onMove);
       window.removeEventListener('pointerup', onUp);
+      dom.removeEventListener('contextmenu', onContextMenu);
       dom.style.cursor = '';
     };
   }, [tool, camera, gl, scene]);
