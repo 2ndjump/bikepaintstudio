@@ -32,6 +32,7 @@ export function loftTube(
   const fore = new THREE.Vector3();
   const side = new THREE.Vector3();
 
+  const ring: number[] = []; // reused per segment (xyz triples for the section)
   for (let i = 0; i <= segs; i++) {
     const t = i / segs;
     const c = curve.getPointAt(t);
@@ -40,6 +41,7 @@ export function loftTube(
     fore.crossVectors(T, side).normalize(); // right-handed → outward winding
     const r = radiusFn(t);
     const d = r * depthFn(t);
+    ring.length = 0;
     for (let j = 0; j <= radial; j++) {
       // +π so the UV seam sits at the BACK (−side) of the tube and the visible
       // front (+side ≈ +x) maps to u≈0.5 — a shape/decal centred there stays
@@ -53,12 +55,26 @@ export function loftTube(
         cA = Math.sign(cA) * Math.pow(Math.abs(cA), e);
         sA = Math.sign(sA) * Math.pow(Math.abs(sA), e);
       }
-      pos.push(
+      ring.push(
         c.x + side.x * cA * r + fore.x * sA * d,
         c.y + side.y * cA * r + fore.y * sA * d,
         c.z + side.z * cA * r + fore.z * sA * d,
       );
-      uv.push(j / radial, t);
+    }
+    // u = normalised cumulative arc length around the section (not the angular
+    // index), so the wrap stays even on non-circular (aero/squircle) tubes
+    // instead of bunching at the flat faces and morphing decals. v = t along.
+    const cum: number[] = [0];
+    for (let j = 1; j <= radial; j++) {
+      const dx = ring[j * 3] - ring[(j - 1) * 3];
+      const dy = ring[j * 3 + 1] - ring[(j - 1) * 3 + 1];
+      const dz = ring[j * 3 + 2] - ring[(j - 1) * 3 + 2];
+      cum[j] = cum[j - 1] + Math.hypot(dx, dy, dz);
+    }
+    const perim = cum[radial];
+    for (let j = 0; j <= radial; j++) {
+      pos.push(ring[j * 3], ring[j * 3 + 1], ring[j * 3 + 2]);
+      uv.push(perim > 0 ? cum[j] / perim : j / radial, t);
     }
   }
 
