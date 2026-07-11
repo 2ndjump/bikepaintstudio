@@ -4,7 +4,6 @@ export type I18nKey =
   | 'active'
   | 'toolCamera'
   | 'toolEdit'
-  | 'toolEditHint'
   | 'save'
   | 'load'
   | 'pngExport'
@@ -134,10 +133,6 @@ const STRINGS: Record<I18nKey, Record<Lang, string>> = {
   active: { de: 'Aktiv', en: 'Active' },
   toolCamera: { de: 'Bike bewegen & drehen', en: 'Move & rotate bike' },
   toolEdit: { de: 'Text/Form bewegen & drehen', en: 'Move & rotate text/shape' },
-  toolEditHint: {
-    de: 'Ziehen: verschieben · Shift+Ziehen: drehen',
-    en: 'Drag: move · Shift+drag: rotate',
-  },
   save: { de: 'Speichern', en: 'Save' },
   load: { de: 'Laden', en: 'Load' },
   pngExport: { de: 'PNG Export', en: 'Export PNG' },

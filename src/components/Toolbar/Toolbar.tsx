@@ -2,6 +2,7 @@ import { useDesignStore } from '../../state/designStore';
 import type { DesignState } from '../../state/types';
 import { useUIStore, type BackgroundMode, type Lang } from '../../state/uiStore';
 import { useT } from '../../i18n/useT';
+import { ToolSelector } from '../Viewport/ToolSelector';
 
 export function Toolbar() {
   const state = useDesignStore();
@@ -85,6 +86,7 @@ export function Toolbar() {
       style={{ borderBottom: '1px solid var(--md-outline-variant)' }}
     >
       <h1 className="m3-title text-base mr-1">Bike Paint Studio</h1>
+      <ToolSelector />
       <div className="flex-1 min-w-0" />
 
       <SegmentedControl>
