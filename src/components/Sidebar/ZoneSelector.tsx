@@ -1,4 +1,5 @@
 import { useDesignStore } from '../../state/designStore';
+import { useUIStore } from '../../state/uiStore';
 import { ZONE_LABELS, ZONES_PARAMETRIC, type ZoneId } from '../../state/types';
 import { useT } from '../../i18n/useT';
 import { ColorPicker } from '../ui/ColorPicker';
@@ -17,7 +18,14 @@ export function ZoneSelector({ columns = 1 }: Props) {
   const setActiveZone = useDesignStore((s) => s.setActiveZone);
   const setZoneBaseColor = useDesignStore((s) => s.setZoneBaseColor);
   const zones = useDesignStore((s) => s.zones);
+  const setActiveDividerId = useUIStore((s) => s.setActiveDividerId);
   const t = useT();
+
+  // Selecting a zone drops any divider being edited (so its handles disappear).
+  const selectZone = (z: ZoneId) => {
+    setActiveZone(z);
+    setActiveDividerId(null);
+  };
 
   const gridClass = columns === 2 ? 'grid grid-cols-2 gap-1.5' : 'space-y-1';
   const compact = columns === 2;
@@ -45,7 +53,7 @@ export function ZoneSelector({ columns = 1 }: Props) {
           onChange={(c) => setZoneBaseColor(z, c)}
         />
         <button
-          onClick={() => setActiveZone(z)}
+          onClick={() => selectZone(z)}
           className="flex-1 min-w-0 text-left truncate bg-transparent"
         >
           {ZONE_LABELS[z]}
