@@ -127,7 +127,9 @@ export function buildFrameModel(): FrameModel {
     [58, -318, 37],
     [56, -386, 47],
   ];
-  mapped.fork.push(bake(loftTube(forkPts, legR, legD, 260, 48).geo));
+  // seamOffset 0 → the fork's UV seam sits on the inner (wheel-facing) flank,
+  // hidden from view, instead of the outer flank.
+  mapped.fork.push(bake(loftTube(forkPts, legR, legD, 260, 48, 2, 0).geo));
 
   // Dropouts + axle bosses (organic, base-only).
   for (const s of [-1, 1]) {

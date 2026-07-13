@@ -19,6 +19,9 @@ export function loftTube(
   segs = 140,
   radial = 48,
   exponent = 2,
+  /** Angle (rad) of the UV seam around the section. Default π = seam at the back
+   *  (−side). The fork passes 0 so its seam faces the wheel, hidden from view. */
+  seamOffset = Math.PI,
 ): { geo: THREE.BufferGeometry; curve: THREE.CatmullRomCurve3 } {
   const vecs = points.map((p) =>
     p instanceof THREE.Vector3 ? p.clone() : new THREE.Vector3(p[0], p[1], p[2]),
@@ -43,10 +46,10 @@ export function loftTube(
     const d = r * depthFn(t);
     ring.length = 0;
     for (let j = 0; j <= radial; j++) {
-      // +π so the UV seam sits at the BACK (−side) of the tube and the visible
-      // front (+side ≈ +x) maps to u≈0.5 — a shape/decal centred there stays
-      // continuous instead of being split by the seam.
-      const a = (j / radial) * Math.PI * 2 + Math.PI;
+      // seamOffset (default π) puts the UV seam at the BACK (−side) so the
+      // visible front (+side ≈ +x) maps to u≈0.5 — a shape/decal centred there
+      // stays continuous instead of being split by the seam.
+      const a = (j / radial) * Math.PI * 2 + seamOffset;
       let cA = Math.cos(a);
       let sA = Math.sin(a);
       if (exponent !== 2) {
