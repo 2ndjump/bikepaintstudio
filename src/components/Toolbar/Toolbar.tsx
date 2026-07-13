@@ -4,6 +4,17 @@ import { useUIStore, type BackgroundMode, type Lang } from '../../state/uiStore'
 import { useT } from '../../i18n/useT';
 import { ToolSelector } from '../Viewport/ToolSelector';
 
+/** Minimal shape of the File System Access API's save picker (not in lib.dom). */
+type ShowSaveFilePicker = (opts: {
+  suggestedName?: string;
+  types?: { description?: string; accept: Record<string, string[]> }[];
+}) => Promise<{
+  createWritable: () => Promise<{
+    write: (data: string) => Promise<void>;
+    close: () => Promise<void>;
+  }>;
+}>;
+
 export function Toolbar() {
   const state = useDesignStore();
   const t = useT();
@@ -16,7 +27,7 @@ export function Toolbar() {
   const pastLen = useDesignStore((s) => s.history.past.length);
   const futureLen = useDesignStore((s) => s.history.future.length);
 
-  function exportJSON() {
+  async function exportJSON() {
     const snapshot: DesignState & { palette: string[] } = {
       activeZone: state.activeZone,
       zones: state.zones,
@@ -24,13 +35,37 @@ export function Toolbar() {
       dividers: state.dividers,
       palette: useUIStore.getState().palette,
     };
-    const blob = new Blob([JSON.stringify(snapshot, null, 2)], {
-      type: 'application/json',
-    });
+    const json = JSON.stringify(snapshot, null, 2);
+    const suggestedName = 'bike-design.json';
+
+    // Preferred: the native save dialog lets the user set the name + location.
+    const picker = (window as unknown as { showSaveFilePicker?: ShowSaveFilePicker })
+      .showSaveFilePicker;
+    if (picker) {
+      try {
+        const handle = await picker({
+          suggestedName,
+          types: [{ description: 'JSON', accept: { 'application/json': ['.json'] } }],
+        });
+        const writable = await handle.createWritable();
+        await writable.write(json);
+        await writable.close();
+        return;
+      } catch (e) {
+        if ((e as DOMException)?.name === 'AbortError') return; // user cancelled
+        // otherwise fall through to the download fallback below
+      }
+    }
+
+    // Fallback (browsers without the File System Access API): prompt for a name.
+    const name = window.prompt(t('save'), suggestedName);
+    if (name === null) return; // cancelled
+    const filename = name.trim() ? (name.endsWith('.json') ? name : `${name}.json`) : suggestedName;
+    const blob = new Blob([json], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'bike-design.json';
+    a.download = filename;
     a.click();
     URL.revokeObjectURL(url);
   }
