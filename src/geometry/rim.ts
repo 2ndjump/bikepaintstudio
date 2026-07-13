@@ -40,32 +40,54 @@ export function buildRimProfileGeometry(
   ];
   const geo = new THREE.LatheGeometry(points, 128);
   geo.computeVertexNormals();
-  remapLatheUVToSidewalls(geo);
+  remapLatheUVToSidewalls(geo, points);
   return geo;
 }
 
-function remapLatheUVToSidewalls(geo: THREE.BufferGeometry): void {
+/**
+ * Remap the lathe UV so a decal reads the same on both sidewalls AND without
+ * morphing. The original lathe V is the profile-point INDEX (unevenly spaced),
+ * which — folded with a flat band at the bead — smeared text across the horn.
+ * Instead map V by ARC LENGTH along each sidewall (spoke bed = 0 → bead = 1),
+ * so the wrap is even (mirrors the frame's arc-length fix). Both sidewalls span
+ * the full 0..1, with U flipped on the +lateral half so they read the same way;
+ * the seam sits in the bead channel (hidden under the tire).
+ */
+function remapLatheUVToSidewalls(geo: THREE.BufferGeometry, points: THREE.Vector2[]): void {
   const uv = geo.attributes.uv;
   if (!uv) return;
+  const n = points.length;
+
+  // Profile indices: 0 = −lateral spoke bed, 4/5 = bead (−/+lateral), 9 = +lateral
+  // spoke bed, n−1 closes back onto point 0.
+  const BEAD_MINUS = 4;
+  const BEAD_PLUS = 5;
+  const SPOKE_PLUS = 9;
+
+  const seg = new Array(n).fill(0);
+  for (let j = 1; j < n; j++) seg[j] = points[j].distanceTo(points[j - 1]);
+
+  // Arc-length position along each sidewall, normalised so spoke bed = 0, bead = 1.
+  const nv = new Array<number>(n).fill(0);
+  const tMinus = seg[1] + seg[2] + seg[3] + seg[4];
+  let acc = 0;
+  for (let j = 1; j <= BEAD_MINUS; j++) {
+    acc += seg[j];
+    nv[j] = acc / tMinus;
+  }
+  const tPlus = seg[6] + seg[7] + seg[8] + seg[9];
+  nv[BEAD_PLUS] = 1;
+  acc = 0;
+  for (let j = BEAD_PLUS + 1; j <= SPOKE_PLUS; j++) {
+    acc += seg[j];
+    nv[j] = 1 - acc / tPlus;
+  }
+  // n−1 (closing point) coincides with point 0 (spoke bed) → nv 0.
+
   for (let i = 0; i < uv.count; i++) {
-    const v = uv.getY(i); // original lathe V: 0 = −lateral spoke bed … 1 = +lateral
-
-    // The rim is a surface of revolution, so both lateral sidewalls sample the
-    // same circumferential U — text/decals therefore read correctly on the
-    // −lateral face but mirrored on the +lateral (lit) face. Flip U on the
-    // +lateral half so both faces read the same way. The flip seam falls in the
-    // bead channel (v ≈ 0.5), which is hidden under the tire.
-    if (v > 0.45) uv.setX(i, 1 - uv.getX(i));
-
-    let nv: number;
-    if (v < 0.4) {
-      nv = v / 0.4;
-    } else if (v > 0.6) {
-      nv = 1 - (v - 0.6) / 0.4;
-    } else {
-      nv = 1;
-    }
-    uv.setY(i, nv);
+    const j = Math.round(uv.getY(i) * (n - 1));
+    if (j >= BEAD_PLUS) uv.setX(i, 1 - uv.getX(i)); // +lateral: flip U to match
+    uv.setY(i, nv[j] ?? 0);
   }
   uv.needsUpdate = true;
 }
