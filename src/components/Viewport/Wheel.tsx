@@ -66,7 +66,8 @@ export function Wheel({ position, zone, tireWidth = 0.014, wheelRadius = 0.339 }
 
   return (
     <group position={position} rotation={[Math.PI / 2, 0, 0]}>
-      <mesh geometry={rimGeo} castShadow receiveShadow>
+      {/* name `zone:<id>` so the edit tool can raycast + drag decals here too. */}
+      <mesh name={`zone:${zone}`} geometry={rimGeo} castShadow receiveShadow>
         <ZonePaintedMaterial zone={zone} side={THREE.DoubleSide} />
       </mesh>
 
