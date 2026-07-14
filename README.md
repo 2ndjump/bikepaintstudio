@@ -1,73 +1,85 @@
-# React + TypeScript + Vite
+# Bike Paint Studio
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+An interactive 3D bike‑frame paint configurator. Design a road/gravel bike's
+paint scheme in real time on a fully procedural 3D model — pick colours and
+finishes per part, stack patterns / images / text / shapes, cut the frame into
+colour zones, and drag decals straight onto the model.
 
-Currently, two official plugins are available:
+**Live:** https://2ndjump.github.io/bikepaintstudio/
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Features
 
-## React Compiler
+### 3D model & view
+- Fully procedural frameset (head tube, top/down/seat tubes, seat & chain
+  stays, fork) plus both wheels, lit in a studio environment.
+- Orbit / pan / zoom camera, dark or light background, PNG snapshot export.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### Paint zones
+- Paint each part independently: the frame tubes, the fork, and each rim are
+  separate zones (the frame shares one global base colour; the rims are their
+  own).
+- **Finishes:** matte, satin, glossy, metallic, and an iridescent chameleon
+  finish.
 
-## Expanding the ESLint configuration
+### Layers (per zone)
+Stack any number of layers, each with its own blend mode, opacity, visibility,
+reordering, and duplicate (with horizontal/vertical mirror):
+- **Patterns** — hexagons, stripes, carbon, smoke, thread, splashes,
+  topographic, marble, voronoi, camo, digital camo, circuit, mesh (procedural
+  or texture source).
+- **Images** — upload your own, with brightness / contrast / saturation / hue,
+  dodge & burn, and levels adjustments.
+- **Text** — upload fonts or use system fonts; size, colour, outline, letter
+  spacing, per‑letter rotation, and **bold / italic / underline / strikethrough**.
+- **Shapes** — 13 shapes (rectangle, triangle, circle, diamond, pentagon,
+  hexagon, star, heart, ring, cross, arrow, lightning, chevron).
+- **Per‑layer effects** — Gaussian, directional, and motion blur.
+- **Clipping masks** — link a layer to the one below so a pattern only shows
+  inside a shape.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### Colour dividers
+- Global, world‑space cut lines that recolour across parts with one clean line
+  (e.g. everything below the line turns blue), positioned by dragging handles in
+  the viewport.
+- Each layer can sit **above or below** the divider.
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+### Direct editing on the model
+- A tool switch in the header toggles between orbiting the bike and editing
+  layers.
+- In edit mode, **drag** a text/shape layer on the model to move it and
+  **Shift‑drag or right‑drag** to rotate it — on the frame and the rims.
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+### Wheels
+- Adjustable rim geometry: depth, width, and spoke count.
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### Project & palette
+- A session colour palette of favourites, shown in every colour picker.
+- **Save / load** the whole design as JSON (choose the filename), including the
+  palette.
+- Undo / redo, and German / English UI.
+
+## Getting started
+
+```bash
+npm install
+npm run dev        # start the dev server (http://localhost:5173)
+npm run build      # type-check (tsc -b) + production build to dist/
+npm run preview    # preview the production build
+npm run lint       # run ESLint
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Tech stack
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+- **React 19** + **TypeScript** + **Vite**
+- **three.js** via **@react-three/fiber** and **@react-three/drei**
+- **zustand** for state, **Tailwind CSS v4** for styling, **react-colorful** for
+  colour pickers
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+Paint is composited per zone onto a 2D canvas that is applied as the material's
+colour map, so patterns, images, text, and shapes all share one layer pipeline;
+colour dividers are drawn in the material shader in world space.
+
+## Deployment
+
+Pushing to `Main` triggers a GitHub Actions workflow that builds the app and
+deploys it to GitHub Pages.
