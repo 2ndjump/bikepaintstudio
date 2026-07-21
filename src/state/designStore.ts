@@ -334,16 +334,18 @@ export const useDesignStore = create<Store>((set, get) => {
     },
 
     // Global colour dividers (world-space cut lines). New ones default to a
-    // slightly tilted line across the mid of the bike, tinting below it.
+    // slightly tilted line across the mid of the bike, tinting below it; the
+    // handles sit on the seat tube (rear) and fork (front) so they're easy to
+    // grab. The drawn line extends past them to still cut the whole bike.
     addDivider: () => {
       const history = recordHistory();
       const divider: Divider = {
         id: newLayerId('div'),
         color: '#1565c0',
-        ax: -0.5,
-        ay: 0.24,
-        bx: 0.72,
-        by: 0.30,
+        ax: -0.08,
+        ay: 0.25,
+        bx: 0.53,
+        by: 0.28,
         softness: 0,
       };
       set((s) => ({ history, dividers: [...s.dividers, divider] }));
