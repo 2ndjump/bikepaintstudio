@@ -344,6 +344,7 @@ export const useDesignStore = create<Store>((set, get) => {
         ay: 0.24,
         bx: 0.72,
         by: 0.30,
+        softness: 0,
       };
       set((s) => ({ history, dividers: [...s.dividers, divider] }));
     },

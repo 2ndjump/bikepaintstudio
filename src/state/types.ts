@@ -225,6 +225,8 @@ export interface Divider {
   ay: number;
   bx: number;
   by: number;
+  /** Edge feathering, 0 (crisp) … 1 (soft gradient). Absent = crisp. */
+  softness?: number;
 }
 
 export interface DesignState {

@@ -14,8 +14,13 @@ export const dividerUniforms = {
   uDivN: { value: new Float32Array(DIV_MAX * 2) }, // line normals (points "up")
   uDivOff: { value: new Float32Array(DIV_MAX) }, // signed offset along the normal
   uDivColor: { value: new Float32Array(DIV_MAX * 3) }, // linear RGB
-  uDivSoft: { value: 0.0022 }, // edge softness in metres (crisp but anti-aliased)
+  uDivSoft: { value: new Float32Array(DIV_MAX) }, // per-divider edge softness (metres)
 };
+
+/** smoothstep half-width in metres for a crisp-but-anti-aliased edge. */
+const AA_FLOOR = 0.0022;
+/** Extra half-width (metres) at softness = 1 — a wide, soft colour gradient. */
+const MAX_SOFT = 0.05;
 
 const _c = new THREE.Color();
 
@@ -26,8 +31,10 @@ export function syncDividerUniforms(dividers: Divider[]): void {
   const N = dividerUniforms.uDivN.value;
   const O = dividerUniforms.uDivOff.value;
   const C = dividerUniforms.uDivColor.value;
+  const S = dividerUniforms.uDivSoft.value;
   for (let i = 0; i < n; i++) {
     const d = dividers[i];
+    S[i] = AA_FLOOR + (d.softness ?? 0) * MAX_SOFT;
     let dx = d.bx - d.ax;
     let dy = d.by - d.ay;
     const len = Math.hypot(dx, dy) || 1;
@@ -56,7 +63,7 @@ uniform int uDivCount;
 uniform vec2 uDivN[DIV_MAX];
 uniform float uDivOff[DIV_MAX];
 uniform vec3 uDivColor[DIV_MAX];
-uniform float uDivSoft;
+uniform float uDivSoft[DIV_MAX];
 varying vec3 vWorldPosDiv;
 `;
 
@@ -64,7 +71,7 @@ const FRAG_BODY = /* glsl */ `
 for (int di = 0; di < DIV_MAX; di++) {
   if (di >= uDivCount) break;
   float sd = dot(vWorldPosDiv.xy, uDivN[di]) - uDivOff[di];
-  float m = 1.0 - smoothstep(-uDivSoft, uDivSoft, sd); // 1 = below the line
+  float m = 1.0 - smoothstep(-uDivSoft[di], uDivSoft[di], sd); // 1 = below the line
   diffuseColor.rgb = mix(diffuseColor.rgb, uDivColor[di], m);
 }
 `;
@@ -113,7 +120,7 @@ float divCov = texture2D(uDivCoverage, vMapUv).a;
 for (int di = 0; di < DIV_MAX; di++) {
   if (di >= uDivCount) break;
   float sd = dot(vWorldPosDiv.xy, uDivN[di]) - uDivOff[di];
-  float m = (1.0 - smoothstep(-uDivSoft, uDivSoft, sd)) * (1.0 - divCov);
+  float m = (1.0 - smoothstep(-uDivSoft[di], uDivSoft[di], sd)) * (1.0 - divCov);
   diffuseColor.rgb = mix(diffuseColor.rgb, uDivColor[di], m);
 }
 `;

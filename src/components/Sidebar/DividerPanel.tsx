@@ -49,38 +49,54 @@ export function DividerPanel() {
           return (
             <div
               key={d.id}
-              className={`flex items-center gap-2 rounded-md px-1 py-0.5 ${
-                active ? 'ring-1 ring-[var(--md-primary)]' : ''
-              }`}
+              className={`rounded-md px-1 py-0.5 ${active ? 'ring-1 ring-[var(--md-primary)]' : ''}`}
             >
-              <ColorPicker
-                value={d.color}
-                swatchOnly
-                swatchClassName="h-6 w-6"
-                onChange={(c) => updateDivider(d.id, { color: c })}
-              />
-              <button
-                type="button"
-                onClick={() => setActiveId(active ? null : d.id)}
-                title={t('dividerEdit')}
-                className={`flex-1 min-w-0 text-left text-xs truncate bg-transparent ${
-                  active ? 'text-[var(--md-primary)]' : 'text-neutral-300'
-                }`}
-              >
-                {t('dividerLabel')} {i + 1}
-                {active && <span className="text-neutral-500"> · {t('dividerEditing')}</span>}
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  removeDivider(d.id);
-                  if (active) setActiveId(null);
-                }}
-                className="m3-icon-btn m3-icon-btn-sm hover:text-[var(--md-error)]"
-                title={t('tooltipDelete')}
-              >
-                ✕
-              </button>
+              <div className="flex items-center gap-2">
+                <ColorPicker
+                  value={d.color}
+                  swatchOnly
+                  swatchClassName="h-6 w-6"
+                  onChange={(c) => updateDivider(d.id, { color: c })}
+                />
+                <button
+                  type="button"
+                  onClick={() => setActiveId(active ? null : d.id)}
+                  title={t('dividerEdit')}
+                  className={`flex-1 min-w-0 text-left text-xs truncate bg-transparent ${
+                    active ? 'text-[var(--md-primary)]' : 'text-neutral-300'
+                  }`}
+                >
+                  {t('dividerLabel')} {i + 1}
+                  {active && <span className="text-neutral-500"> · {t('dividerEditing')}</span>}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    removeDivider(d.id);
+                    if (active) setActiveId(null);
+                  }}
+                  className="m3-icon-btn m3-icon-btn-sm hover:text-[var(--md-error)]"
+                  title={t('tooltipDelete')}
+                >
+                  ✕
+                </button>
+              </div>
+
+              {active && (
+                <label className="mt-1 flex flex-col gap-1 px-1 pb-1 text-xs text-neutral-400">
+                  {t('dividerSoftness')} {Math.round((d.softness ?? 0) * 100)}%
+                  <input
+                    type="range"
+                    min={0}
+                    max={1}
+                    step={0.01}
+                    value={d.softness ?? 0}
+                    onChange={(e) =>
+                      updateDivider(d.id, { softness: parseFloat(e.target.value) })
+                    }
+                  />
+                </label>
+              )}
             </div>
           );
         })}

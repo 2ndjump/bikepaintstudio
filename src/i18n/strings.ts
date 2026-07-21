@@ -16,6 +16,7 @@ export type I18nKey =
   | 'dividerLabel'
   | 'dividerEdit'
   | 'dividerEditing'
+  | 'dividerSoftness'
   | 'palette'
   | 'removeColor'
   | 'paletteEmpty'
@@ -144,6 +145,7 @@ const STRINGS: Record<I18nKey, Record<Lang, string>> = {
   dividerLabel: { de: 'Divider', en: 'Divider' },
   dividerEdit: { de: 'Linie bearbeiten', en: 'Edit line' },
   dividerEditing: { de: 'Griffe im Bild ziehen', en: 'Drag the handles' },
+  dividerSoftness: { de: 'Weichzeichnen', en: 'Feather' },
   hasLayers: { de: 'Ebenen vorhanden', en: 'Has layers' },
   palette: { de: 'Palette', en: 'Palette' },
   removeColor: { de: 'Entfernen', en: 'Remove' },
