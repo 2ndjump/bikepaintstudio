@@ -9,7 +9,7 @@ import type {
   SolidColorLayer,
   ZoneId,
 } from '../state/types';
-import { renderPattern } from './patterns';
+import { renderPattern, patternRepeat } from './patterns';
 import { getZoneAspect } from './zoneMetrics';
 
 /** Apply a blur/smear effect to a canvas's own pixels, in place. Opacity/blend
@@ -463,8 +463,10 @@ export class ZoneCompositor {
     if (!pattern) return;
     // The tile is rendered at a fixed high resolution; scale it down to the
     // requested on-surface size here (layer.scale) via the pattern's own
-    // transform, so the fill overdraw below still covers the canvas.
-    const target = Math.max(32, layer.scale * 8);
+    // transform, so the fill overdraw below still covers the canvas. Organic
+    // patterns map to a larger span (patternRepeat) so they repeat far less
+    // often — the matching higher period keeps the feature size unchanged.
+    const target = Math.max(32, layer.scale * 8) * patternRepeat(layer.pattern);
     const f = target / tile.width;
     pattern.setTransform?.(new DOMMatrix([f, 0, 0, f, 0, 0]));
     const w = this.canvas.width;

@@ -1,6 +1,28 @@
-import type { PatternLayer } from '../state/types';
+import type { PatternKind, PatternLayer } from '../state/types';
 
 const cache = new Map<string, HTMLCanvasElement>();
+
+/**
+ * How far to spread an organic (noise) pattern before it repeats, vs geometric
+ * patterns that are meant to tile regularly. The factor scales BOTH the tile's
+ * feature count (period/cells) here AND its on-surface span in the compositor
+ * (drawPattern), so the feature size is unchanged but the same tile recurs far
+ * less often — killing the obvious repetition.
+ */
+export function patternRepeat(pattern: PatternKind): number {
+  switch (pattern) {
+    case 'forged':
+    case 'marble':
+    case 'camo':
+    case 'digicamo':
+    case 'topo':
+    case 'smoke':
+    case 'voronoi':
+      return 4;
+    default:
+      return 1; // geometric: hexagons, stripes, carbon, circuit, mesh, …
+  }
+}
 
 // Tiles render at a fixed high resolution; the compositor (drawPattern) scales
 // them down to the on-surface size (layer.scale), so fine detail no longer
@@ -164,7 +186,7 @@ function drawSmoke(ctx: CanvasRenderingContext2D, size: number, layer: PatternLa
   // so fold the layer intensity into the per-pixel alpha here.
   const imgData = ctx.getImageData(0, 0, size, size);
   const [fr, fg, fb] = parseHex(layer.color);
-  const period = 4;
+  const period = 4 * patternRepeat(layer.pattern);
   const scale = period / size;
   const seed = 7;
   for (let y = 0; y < size; y++) {
@@ -245,7 +267,7 @@ function drawSplashes(ctx: CanvasRenderingContext2D, size: number, layer: Patter
 function drawTopo(ctx: CanvasRenderingContext2D, size: number, layer: PatternLayer) {
   const img = ctx.getImageData(0, 0, size, size);
   const [r, g, b] = parseHex(layer.color);
-  const period = 6;
+  const period = 6 * patternRepeat(layer.pattern);
   const scale = period / size;
   const seed = 21;
   const bands = 8; // number of contour levels across the height field
@@ -269,7 +291,7 @@ function drawTopo(ctx: CanvasRenderingContext2D, size: number, layer: PatternLay
 function drawMarble(ctx: CanvasRenderingContext2D, size: number, layer: PatternLayer) {
   const img = ctx.getImageData(0, 0, size, size);
   const [r, g, b] = parseHex(layer.color);
-  const period = 5;
+  const period = 5 * patternRepeat(layer.pattern);
   const scale = period / size;
   const seed = 41;
   for (let y = 0; y < size; y++) {
@@ -299,7 +321,7 @@ function drawMarble(ctx: CanvasRenderingContext2D, size: number, layer: PatternL
 function drawVoronoi(ctx: CanvasRenderingContext2D, size: number, layer: PatternLayer) {
   const img = ctx.getImageData(0, 0, size, size);
   const [r, g, b] = parseHex(layer.color);
-  const cells = 6; // feature-point grid across the tile
+  const cells = 6 * patternRepeat(layer.pattern); // feature-point grid across the tile
   const cs = size / cells;
   const seed = 55;
   for (let y = 0; y < size; y++) {
@@ -345,10 +367,11 @@ function drawCamo(
 ) {
   const img = ctx.getImageData(0, 0, size, size);
   const [r, g, b] = parseHex(layer.color);
-  const period = 5;
+  const rep = patternRepeat(layer.pattern);
+  const period = 5 * rep;
   const scale = period / size;
   const seed = 63;
-  const cell = size / 40; // pixel size for digital camo
+  const cell = size / (40 * rep); // pixel size for digital camo (keeps ratio to patches)
   for (let y = 0; y < size; y++) {
     for (let x = 0; x < size; x++) {
       let sx = x;
@@ -432,9 +455,10 @@ function drawCircuit(ctx: CanvasRenderingContext2D, size: number, layer: Pattern
 function drawForged(ctx: CanvasRenderingContext2D, size: number, layer: PatternLayer) {
   const img = ctx.getImageData(0, 0, size, size);
   const [r, g, b] = parseHex(layer.color);
-  const period = 5;
+  const rep = patternRepeat(layer.pattern);
+  const period = 5 * rep;
   const scale = period / size;
-  const dPeriod = 15; // higher-frequency mottle (integer → tiles cleanly)
+  const dPeriod = 15 * rep; // higher-frequency mottle (integer → tiles cleanly)
   const dScale = dPeriod / size;
   const seed = 88;
   for (let y = 0; y < size; y++) {
