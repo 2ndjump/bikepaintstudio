@@ -120,6 +120,7 @@ export type I18nKey =
   | 'patternDigiCamo'
   | 'patternCircuit'
   | 'patternMesh'
+  | 'patternForged'
   | 'patternSource'
   | 'patternProcedural'
   | 'patternTexture'
@@ -250,6 +251,7 @@ const STRINGS: Record<I18nKey, Record<Lang, string>> = {
   patternDigiCamo: { de: 'Digital-Camo', en: 'Digital camo' },
   patternCircuit: { de: 'Circuit', en: 'Circuit' },
   patternMesh: { de: 'Gitter', en: 'Mesh' },
+  patternForged: { de: 'Forged Carbon', en: 'Forged Carbon' },
   patternSource: { de: 'Quelle', en: 'Source' },
   patternProcedural: { de: 'Procedural', en: 'Procedural' },
   patternTexture: { de: 'Textur', en: 'Texture' },

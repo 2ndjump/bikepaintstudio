@@ -102,7 +102,8 @@ export type PatternKind =
   | 'camo'
   | 'digicamo'
   | 'circuit'
-  | 'mesh';
+  | 'mesh'
+  | 'forged';
 
 export interface PatternLayer extends LayerBase {
   type: 'pattern';

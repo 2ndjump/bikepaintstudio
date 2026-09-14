@@ -36,6 +36,7 @@ export async function renderPattern(layer: PatternLayer): Promise<HTMLCanvasElem
   else if (layer.pattern === 'digicamo') drawCamo(ctx, size, layer, true);
   else if (layer.pattern === 'circuit') drawCircuit(ctx, size, layer);
   else if (layer.pattern === 'mesh') drawMesh(ctx, size, layer);
+  else if (layer.pattern === 'forged') drawForged(ctx, size, layer);
 
   cache.set(key, canvas);
   if (cache.size > 48) {
@@ -421,6 +422,50 @@ function drawCircuit(ctx: CanvasRenderingContext2D, size: number, layer: Pattern
       }
     }
   }
+}
+
+/**
+ * Forged-carbon / hydro-dip marble: strongly domain-warped fBm makes organic
+ * dark clouds (drawn in layer.color) over a bright base, with thin bright cracks
+ * where the base shows through — the classic marbled forged-carbon look.
+ */
+function drawForged(ctx: CanvasRenderingContext2D, size: number, layer: PatternLayer) {
+  const img = ctx.getImageData(0, 0, size, size);
+  const [r, g, b] = parseHex(layer.color);
+  const period = 5;
+  const scale = period / size;
+  const dPeriod = 15; // higher-frequency mottle (integer → tiles cleanly)
+  const dScale = dPeriod / size;
+  const seed = 88;
+  for (let y = 0; y < size; y++) {
+    for (let x = 0; x < size; x++) {
+      // Strong domain warp for the flowing marble structure.
+      const qx = fbmTiled(x * scale, y * scale, period, 4, seed);
+      const qy = fbmTiled(x * scale + 3.1, y * scale + 6.7, period, 4, seed + 9);
+      const n = fbmTiled(
+        x * scale + (qx - 0.5) * 2.6,
+        y * scale + (qy - 0.5) * 2.6,
+        period,
+        5,
+        seed + 17,
+      );
+      // Broad, high-contrast, soft-edged dark clouds.
+      let cloud = smoothstep(0.3, 0.56, n);
+      // Fine mottle so the clouds aren't flat.
+      const detail = fbmTiled(x * dScale, y * dScale, dPeriod, 3, seed + 31);
+      cloud *= 0.8 + 0.45 * detail;
+      // Thin bright cracks along the warped field's midline — subtract so the
+      // base coat shows through as veins.
+      const crack = Math.pow(1 - Math.abs(2 * n - 1), 9);
+      const a = Math.max(0, Math.min(1, cloud - crack * 0.9));
+      const idx = (y * size + x) * 4;
+      img.data[idx] = r;
+      img.data[idx + 1] = g;
+      img.data[idx + 2] = b;
+      img.data[idx + 3] = Math.round(a * layer.intensity * 255);
+    }
+  }
+  ctx.putImageData(img, 0, 0);
 }
 
 /** Fine technical grid/mesh with heavier major lines. */

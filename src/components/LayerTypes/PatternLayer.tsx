@@ -23,6 +23,7 @@ const PATTERNS: { value: PatternKind; labelKey: I18nKey }[] = [
   { value: 'digicamo', labelKey: 'patternDigiCamo' },
   { value: 'circuit', labelKey: 'patternCircuit' },
   { value: 'mesh', labelKey: 'patternMesh' },
+  { value: 'forged', labelKey: 'patternForged' },
 ];
 
 export function PatternLayerEditor({ layer, zoneId }: Props) {
