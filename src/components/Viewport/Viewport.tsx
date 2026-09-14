@@ -11,7 +11,7 @@ import { FRONT_HUB, REAR_HUB } from '../../geometry/frameModel';
 import { useEffect } from 'react';
 import { useUIStore } from '../../state/uiStore';
 import { useDesignStore } from '../../state/designStore';
-import { syncDividerUniforms } from '../../rendering/dividers';
+import { syncDividerUniforms, syncDividerPatterns } from '../../rendering/dividers';
 
 const BG_COLORS: Record<'dark' | 'light', string> = {
   dark: '#0e0f12', // studio spec flat background
@@ -31,6 +31,7 @@ function DividerSync() {
   const dividers = useDesignStore((s) => s.dividers);
   useEffect(() => {
     syncDividerUniforms(dividers);
+    syncDividerPatterns(dividers);
   }, [dividers]);
   return null;
 }

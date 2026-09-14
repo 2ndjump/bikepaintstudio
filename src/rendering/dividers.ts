@@ -1,8 +1,20 @@
 import * as THREE from 'three';
-import type { Divider } from '../state/types';
+import type { Divider, PatternLayer } from '../state/types';
+import { renderPattern } from './patterns';
 
 /** Max dividers supported by the shader (fixed array size). */
 export const DIV_MAX = 6;
+
+// Each divider's pattern tile lives in one cell of a single horizontal atlas
+// texture (one sampler2D — a dynamically-indexed sampler array won't link on
+// GLSL ES). Cells are sampled by world XY in the shader.
+const ATLAS_CELL = 256;
+const atlasCanvas = document.createElement('canvas');
+atlasCanvas.width = ATLAS_CELL * DIV_MAX;
+atlasCanvas.height = ATLAS_CELL;
+const atlasTex = new THREE.CanvasTexture(atlasCanvas);
+atlasTex.wrapS = THREE.ClampToEdgeWrapping;
+atlasTex.wrapT = THREE.ClampToEdgeWrapping;
 
 /**
  * Shared uniforms for the world-space colour dividers. Every painted material's
@@ -15,6 +27,9 @@ export const dividerUniforms = {
   uDivOff: { value: new Float32Array(DIV_MAX) }, // signed offset along the normal
   uDivColor: { value: new Float32Array(DIV_MAX * 3) }, // linear RGB
   uDivSoft: { value: new Float32Array(DIV_MAX) }, // per-divider edge softness (metres)
+  // Optional per-divider pattern filling the region (sampled by world XY).
+  uDivAtlas: { value: atlasTex as THREE.Texture },
+  uDivPatScale: { value: new Float32Array(DIV_MAX) }, // world tiles/metre, 0 = none
 };
 
 /** smoothstep half-width in metres for a crisp-but-anti-aliased edge. */
@@ -64,7 +79,25 @@ uniform vec2 uDivN[DIV_MAX];
 uniform float uDivOff[DIV_MAX];
 uniform vec3 uDivColor[DIV_MAX];
 uniform float uDivSoft[DIV_MAX];
+uniform sampler2D uDivAtlas;
+uniform float uDivPatScale[DIV_MAX];
 varying vec3 vWorldPosDiv;
+#define DIV_EDGE ${(1 / ATLAS_CELL).toFixed(6)}
+// The divider's fill: base colour, optionally overlaid with a world-space
+// pattern tile from cell di of the atlas (its colour baked in; approximate
+// sRGB to linear). puv.x is clamped a texel in so bilinear doesn't bleed
+// between cells; the tiles are periodic, so this stays seamless.
+vec3 dividerFill(int di) {
+  vec3 fill = uDivColor[di];
+  if (uDivPatScale[di] > 0.0) {
+    vec2 puv = fract(vWorldPosDiv.xy * uDivPatScale[di]);
+    float cw = 1.0 / float(DIV_MAX);
+    float au = (float(di) + clamp(puv.x, DIV_EDGE, 1.0 - DIV_EDGE)) * cw;
+    vec4 pc = texture2D(uDivAtlas, vec2(au, puv.y));
+    fill = mix(fill, pow(pc.rgb, vec3(2.2)), pc.a);
+  }
+  return fill;
+}
 `;
 
 const FRAG_BODY = /* glsl */ `
@@ -72,7 +105,7 @@ for (int di = 0; di < DIV_MAX; di++) {
   if (di >= uDivCount) break;
   float sd = dot(vWorldPosDiv.xy, uDivN[di]) - uDivOff[di];
   float m = 1.0 - smoothstep(-uDivSoft[di], uDivSoft[di], sd); // 1 = below the line
-  diffuseColor.rgb = mix(diffuseColor.rgb, uDivColor[di], m);
+  diffuseColor.rgb = mix(diffuseColor.rgb, dividerFill(di), m);
 }
 `;
 
@@ -97,6 +130,38 @@ function wireUniforms(shader: CompileShader): void {
   shader.uniforms.uDivOff = dividerUniforms.uDivOff;
   shader.uniforms.uDivColor = dividerUniforms.uDivColor;
   shader.uniforms.uDivSoft = dividerUniforms.uDivSoft;
+  shader.uniforms.uDivAtlas = dividerUniforms.uDivAtlas;
+  shader.uniforms.uDivPatScale = dividerUniforms.uDivPatScale;
+}
+
+/**
+ * Render each divider's pattern into its atlas cell and set the per-divider
+ * world scale (0 = no pattern). Async because pattern tiles render off the main
+ * path; safe to call on every divider change.
+ */
+export async function syncDividerPatterns(dividers: Divider[]): Promise<void> {
+  const ps = dividerUniforms.uDivPatScale.value;
+  const ctx = atlasCanvas.getContext('2d');
+  if (!ctx) return;
+  const n = Math.min(dividers.length, DIV_MAX);
+  for (let i = 0; i < DIV_MAX; i++) {
+    const d = i < n ? dividers[i] : undefined;
+    const x = i * ATLAS_CELL;
+    ctx.clearRect(x, 0, ATLAS_CELL, ATLAS_CELL);
+    if (!d?.pattern) {
+      ps[i] = 0;
+      continue;
+    }
+    const canvas = await renderPattern({
+      pattern: d.pattern,
+      color: d.patternColor ?? '#0a0a0a',
+      intensity: 1,
+    } as PatternLayer);
+    ctx.clearRect(x, 0, ATLAS_CELL, ATLAS_CELL);
+    ctx.drawImage(canvas, x, 0, ATLAS_CELL, ATLAS_CELL);
+    ps[i] = (d.patternScale ?? 12) / 3; // world tiles per metre
+  }
+  atlasTex.needsUpdate = true;
 }
 
 /**
@@ -121,7 +186,7 @@ for (int di = 0; di < DIV_MAX; di++) {
   if (di >= uDivCount) break;
   float sd = dot(vWorldPosDiv.xy, uDivN[di]) - uDivOff[di];
   float m = (1.0 - smoothstep(-uDivSoft[di], uDivSoft[di], sd)) * (1.0 - divCov);
-  diffuseColor.rgb = mix(diffuseColor.rgb, uDivColor[di], m);
+  diffuseColor.rgb = mix(diffuseColor.rgb, dividerFill(di), m);
 }
 `;
 

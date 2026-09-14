@@ -228,6 +228,12 @@ export interface Divider {
   by: number;
   /** Edge feathering, 0 (crisp) … 1 (soft gradient). Absent = crisp. */
   softness?: number;
+  /** Optional world-space pattern filling the divider region (over `color`). */
+  pattern?: PatternKind;
+  /** Colour the pattern is drawn in (over the divider `color` base). */
+  patternColor?: string;
+  /** Pattern tiling size across the bike (like a layer's scale). Absent → 12. */
+  patternScale?: number;
 }
 
 export interface DesignState {
