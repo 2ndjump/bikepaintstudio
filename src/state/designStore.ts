@@ -166,6 +166,7 @@ interface DesignActions {
   setRim(patch: Partial<DesignState['rim']>): void;
   addDivider(): void;
   updateDivider(id: string, patch: Partial<Divider>): void;
+  reorderDivider(id: string, direction: -1 | 1): void;
   removeDivider(id: string): void;
   loadDesign(state: DesignState): void;
   undo(): void;
@@ -357,6 +358,19 @@ export const useDesignStore = create<Store>((set, get) => {
         history,
         dividers: s.dividers.map((d) => (d.id === id ? { ...d, ...patch } : d)),
       }));
+    },
+
+    reorderDivider: (id, direction) => {
+      const history = recordHistory();
+      set((s) => {
+        const dividers = [...s.dividers];
+        const idx = dividers.findIndex((d) => d.id === id);
+        if (idx < 0) return s;
+        const target = idx + direction;
+        if (target < 0 || target >= dividers.length) return s;
+        [dividers[idx], dividers[target]] = [dividers[target], dividers[idx]];
+        return { history, dividers };
+      });
     },
 
     removeDivider: (id) => {

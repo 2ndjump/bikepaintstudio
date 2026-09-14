@@ -31,6 +31,7 @@ export function DividerPanel() {
   const dividers = useDesignStore((s) => s.dividers);
   const addDivider = useDesignStore((s) => s.addDivider);
   const updateDivider = useDesignStore((s) => s.updateDivider);
+  const reorderDivider = useDesignStore((s) => s.reorderDivider);
   const removeDivider = useDesignStore((s) => s.removeDivider);
   const activeId = useUIStore((s) => s.activeDividerId);
   const setActiveId = useUIStore((s) => s.setActiveDividerId);
@@ -87,6 +88,24 @@ export function DividerPanel() {
                 >
                   {t('dividerLabel')} {i + 1}
                   {active && <span className="text-neutral-500"> · {t('dividerEditing')}</span>}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => reorderDivider(d.id, -1)}
+                  disabled={i === 0}
+                  className="m3-icon-btn m3-icon-btn-sm disabled:opacity-30"
+                  title={t('tooltipMoveUp')}
+                >
+                  ▲
+                </button>
+                <button
+                  type="button"
+                  onClick={() => reorderDivider(d.id, 1)}
+                  disabled={i === dividers.length - 1}
+                  className="m3-icon-btn m3-icon-btn-sm disabled:opacity-30"
+                  title={t('tooltipMoveDown')}
+                >
+                  ▼
                 </button>
                 <button
                   type="button"
