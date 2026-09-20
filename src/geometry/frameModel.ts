@@ -66,6 +66,25 @@ export const MODEL_SCALE = 0.001;
 export const FRONT_HUB = new THREE.Vector3(FRONT_AXLE.x, FRONT_AXLE.y, 0).multiplyScalar(MODEL_SCALE);
 export const REAR_HUB = new THREE.Vector3(REAR_AXLE_X, 75, 0).multiplyScalar(MODEL_SCALE);
 
+/**
+ * The fork is ONE loft running dropout → crown → dropout, so its V axis covers
+ * both blades in series — a shape/decal would land on only one leg and leave the
+ * other bare (showing the base coat / a divider underneath). Fold V at the crown
+ * so both blades share the same 0…1 range (0 = dropout, 1 = crown) and any paint
+ * applies symmetrically to both legs, and mirror U on the second half so decals
+ * read the same way on each. (Same trick as the rim's two sidewalls.)
+ */
+function foldForkUV(geo: THREE.BufferGeometry): void {
+  const uv = geo.attributes.uv;
+  if (!uv) return;
+  for (let i = 0; i < uv.count; i++) {
+    const v = uv.getY(i);
+    if (v > 0.5) uv.setX(i, 1 - uv.getX(i));
+    uv.setY(i, 1 - Math.abs(2 * v - 1));
+  }
+  uv.needsUpdate = true;
+}
+
 export function buildFrameModel(): FrameModel {
   const mapped: Record<FrameZone, THREE.BufferGeometry[]> = {
     headTube: [],
@@ -129,7 +148,9 @@ export function buildFrameModel(): FrameModel {
   ];
   // seamOffset 0 → the fork's UV seam sits on the inner (wheel-facing) flank,
   // hidden from view, instead of the outer flank.
-  mapped.fork.push(bake(loftTube(forkPts, legR, legD, 260, 48, 2, 0).geo));
+  const forkGeo = loftTube(forkPts, legR, legD, 260, 48, 2, 0).geo;
+  foldForkUV(forkGeo);
+  mapped.fork.push(bake(forkGeo));
 
   // Dropouts + axle bosses (organic, base-only).
   for (const s of [-1, 1]) {
