@@ -15,7 +15,7 @@ import { loftTube } from './loft';
  * Per paint zone the geometry is split into two buckets:
  *  - `zones[z]`      the tube lofts, painted with the zone's composited texture
  *                    (base colour + layers/decals/shapes).
- *  - `zonesPlain[z]` chunky junction primitives (BB shell, rear dropouts, steerer)
+ *  - `zonesPlain[z]` chunky junction primitives (BB shell, steerer)
  *                    painted with the zone's BASE COLOUR only. Their UVs don't
  *                    match the tube wrap, so mapping the layer texture onto them
  *                    would smear/bleed decals & shapes across them (e.g. a shape
@@ -287,7 +287,6 @@ export function buildFrameModel(): FrameModel {
   const plain: Partial<Record<FrameZone, THREE.BufferGeometry[]>> = {
     fork: [],
     seatTube: [],
-    chainStays: [],
   };
   const alu: THREE.BufferGeometry[] = [];
   const dark: THREE.BufferGeometry[] = [];
@@ -404,21 +403,27 @@ export function buildFrameModel(): FrameModel {
     }
   }
 
-  // Chain stays (mapped) + rear dropouts (base-only).
+  // Chain stays (mapped). Past the axle each stay flattens into a thin, tall
+  // dropout plate with a rounded tip — part of the same sweep, so layers cover it.
   for (const s of [-1, 1]) {
     const pts = [
       // Root reaches into the BB shell and is pulled inward along z so the ends
       // bury inside the shell instead of overlapping at its outer rim.
-      [-8, -3, s * 18],
-      [-160, 28, s * 52],
-      [-320, 58, s * 64],
-      [REAR_AXLE_X + 6, 73, s * 66],
+      new THREE.Vector3(-8, -3, s * 18),
+      new THREE.Vector3(-160, 28, s * 52),
+      new THREE.Vector3(-320, 58, s * 64),
+      new THREE.Vector3(REAR_AXLE_X + 20, 72, s * 66),
+      new THREE.Vector3(REAR_AXLE_X - 16, 77, s * 66), // dropout tip
     ];
-    mapped.chainStays.push(loftTube(pts, (t) => 11.5 - 3 * t, () => 0.9, 90, 32).geo);
-    const drop = new THREE.SphereGeometry(13, 40, 28);
-    drop.scale(1.3, 1.05, 0.5);
-    drop.translate(REAR_AXLE_X, 75, s * 66);
-    plain.chainStays!.push(drop);
+    const len = new THREE.CatmullRomCurve3(pts, false, 'catmullrom', 0.5).getLength();
+    const plate = (t: number) => 1 - THREE.MathUtils.smoothstep((1 - t) * len, 14, 80); // 1 on the dropout, long taper
+    const tip = (t: number) => {
+      const u = Math.min(1, ((1 - t) * len) / 8);
+      return Math.max(0.2, Math.sqrt(1 - (1 - u) * (1 - u))); // quarter-round tip
+    };
+    const r = (t: number) => THREE.MathUtils.lerp(11.5 - 3 * t, 11, plate(t)) * tip(t);
+    const lateral = (t: number) => THREE.MathUtils.lerp((11.5 - 3 * t) * 0.9, 4.5, plate(t)) * tip(t);
+    mapped.chainStays.push(loftTube(pts, r, (t) => lateral(t) / r(t), 110, 32).geo);
   }
 
   // Seat stays — DROPPED: they join the seat tube low (~61% up), well below the
@@ -429,9 +434,11 @@ export function buildFrameModel(): FrameModel {
       new THREE.Vector3(a.x, a.y, s * 9),
       new THREE.Vector3(-235, 250, s * 38),
       new THREE.Vector3(-345, 150, s * 56),
-      new THREE.Vector3(REAR_AXLE_X + 8, 82, s * 64),
+      new THREE.Vector3(REAR_AXLE_X - 8, 79, s * 66), // upper edge runs flush onto the dropout plate
     ];
-    mapped.seatStays.push(loftTube(pts, (t) => 8.5 - 2 * t, () => 0.9, 90, 32).geo);
+    // The end flattens so it stays within the thin dropout plate's width.
+    const flat = (t: number) => THREE.MathUtils.lerp(0.9, 0.55, THREE.MathUtils.smoothstep(t, 0.8, 1));
+    mapped.seatStays.push(loftTube(pts, (t) => 8.5 - 2 * t, flat, 90, 32).geo);
   }
 
   const zones = {} as Record<FrameZone, THREE.BufferGeometry>;
