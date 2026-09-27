@@ -42,8 +42,9 @@ reordering, and duplicate (with horizontal/vertical mirror):
   (e.g. everything below the line turns blue), positioned by dragging handles in
   the viewport.
 - Global **shapes** in the same list: a shape (star, arrow, lightning, …)
-  projected onto the side profile across all tubes; drag its centre handle,
-  set size and rotation in the panel.
+  projected onto the side profile across all tubes, edited with a transform
+  box in the viewport (move, resize from corners/edges, rotate; Shift snaps
+  to 15°) or with the panel sliders.
 - Each layer can sit **above or below** the divider.
 
 ### Direct editing on the model
