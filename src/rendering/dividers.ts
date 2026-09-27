@@ -3,39 +3,43 @@ import type { Divider, PatternLayer } from '../state/types';
 import { renderPattern } from './patterns';
 import { fillShape } from './LayerCompositor';
 
-/** Max dividers supported by the shader (fixed array size). */
-export const DIV_MAX = 6;
+/** Max dividers (lines + shapes) supported by the shader (fixed array size). */
+export const DIV_MAX = 16;
 
-// Each divider's pattern tile lives in one cell of a single atlas texture (one
-// sampler2D — a dynamically-indexed sampler array won't link on GLSL ES): top
-// row = pattern tiles (sampled by world XY), bottom row = shape masks (alpha,
-// kind 'shape' only).
+// Each divider's pattern tile and shape mask live in a single atlas texture (one
+// sampler2D — a dynamically-indexed sampler array won't link on GLSL ES). Entry
+// i owns a block of two cells [pattern | mask] in a grid of ATLAS_COLS blocks
+// per row, so the atlas stays within a 4096 px texture limit.
 const ATLAS_CELL = 512;
+const ATLAS_COLS = 4;
+const ATLAS_ROWS = Math.ceil(DIV_MAX / ATLAS_COLS);
 const atlasCanvas = document.createElement('canvas');
-atlasCanvas.width = ATLAS_CELL * DIV_MAX;
-atlasCanvas.height = ATLAS_CELL * 2;
+atlasCanvas.width = ATLAS_CELL * 2 * ATLAS_COLS;
+atlasCanvas.height = ATLAS_CELL * ATLAS_ROWS;
 const atlasTex = new THREE.CanvasTexture(atlasCanvas);
 atlasTex.wrapS = THREE.ClampToEdgeWrapping;
 atlasTex.wrapT = THREE.ClampToEdgeWrapping;
 
+/** Canvas origin of cell `sub` (0 = pattern, 1 = mask) of entry i. */
+function cellOrigin(i: number, sub: 0 | 1): [number, number] {
+  return [((i % ATLAS_COLS) * 2 + sub) * ATLAS_CELL, Math.floor(i / ATLAS_COLS) * ATLAS_CELL];
+}
+
 /**
  * Shared uniforms for the world-space colour dividers. Every painted material's
  * onBeforeCompile references THESE objects, so a single sync updates all shaders
- * at once (no recompile).
+ * at once (no recompile). Packed into three vec4s per entry to stay well within
+ * the fragment uniform budget.
  */
 export const dividerUniforms = {
   uDivCount: { value: 0 },
-  uDivN: { value: new Float32Array(DIV_MAX * 2) }, // line normals (points "up")
-  uDivOff: { value: new Float32Array(DIV_MAX) }, // signed offset along the normal
-  uDivColor: { value: new Float32Array(DIV_MAX * 3) }, // linear RGB
-  uDivSoft: { value: new Float32Array(DIV_MAX) }, // per-divider edge softness (metres)
+  // Line: (normal xy pointing "up", signed offset, edge softness in metres).
+  // Shape: (centre xy, cos, sin of rotation).
+  uDivGeo: { value: new Float32Array(DIV_MAX * 4) },
+  uDivColor: { value: new Float32Array(DIV_MAX * 4) }, // linear RGB, kind (0 line, 1 shape)
+  uDivExt: { value: new Float32Array(DIV_MAX * 4) }, // shape w, h (metres), pattern tiles/metre (0 = none)
   // Optional per-divider pattern filling the region (sampled by world XY).
   uDivAtlas: { value: atlasTex as THREE.Texture },
-  uDivPatScale: { value: new Float32Array(DIV_MAX) }, // world tiles/metre, 0 = none
-  // Shapes: kind (0 line, 1 shape), centre + cos/sin of rotation, size (metres).
-  uDivKind: { value: new Float32Array(DIV_MAX) },
-  uDivShape: { value: new Float32Array(DIV_MAX * 4) },
-  uDivSize: { value: new Float32Array(DIV_MAX * 2) },
 };
 
 /** smoothstep half-width in metres for a crisp-but-anti-aliased edge. */
@@ -49,25 +53,18 @@ const _c = new THREE.Color();
 export function syncDividerUniforms(dividers: Divider[]): void {
   const n = Math.min(dividers.length, DIV_MAX);
   dividerUniforms.uDivCount.value = n;
-  const N = dividerUniforms.uDivN.value;
-  const O = dividerUniforms.uDivOff.value;
+  const G = dividerUniforms.uDivGeo.value;
   const C = dividerUniforms.uDivColor.value;
-  const S = dividerUniforms.uDivSoft.value;
-  const K = dividerUniforms.uDivKind.value;
-  const SH = dividerUniforms.uDivShape.value;
-  const SZ = dividerUniforms.uDivSize.value;
+  const E = dividerUniforms.uDivExt.value;
   for (let i = 0; i < n; i++) {
     const d = dividers[i];
-    S[i] = AA_FLOOR + (d.softness ?? 0) * MAX_SOFT;
     _c.set(d.color); // linear RGB (ColorManagement on)
-    C[i * 3] = _c.r;
-    C[i * 3 + 1] = _c.g;
-    C[i * 3 + 2] = _c.b;
-    K[i] = d.kind === 'shape' ? 1 : 0;
+    C.set([_c.r, _c.g, _c.b, d.kind === 'shape' ? 1 : 0], i * 4);
     if (d.kind === 'shape') {
       const a = ((d.rotation ?? 0) * Math.PI) / 180;
-      SH.set([d.cx ?? 0, d.cy ?? 0, Math.cos(a), Math.sin(a)], i * 4);
-      SZ.set([d.w ?? 0.1, d.h ?? 0.1], i * 2);
+      G.set([d.cx ?? 0, d.cy ?? 0, Math.cos(a), Math.sin(a)], i * 4);
+      E[i * 4] = d.w ?? 0.1;
+      E[i * 4 + 1] = d.h ?? 0.1;
       continue;
     }
     let dx = d.bx - d.ax;
@@ -82,39 +79,37 @@ export function syncDividerUniforms(dividers: Divider[]): void {
       nx = -nx;
       ny = -ny;
     }
-    N[i * 2] = nx;
-    N[i * 2 + 1] = ny;
-    O[i] = d.ax * nx + d.ay * ny;
+    G.set([nx, ny, d.ax * nx + d.ay * ny, AA_FLOOR + (d.softness ?? 0) * MAX_SOFT], i * 4);
   }
 }
 
 const FRAG_HEAD = /* glsl */ `
 #define DIV_MAX ${DIV_MAX}
+#define DIV_COLS ${ATLAS_COLS.toFixed(1)}
+#define DIV_ROWS ${ATLAS_ROWS.toFixed(1)}
 uniform int uDivCount;
-uniform vec2 uDivN[DIV_MAX];
-uniform float uDivOff[DIV_MAX];
-uniform vec3 uDivColor[DIV_MAX];
-uniform float uDivSoft[DIV_MAX];
+uniform vec4 uDivGeo[DIV_MAX];
+uniform vec4 uDivColor[DIV_MAX];
+uniform vec4 uDivExt[DIV_MAX];
 uniform sampler2D uDivAtlas;
-uniform float uDivPatScale[DIV_MAX];
-uniform float uDivKind[DIV_MAX];
-uniform vec4 uDivShape[DIV_MAX];
-uniform vec2 uDivSize[DIV_MAX];
 varying vec3 vWorldPosDiv;
 #define DIV_EDGE ${(1 / ATLAS_CELL).toFixed(6)}
-// Sample cell di of the atlas at cell uv (row 1 = patterns on top, row 0 =
-// shape masks). Clamped a texel in so bilinear doesn't bleed between cells.
-vec4 divAtlas(int di, vec2 uv, float row) {
+// Sample cell sub (0 = pattern, 1 = shape mask) of entry di at cell uv (v up).
+// Clamped a texel in so bilinear doesn't bleed between cells.
+vec4 divAtlas(int di, vec2 uv, float sub) {
   vec2 c = clamp(uv, DIV_EDGE, 1.0 - DIV_EDGE);
-  return texture2D(uDivAtlas, vec2((float(di) + c.x) / float(DIV_MAX), (row + c.y) * 0.5));
+  float col = mod(float(di), DIV_COLS);
+  float row = floor(float(di) / DIV_COLS);
+  return texture2D(uDivAtlas, vec2((col * 2.0 + sub + c.x) / (DIV_COLS * 2.0), 1.0 - (row + 1.0 - c.y) / DIV_ROWS));
 }
 // The divider's fill: base colour, optionally overlaid with a world-space
 // pattern tile (its colour baked in; approximate sRGB to linear). The tiles
 // are periodic, so the clamp above stays seamless.
 vec3 dividerFill(int di) {
-  vec3 fill = uDivColor[di];
-  if (uDivPatScale[di] > 0.0) {
-    vec4 pc = divAtlas(di, fract(vWorldPosDiv.xy * uDivPatScale[di]), 1.0);
+  vec3 fill = uDivColor[di].rgb;
+  float ps = uDivExt[di].z;
+  if (ps > 0.0) {
+    vec4 pc = divAtlas(di, fract(vWorldPosDiv.xy * ps), 0.0);
     fill = mix(fill, pow(pc.rgb, vec3(2.2)), pc.a);
   }
   return fill;
@@ -122,15 +117,15 @@ vec3 dividerFill(int di) {
 // How much of divider di covers this fragment: below the line (kind 0), or
 // inside the shape mask projected onto the side profile (kind 1).
 float dividerMask(int di) {
-  if (uDivKind[di] < 0.5) {
-    float sd = dot(vWorldPosDiv.xy, uDivN[di]) - uDivOff[di];
-    return 1.0 - smoothstep(-uDivSoft[di], uDivSoft[di], sd); // 1 = below the line
+  vec4 g = uDivGeo[di];
+  if (uDivColor[di].a < 0.5) {
+    float sd = dot(vWorldPosDiv.xy, g.xy) - g.z;
+    return 1.0 - smoothstep(-g.w, g.w, sd); // 1 = below the line
   }
-  vec4 sh = uDivShape[di];
-  vec2 p = vWorldPosDiv.xy - sh.xy;
-  vec2 uv = vec2(sh.z * p.x + sh.w * p.y, -sh.w * p.x + sh.z * p.y) / uDivSize[di] + 0.5;
+  vec2 p = vWorldPosDiv.xy - g.xy;
+  vec2 uv = vec2(g.z * p.x + g.w * p.y, -g.w * p.x + g.z * p.y) / uDivExt[di].xy + 0.5;
   if (uv.x < 0.0 || uv.y < 0.0 || uv.x > 1.0 || uv.y > 1.0) return 0.0;
-  return divAtlas(di, uv, 0.0).a;
+  return divAtlas(di, uv, 1.0).a;
 }
 `;
 
@@ -158,15 +153,10 @@ function injectVertex(shader: CompileShader): void {
 
 function wireUniforms(shader: CompileShader): void {
   shader.uniforms.uDivCount = dividerUniforms.uDivCount;
-  shader.uniforms.uDivN = dividerUniforms.uDivN;
-  shader.uniforms.uDivOff = dividerUniforms.uDivOff;
+  shader.uniforms.uDivGeo = dividerUniforms.uDivGeo;
   shader.uniforms.uDivColor = dividerUniforms.uDivColor;
-  shader.uniforms.uDivSoft = dividerUniforms.uDivSoft;
+  shader.uniforms.uDivExt = dividerUniforms.uDivExt;
   shader.uniforms.uDivAtlas = dividerUniforms.uDivAtlas;
-  shader.uniforms.uDivPatScale = dividerUniforms.uDivPatScale;
-  shader.uniforms.uDivKind = dividerUniforms.uDivKind;
-  shader.uniforms.uDivShape = dividerUniforms.uDivShape;
-  shader.uniforms.uDivSize = dividerUniforms.uDivSize;
 }
 
 /**
@@ -175,27 +165,28 @@ function wireUniforms(shader: CompileShader): void {
  * path; safe to call on every divider change.
  */
 export async function syncDividerPatterns(dividers: Divider[]): Promise<void> {
-  const ps = dividerUniforms.uDivPatScale.value;
+  const E = dividerUniforms.uDivExt.value;
   const ctx = atlasCanvas.getContext('2d');
   if (!ctx) return;
   const n = Math.min(dividers.length, DIV_MAX);
   for (let i = 0; i < DIV_MAX; i++) {
     const d = i < n ? dividers[i] : undefined;
-    const x = i * ATLAS_CELL;
-    ctx.clearRect(x, 0, ATLAS_CELL, ATLAS_CELL * 2);
+    const [px, py] = cellOrigin(i, 0);
+    const [mx, my] = cellOrigin(i, 1);
+    ctx.clearRect(px, py, ATLAS_CELL * 2, ATLAS_CELL);
     if (d?.kind === 'shape' && d.shape) {
       // Shape mask fills the whole cell; the shader stretches it to w × h.
       ctx.save();
       ctx.beginPath();
-      ctx.rect(x, ATLAS_CELL, ATLAS_CELL, ATLAS_CELL);
+      ctx.rect(mx, my, ATLAS_CELL, ATLAS_CELL);
       ctx.clip();
-      ctx.translate(x + ATLAS_CELL / 2, ATLAS_CELL * 1.5);
+      ctx.translate(mx + ATLAS_CELL / 2, my + ATLAS_CELL / 2);
       ctx.fillStyle = '#fff';
       fillShape(ctx, d.shape, ATLAS_CELL, ATLAS_CELL);
       ctx.restore();
     }
     if (!d?.pattern) {
-      ps[i] = 0;
+      E[i * 4 + 2] = 0;
       continue;
     }
     const canvas = await renderPattern({
@@ -203,9 +194,9 @@ export async function syncDividerPatterns(dividers: Divider[]): Promise<void> {
       color: d.patternColor ?? '#0a0a0a',
       intensity: 1,
     } as PatternLayer);
-    ctx.clearRect(x, 0, ATLAS_CELL, ATLAS_CELL);
-    ctx.drawImage(canvas, x, 0, ATLAS_CELL, ATLAS_CELL);
-    ps[i] = (d.patternScale ?? 12) / 3; // world tiles per metre
+    ctx.clearRect(px, py, ATLAS_CELL, ATLAS_CELL);
+    ctx.drawImage(canvas, px, py, ATLAS_CELL, ATLAS_CELL);
+    E[i * 4 + 2] = (d.patternScale ?? 12) / 3; // world tiles per metre
   }
   atlasTex.needsUpdate = true;
 }

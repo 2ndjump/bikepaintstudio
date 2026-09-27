@@ -6,6 +6,7 @@ import { useT } from '../../i18n/useT';
 import { ColorPicker } from '../ui/ColorPicker';
 import { ShapeKindSelect } from '../LayerTypes/ShapeLayer';
 import { ShapeIcon } from './LayerStack';
+import { DIV_MAX } from '../../rendering/dividers';
 
 const PATTERNS: { value: PatternKind; labelKey: I18nKey }[] = [
   { value: 'hexagons', labelKey: 'patternHexagons' },
@@ -41,6 +42,9 @@ export function DividerPanel() {
   const setActiveId = useUIStore((s) => s.setActiveDividerId);
   const t = useT();
 
+  // The shader has room for DIV_MAX entries (lines + shapes together).
+  const full = dividers.length >= DIV_MAX;
+
   function add(kind: 'line' | 'shape') {
     if (kind === 'shape') addDividerShape();
     else addDivider();
@@ -57,7 +61,8 @@ export function DividerPanel() {
           <button
             type="button"
             onClick={() => add('shape')}
-            className="m3-icon-btn m3-icon-btn-sm"
+            disabled={full}
+            className="m3-icon-btn m3-icon-btn-sm disabled:opacity-30"
             title={t('addDividerShape')}
             aria-label={t('addDividerShape')}
           >
@@ -66,7 +71,8 @@ export function DividerPanel() {
           <button
             type="button"
             onClick={() => add('line')}
-            className="m3-icon-btn m3-icon-btn-sm"
+            disabled={full}
+            className="m3-icon-btn m3-icon-btn-sm disabled:opacity-30"
             title={t('addDivider')}
             aria-label={t('addDivider')}
           >
