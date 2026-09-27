@@ -23,7 +23,7 @@ export function DividerHandles() {
   const gl = useThree((s) => s.gl);
   const controls = useThree((s) => s.controls) as { enabled: boolean } | null;
 
-  function startDrag(id: string, which: 'a' | 'b', e: React.PointerEvent) {
+  function startDrag(id: string, which: 'a' | 'b' | 'c', e: React.PointerEvent) {
     e.stopPropagation();
     const prevEnabled = controls?.enabled ?? true;
     if (controls) controls.enabled = false; // don't orbit while dragging a handle
@@ -34,7 +34,14 @@ export function DividerHandles() {
       _ndc.y = -((ev.clientY - rect.top) / rect.height) * 2 + 1;
       _ray.setFromCamera(_ndc, camera);
       if (_ray.ray.intersectPlane(PLANE, _hit)) {
-        updateDivider(id, which === 'a' ? { ax: _hit.x, ay: _hit.y } : { bx: _hit.x, by: _hit.y });
+        updateDivider(
+          id,
+          which === 'a'
+            ? { ax: _hit.x, ay: _hit.y }
+            : which === 'b'
+              ? { bx: _hit.x, by: _hit.y }
+              : { cx: _hit.x, cy: _hit.y },
+        );
       }
     };
     const onUp = () => {
@@ -46,6 +53,33 @@ export function DividerHandles() {
     window.addEventListener('pointerup', onUp);
   }
 
+  function handle(id: string, which: 'a' | 'b' | 'c', x: number, y: number, color: string) {
+    return (
+      <Html
+        key={which}
+        position={[x, y, 0]}
+        center
+        zIndexRange={[100, 100]}
+        style={{ pointerEvents: 'auto' }}
+      >
+        <div
+          onPointerDown={(e) => startDrag(id, which, e)}
+          title="Divider"
+          style={{
+            width: 16,
+            height: 16,
+            borderRadius: '50%',
+            background: color,
+            border: '2px solid #fff',
+            boxShadow: '0 0 0 1px rgba(0,0,0,0.5)',
+            cursor: 'grab',
+            touchAction: 'none',
+          }}
+        />
+      </Html>
+    );
+  }
+
   // Only the divider being edited shows its guide line + handles; the colour
   // cut itself is always applied (in the shader).
   const shown = dividers.filter((d) => d.id === activeId);
@@ -53,6 +87,39 @@ export function DividerHandles() {
   return (
     <>
       {shown.map((d) => {
+        if (d.kind === 'shape') {
+          // Outline of the shape's (rotated) box + a centre handle to move it.
+          const cx = d.cx ?? 0;
+          const cy = d.cy ?? 0;
+          const a = ((d.rotation ?? 0) * Math.PI) / 180;
+          const c = Math.cos(a);
+          const s = Math.sin(a);
+          const hw = (d.w ?? 0.1) / 2;
+          const hh = (d.h ?? 0.1) / 2;
+          const corners = [
+            [-hw, -hh],
+            [hw, -hh],
+            [hw, hh],
+            [-hw, hh],
+            [-hw, -hh],
+          ].map(([x, y]) => [cx + c * x - s * y, cy + s * x + c * y, 0] as [number, number, number]);
+          return (
+            <group key={d.id}>
+              <Line
+                points={corners}
+                color={d.color}
+                lineWidth={1.5}
+                dashed
+                dashSize={0.01}
+                gapSize={0.006}
+                depthTest={false}
+                renderOrder={999}
+                transparent
+              />
+              {handle(d.id, 'c', cx, cy, d.color)}
+            </group>
+          );
+        }
         // Extend the drawn line well past the handles so it reads as a full cut.
         const dx = d.bx - d.ax;
         const dy = d.by - d.ay;
@@ -72,34 +139,9 @@ export function DividerHandles() {
               renderOrder={999}
               transparent
             />
-            {(['a', 'b'] as const).map((which) => {
-              const x = which === 'a' ? d.ax : d.bx;
-              const y = which === 'a' ? d.ay : d.by;
-              return (
-                <Html
-                  key={which}
-                  position={[x, y, 0]}
-                  center
-                  zIndexRange={[100, 100]}
-                  style={{ pointerEvents: 'auto' }}
-                >
-                  <div
-                    onPointerDown={(e) => startDrag(d.id, which, e)}
-                    title="Divider"
-                    style={{
-                      width: 16,
-                      height: 16,
-                      borderRadius: '50%',
-                      background: d.color,
-                      border: '2px solid #fff',
-                      boxShadow: '0 0 0 1px rgba(0,0,0,0.5)',
-                      cursor: 'grab',
-                      touchAction: 'none',
-                    }}
-                  />
-                </Html>
-              );
-            })}
+            {(['a', 'b'] as const).map((which) =>
+              handle(d.id, which, which === 'a' ? d.ax : d.bx, which === 'a' ? d.ay : d.by, d.color),
+            )}
           </group>
         );
       })}

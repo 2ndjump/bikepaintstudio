@@ -47,7 +47,7 @@ function TextIcon() {
 }
 
 /** Shape: a triangle. */
-function ShapeIcon() {
+export function ShapeIcon() {
   return (
     <svg {...ICON} fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round" aria-hidden="true">
       <path d="M8 3 L13.5 12.5 H2.5 Z" />

@@ -12,6 +12,8 @@ export type I18nKey =
   | 'hasLayers'
   | 'dividers'
   | 'addDivider'
+  | 'addDividerShape'
+  | 'dividerShapeLabel'
   | 'dividersEmpty'
   | 'dividerLabel'
   | 'dividerEdit'
@@ -143,6 +145,8 @@ const STRINGS: Record<I18nKey, Record<Lang, string>> = {
   rims: { de: 'Felgen', en: 'Rims' },
   dividers: { de: 'Divider', en: 'Dividers' },
   addDivider: { de: 'Divider hinzufügen', en: 'Add divider' },
+  addDividerShape: { de: 'Form hinzufügen', en: 'Add shape' },
+  dividerShapeLabel: { de: 'Form', en: 'Shape' },
   dividersEmpty: { de: 'Kein Divider', en: 'No dividers' },
   dividerLabel: { de: 'Divider', en: 'Divider' },
   dividerEdit: { de: 'Linie bearbeiten', en: 'Edit line' },

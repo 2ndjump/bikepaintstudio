@@ -4,6 +4,8 @@ import type { PatternKind } from '../../state/types';
 import type { I18nKey } from '../../i18n/strings';
 import { useT } from '../../i18n/useT';
 import { ColorPicker } from '../ui/ColorPicker';
+import { ShapeKindSelect } from '../LayerTypes/ShapeLayer';
+import { ShapeIcon } from './LayerStack';
 
 const PATTERNS: { value: PatternKind; labelKey: I18nKey }[] = [
   { value: 'hexagons', labelKey: 'patternHexagons' },
@@ -24,12 +26,14 @@ const PATTERNS: { value: PatternKind; labelKey: I18nKey }[] = [
 
 /**
  * Global colour dividers: world-space cut lines that tint everything below them
- * across the frame. Click a divider to edit it — only then does its guide line +
- * handles appear on the viewport (drag the handles to position the line).
+ * across the frame, and global shapes that tint everything inside them (side
+ * profile). Click an entry to edit it — only then do its guide + handles appear
+ * on the viewport (drag the handles to position it).
  */
 export function DividerPanel() {
   const dividers = useDesignStore((s) => s.dividers);
   const addDivider = useDesignStore((s) => s.addDivider);
+  const addDividerShape = useDesignStore((s) => s.addDividerShape);
   const updateDivider = useDesignStore((s) => s.updateDivider);
   const reorderDivider = useDesignStore((s) => s.reorderDivider);
   const removeDivider = useDesignStore((s) => s.removeDivider);
@@ -37,8 +41,9 @@ export function DividerPanel() {
   const setActiveId = useUIStore((s) => s.setActiveDividerId);
   const t = useT();
 
-  function add() {
-    addDivider();
+  function add(kind: 'line' | 'shape') {
+    if (kind === 'shape') addDividerShape();
+    else addDivider();
     const ds = useDesignStore.getState().dividers;
     const last = ds[ds.length - 1];
     if (last) setActiveId(last.id); // select the new one so its handles show
@@ -48,15 +53,26 @@ export function DividerPanel() {
     <div className="space-y-2">
       <div className="m3-section-title flex items-center justify-between">
         <span>{t('dividers')}</span>
-        <button
-          type="button"
-          onClick={add}
-          className="m3-icon-btn m3-icon-btn-sm"
-          title={t('addDivider')}
-          aria-label={t('addDivider')}
-        >
-          +
-        </button>
+        <span className="flex items-center gap-1">
+          <button
+            type="button"
+            onClick={() => add('shape')}
+            className="m3-icon-btn m3-icon-btn-sm"
+            title={t('addDividerShape')}
+            aria-label={t('addDividerShape')}
+          >
+            <ShapeIcon />
+          </button>
+          <button
+            type="button"
+            onClick={() => add('line')}
+            className="m3-icon-btn m3-icon-btn-sm"
+            title={t('addDivider')}
+            aria-label={t('addDivider')}
+          >
+            +
+          </button>
+        </span>
       </div>
 
       {dividers.length === 0 && (
@@ -66,6 +82,7 @@ export function DividerPanel() {
       <div className="space-y-1.5">
         {dividers.map((d, i) => {
           const active = d.id === activeId;
+          const isShape = d.kind === 'shape';
           return (
             <div
               key={d.id}
@@ -86,7 +103,7 @@ export function DividerPanel() {
                     active ? 'text-[var(--md-primary)]' : 'text-neutral-300'
                   }`}
                 >
-                  {t('dividerLabel')} {i + 1}
+                  {t(isShape ? 'dividerShapeLabel' : 'dividerLabel')} {i + 1}
                   {active && <span className="text-neutral-500"> · {t('dividerEditing')}</span>}
                 </button>
                 <button
@@ -122,19 +139,54 @@ export function DividerPanel() {
 
               {active && (
                 <div className="mt-1 space-y-1.5 px-1 pb-1">
-                  <label className="flex flex-col gap-1 text-xs text-neutral-400">
-                    {t('dividerSoftness')} {Math.round((d.softness ?? 0) * 100)}%
-                    <input
-                      type="range"
-                      min={0}
-                      max={1}
-                      step={0.01}
-                      value={d.softness ?? 0}
-                      onChange={(e) =>
-                        updateDivider(d.id, { softness: parseFloat(e.target.value) })
-                      }
-                    />
-                  </label>
+                  {isShape ? (
+                    <>
+                      <ShapeKindSelect
+                        value={d.shape ?? 'star'}
+                        onChange={(shape) => updateDivider(d.id, { shape })}
+                      />
+                      {(['w', 'h'] as const).map((k) => (
+                        <label key={k} className="flex flex-col gap-1 text-xs text-neutral-400">
+                          {t(k === 'w' ? 'width' : 'height')} {Math.round((d[k] ?? 0.1) * 100)} cm
+                          <input
+                            type="range"
+                            min={0.02}
+                            max={k === 'w' ? 2 : 0.8} // width spans past the whole bike (~1.8 m)
+                            step={0.005}
+                            value={d[k] ?? 0.1}
+                            onChange={(e) => updateDivider(d.id, { [k]: parseFloat(e.target.value) })}
+                          />
+                        </label>
+                      ))}
+                      <label className="flex flex-col gap-1 text-xs text-neutral-400">
+                        {t('rotationShort')} {(d.rotation ?? 0).toFixed(0)}°
+                        <input
+                          type="range"
+                          min={0}
+                          max={360}
+                          step={1}
+                          value={d.rotation ?? 0}
+                          onChange={(e) =>
+                            updateDivider(d.id, { rotation: parseFloat(e.target.value) })
+                          }
+                        />
+                      </label>
+                    </>
+                  ) : (
+                    <label className="flex flex-col gap-1 text-xs text-neutral-400">
+                      {t('dividerSoftness')} {Math.round((d.softness ?? 0) * 100)}%
+                      <input
+                        type="range"
+                        min={0}
+                        max={1}
+                        step={0.01}
+                        value={d.softness ?? 0}
+                        onChange={(e) =>
+                          updateDivider(d.id, { softness: parseFloat(e.target.value) })
+                        }
+                      />
+                    </label>
+                  )}
 
                   <select
                     value={d.pattern ?? ''}

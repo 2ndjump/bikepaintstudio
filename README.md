@@ -41,6 +41,9 @@ reordering, and duplicate (with horizontal/vertical mirror):
 - Global, world‑space cut lines that recolour across parts with one clean line
   (e.g. everything below the line turns blue), positioned by dragging handles in
   the viewport.
+- Global **shapes** in the same list: a shape (star, arrow, lightning, …)
+  projected onto the side profile across all tubes; drag its centre handle,
+  set size and rotation in the panel.
 - Each layer can sit **above or below** the divider.
 
 ### Direct editing on the model

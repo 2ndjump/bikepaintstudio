@@ -5,6 +5,7 @@ import type {
   Layer,
   LayerEffect,
   PatternLayer,
+  ShapeKind,
   ShapeLayer,
   SolidColorLayer,
   ZoneId,
@@ -303,134 +304,11 @@ export class ZoneCompositor {
     const sw = w * layer.width;
     const sh = h * layer.height;
 
-    const rx = sw / 2;
-    const ry = sh / 2;
-
     ctx.save();
     ctx.translate(w * layer.x, h * layer.y);
     ctx.rotate((layer.rotation * Math.PI) / 180);
     ctx.fillStyle = layer.color;
-
-    // Regular n-gon inscribed in the rx/ry ellipse, first vertex at the top.
-    const poly = (n: number) => {
-      ctx.beginPath();
-      for (let i = 0; i < n; i++) {
-        const a = -Math.PI / 2 + (i / n) * Math.PI * 2;
-        const x = rx * Math.cos(a);
-        const y = ry * Math.sin(a);
-        if (i === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
-      }
-      ctx.closePath();
-    };
-    // Star: `pts` spikes alternating outer (1) / inner (`inner`) radius.
-    const star = (pts: number, inner: number) => {
-      ctx.beginPath();
-      for (let i = 0; i < pts * 2; i++) {
-        const a = -Math.PI / 2 + (i / (pts * 2)) * Math.PI * 2;
-        const rr = i % 2 === 0 ? 1 : inner;
-        const x = rx * rr * Math.cos(a);
-        const y = ry * rr * Math.sin(a);
-        if (i === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
-      }
-      ctx.closePath();
-    };
-    const path = (pointsOrPath: () => void) => {
-      ctx.beginPath();
-      pointsOrPath();
-      ctx.closePath();
-      ctx.fill();
-    };
-    const line = (x: number, y: number) => ctx.lineTo(x, y);
-
-    switch (layer.shape) {
-      case 'rectangle':
-        ctx.fillRect(-rx, -ry, sw, sh);
-        break;
-      case 'circle':
-        ctx.beginPath();
-        ctx.ellipse(0, 0, rx, ry, 0, 0, Math.PI * 2);
-        ctx.fill();
-        break;
-      case 'triangle':
-        ctx.beginPath();
-        ctx.moveTo(0, -ry);
-        line(rx, ry);
-        line(-rx, ry);
-        ctx.closePath();
-        ctx.fill();
-        break;
-      case 'diamond':
-        poly(4);
-        ctx.fill();
-        break;
-      case 'pentagon':
-        poly(5);
-        ctx.fill();
-        break;
-      case 'hexagon':
-        poly(6);
-        ctx.fill();
-        break;
-      case 'star':
-        star(5, 0.42);
-        ctx.fill();
-        break;
-      case 'ring':
-        ctx.beginPath();
-        ctx.ellipse(0, 0, rx, ry, 0, 0, Math.PI * 2);
-        ctx.ellipse(0, 0, rx * 0.58, ry * 0.58, 0, 0, Math.PI * 2);
-        ctx.fill('evenodd');
-        break;
-      case 'cross': {
-        const t = 0.34; // arm thickness (fraction of full size)
-        ctx.beginPath();
-        ctx.rect(-rx * t, -ry, sw * t, sh);
-        ctx.rect(-rx, -ry * t, sw, sh * t);
-        ctx.fill();
-        break;
-      }
-      case 'heart':
-        ctx.beginPath();
-        ctx.moveTo(0, ry); // bottom point
-        ctx.bezierCurveTo(rx * 1.4, ry * 0.15, rx, -ry * 0.9, 0, -ry * 0.3);
-        ctx.bezierCurveTo(-rx, -ry * 0.9, -rx * 1.4, ry * 0.15, 0, ry);
-        ctx.closePath();
-        ctx.fill();
-        break;
-      case 'arrow':
-        path(() => {
-          ctx.moveTo(0, -ry); // tip
-          line(rx, -ry * 0.1);
-          line(rx * 0.42, -ry * 0.1);
-          line(rx * 0.42, ry);
-          line(-rx * 0.42, ry);
-          line(-rx * 0.42, -ry * 0.1);
-          line(-rx, -ry * 0.1);
-        });
-        break;
-      case 'lightning':
-        path(() => {
-          ctx.moveTo(rx * 0.25, -ry);
-          line(-rx * 0.55, ry * 0.15);
-          line(-rx * 0.05, ry * 0.15);
-          line(-rx * 0.25, ry);
-          line(rx * 0.55, -ry * 0.2);
-          line(rx * 0.05, -ry * 0.2);
-        });
-        break;
-      case 'chevron':
-        path(() => {
-          ctx.moveTo(-rx, -ry * 0.5);
-          line(0, ry * 0.5);
-          line(rx, -ry * 0.5);
-          line(rx, -ry);
-          line(0, 0);
-          line(-rx, -ry);
-        });
-        break;
-    }
+    fillShape(ctx, layer.shape, sw, sh);
     ctx.restore();
   }
 
@@ -652,4 +530,134 @@ export function getCompositor(zoneId: ZoneId): ZoneCompositor {
     compositors.set(zoneId, c);
   }
   return c;
+}
+
+/**
+ * Fill `shape` centred on the origin, spanning sw × sh, with the current
+ * fillStyle. Shared by shape layers and the global shape masks (dividers.ts).
+ */
+export function fillShape(ctx: CanvasRenderingContext2D, shape: ShapeKind, sw: number, sh: number) {
+  const rx = sw / 2;
+  const ry = sh / 2;
+
+  // Regular n-gon inscribed in the rx/ry ellipse, first vertex at the top.
+  const poly = (n: number) => {
+    ctx.beginPath();
+    for (let i = 0; i < n; i++) {
+      const a = -Math.PI / 2 + (i / n) * Math.PI * 2;
+      const x = rx * Math.cos(a);
+      const y = ry * Math.sin(a);
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+  };
+  // Star: `pts` spikes alternating outer (1) / inner (`inner`) radius.
+  const star = (pts: number, inner: number) => {
+    ctx.beginPath();
+    for (let i = 0; i < pts * 2; i++) {
+      const a = -Math.PI / 2 + (i / (pts * 2)) * Math.PI * 2;
+      const rr = i % 2 === 0 ? 1 : inner;
+      const x = rx * rr * Math.cos(a);
+      const y = ry * rr * Math.sin(a);
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+  };
+  const path = (pointsOrPath: () => void) => {
+    ctx.beginPath();
+    pointsOrPath();
+    ctx.closePath();
+    ctx.fill();
+  };
+  const line = (x: number, y: number) => ctx.lineTo(x, y);
+
+  switch (shape) {
+    case 'rectangle':
+      ctx.fillRect(-rx, -ry, sw, sh);
+      break;
+    case 'circle':
+      ctx.beginPath();
+      ctx.ellipse(0, 0, rx, ry, 0, 0, Math.PI * 2);
+      ctx.fill();
+      break;
+    case 'triangle':
+      ctx.beginPath();
+      ctx.moveTo(0, -ry);
+      line(rx, ry);
+      line(-rx, ry);
+      ctx.closePath();
+      ctx.fill();
+      break;
+    case 'diamond':
+      poly(4);
+      ctx.fill();
+      break;
+    case 'pentagon':
+      poly(5);
+      ctx.fill();
+      break;
+    case 'hexagon':
+      poly(6);
+      ctx.fill();
+      break;
+    case 'star':
+      star(5, 0.42);
+      ctx.fill();
+      break;
+    case 'ring':
+      ctx.beginPath();
+      ctx.ellipse(0, 0, rx, ry, 0, 0, Math.PI * 2);
+      ctx.ellipse(0, 0, rx * 0.58, ry * 0.58, 0, 0, Math.PI * 2);
+      ctx.fill('evenodd');
+      break;
+    case 'cross': {
+      const t = 0.34; // arm thickness (fraction of full size)
+      ctx.beginPath();
+      ctx.rect(-rx * t, -ry, sw * t, sh);
+      ctx.rect(-rx, -ry * t, sw, sh * t);
+      ctx.fill();
+      break;
+    }
+    case 'heart':
+      ctx.beginPath();
+      ctx.moveTo(0, ry); // bottom point
+      ctx.bezierCurveTo(rx * 1.4, ry * 0.15, rx, -ry * 0.9, 0, -ry * 0.3);
+      ctx.bezierCurveTo(-rx, -ry * 0.9, -rx * 1.4, ry * 0.15, 0, ry);
+      ctx.closePath();
+      ctx.fill();
+      break;
+    case 'arrow':
+      path(() => {
+        ctx.moveTo(0, -ry); // tip
+        line(rx, -ry * 0.1);
+        line(rx * 0.42, -ry * 0.1);
+        line(rx * 0.42, ry);
+        line(-rx * 0.42, ry);
+        line(-rx * 0.42, -ry * 0.1);
+        line(-rx, -ry * 0.1);
+      });
+      break;
+    case 'lightning':
+      path(() => {
+        ctx.moveTo(rx * 0.25, -ry);
+        line(-rx * 0.55, ry * 0.15);
+        line(-rx * 0.05, ry * 0.15);
+        line(-rx * 0.25, ry);
+        line(rx * 0.55, -ry * 0.2);
+        line(rx * 0.05, -ry * 0.2);
+      });
+      break;
+    case 'chevron':
+      path(() => {
+        ctx.moveTo(-rx, -ry * 0.5);
+        line(0, ry * 0.5);
+        line(rx, -ry * 0.5);
+        line(rx, -ry);
+        line(0, 0);
+        line(-rx, -ry);
+      });
+      break;
+  }
 }

@@ -25,6 +25,26 @@ const SHAPES: { value: ShapeKind; labelKey: I18nKey }[] = [
   { value: 'chevron', labelKey: 'shapeChevron' },
 ];
 
+/** Dropdown of all shape outlines (shared with the global shapes in DividerPanel). */
+export function ShapeKindSelect({
+  value,
+  onChange,
+}: {
+  value: ShapeKind;
+  onChange: (shape: ShapeKind) => void;
+}) {
+  const t = useT();
+  return (
+    <select value={value} onChange={(e) => onChange(e.target.value as ShapeKind)} className="m3-field">
+      {SHAPES.map((s) => (
+        <option key={s.value} value={s.value}>
+          {t(s.labelKey)}
+        </option>
+      ))}
+    </select>
+  );
+}
+
 export function ShapeLayerEditor({ layer, zoneId }: Props) {
   const updateLayer = useDesignStore((s) => s.updateLayer);
   const t = useT();
@@ -41,17 +61,7 @@ export function ShapeLayerEditor({ layer, zoneId }: Props) {
 
   return (
     <div className="space-y-2">
-      <select
-        value={layer.shape}
-        onChange={(e) => changeShape(e.target.value as ShapeKind)}
-        className="m3-field"
-      >
-        {SHAPES.map((s) => (
-          <option key={s.value} value={s.value}>
-            {t(s.labelKey)}
-          </option>
-        ))}
-      </select>
+      <ShapeKindSelect value={layer.shape} onChange={changeShape} />
 
       <ColorPicker
         value={layer.color}

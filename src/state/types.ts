@@ -216,16 +216,27 @@ export interface RimParams {
 
 /**
  * A global colour divider: a world-space line (in the scene's XY side profile,
- * metres) that tints everything BELOW it across all bike parts. Dividers apply
- * in order, so several make horizontal colour bands.
+ * metres) that tints everything BELOW it across all bike parts — or, with
+ * kind 'shape', everything INSIDE a shape projected onto the side profile.
+ * Entries apply in order, so several make colour bands / overlapping shapes.
  */
 export interface Divider {
   id: string;
   color: string;
+  /** 'line' (default, absent in older designs) or 'shape'. */
+  kind?: 'line' | 'shape';
+  /** Line end points (kind 'line'). */
   ax: number;
   ay: number;
   bx: number;
   by: number;
+  /** Shape outline, centre, size (metres) and rotation (degrees, CCW) — kind 'shape'. */
+  shape?: ShapeKind;
+  cx?: number;
+  cy?: number;
+  w?: number;
+  h?: number;
+  rotation?: number;
   /** Edge feathering, 0 (crisp) … 1 (soft gradient). Absent = crisp. */
   softness?: number;
   /** Optional world-space pattern filling the divider region (over `color`). */

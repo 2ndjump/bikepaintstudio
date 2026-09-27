@@ -165,6 +165,7 @@ interface DesignActions {
   duplicateLayer(zone: ZoneId, layerId: string, options: DuplicateOptions): void;
   setRim(patch: Partial<DesignState['rim']>): void;
   addDivider(): void;
+  addDividerShape(): void;
   updateDivider(id: string, patch: Partial<Divider>): void;
   reorderDivider(id: string, direction: -1 | 1): void;
   removeDivider(id: string): void;
@@ -348,6 +349,27 @@ export const useDesignStore = create<Store>((set, get) => {
         bx: 0.53,
         by: 0.28,
         softness: 0,
+      };
+      set((s) => ({ history, dividers: [...s.dividers, divider] }));
+    },
+
+    // A global shape: projected onto the side profile, centred on the down tube.
+    addDividerShape: () => {
+      const history = recordHistory();
+      const divider: Divider = {
+        id: newLayerId('div'),
+        kind: 'shape',
+        color: '#1565c0',
+        ax: 0,
+        ay: 0,
+        bx: 0,
+        by: 0,
+        shape: 'star',
+        cx: 0.25,
+        cy: 0.2,
+        w: 0.14,
+        h: 0.14,
+        rotation: 0,
       };
       set((s) => ({ history, dividers: [...s.dividers, divider] }));
     },
