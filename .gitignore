@@ -30,3 +30,6 @@ screenshots/
 
 # Per-user Claude Code config (project-shared config goes in .claude/settings.json or .mcp.json instead)
 .claude/settings.local.json
+
+# Blender auto-backups
+*.blend1
