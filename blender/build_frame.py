@@ -17,10 +17,11 @@ WHEEL_R = 0.350          # 700x40c outer radius
 BB_DROP = 0.072
 STA, HTA = 73.5 * D2R, 71.5 * D2R
 ST_LEN = 0.540           # BB -> seat tube top
-STACK, REACH = 0.585, 0.385
+REACH = 0.385
 HT_LEN = 0.165
 CS_LEN = 0.425
 RAKE = 0.050
+FORK_A2C = 0.403        # axle-to-crown (axle -> crown race), sets tire clearance
 HALF_REAR = 0.066        # 142mm thru-axle, stay centerline
 HALF_FRONT = 0.056       # 100mm thru-axle
 DROP_HALF_REAR = 0.0065  # half thickness of the dropout bosses (lateral)
@@ -33,13 +34,15 @@ def P(x, y, z):  # helper: coords relative to BB
 
 st_dir = Vector((-math.cos(STA), 0, math.sin(STA)))
 ht_up = Vector((-math.cos(HTA), 0, math.sin(HTA)))
+fwd_n = Vector((math.sin(HTA), 0, math.cos(HTA)))           # perpendicular to steering axis, forward
+# Stack follows from the fork length: both hubs sit at BB_DROP above the BB.
+CROWN_RACE = 0.04 * HT_LEN + 0.001                            # head tube bottom -> crown race
+FORK_AXIAL = math.sqrt(FORK_A2C**2 - RAKE**2)                 # A2C measured along the steering axis
+STACK = BB_DROP + ht_up.z * (HT_LEN + CROWN_RACE + FORK_AXIAL) - fwd_n.z * RAKE
 ht_top = P(REACH, 0, STACK)
 ht_bot = ht_top - ht_up * HT_LEN
 rear_hub = P(-math.sqrt(CS_LEN**2 - BB_DROP**2), 0, BB_DROP)
-fwd_n = Vector((math.sin(HTA), 0, math.cos(HTA)))           # perpendicular to steering axis, forward
-t = (ht_bot.z + RAKE * fwd_n.z - rear_hub.z) / ht_up.z
-front_hub = ht_bot - ht_up * t + fwd_n * RAKE
-front_hub.z = rear_hub.z
+front_hub = ht_bot - ht_up * (CROWN_RACE + FORK_AXIAL) + fwd_n * RAKE
 
 def st_at(f):
     return BB + st_dir * (ST_LEN * f)
@@ -225,7 +228,7 @@ def fork_parts():
     # headset gap) and widens laterally to swallow the blade tops
     gap_top = ht_at(-0.04) - ht_up * 0.001
     parts.append(sweep("forkCrown", "fork",
-                       [gap_top, gap_top - ht_up * 0.022, gap_top - ht_up * 0.046],
+                       [gap_top, gap_top - ht_up * 0.016, gap_top - ht_up * 0.032],
                        ((0, 0.0285), (0.5, 0.0280), (1, 0.0245)),
                        wy_keys=((0, 1.0), (0.5, 1.2), (1, 1.6)), wz_keys=((0, 1.0), (1, 1.12)),
                        expo=2.2, n=24, ring=64, side=Vector((0, 1, 0))))
@@ -336,6 +339,6 @@ def build(voxel=0.0008, fillet=12, band=14, smooth=0):
         bpy.data.collections.remove(c)
     return frame, fork
 
-KEY = dict(BB=BB, rear_hub=rear_hub, front_hub=front_hub, ht_top=ht_top, ht_bot=ht_bot,
+KEY = dict(STACK=STACK, FORK_A2C=FORK_A2C, BB=BB, rear_hub=rear_hub, front_hub=front_hub, ht_top=ht_top, ht_bot=ht_bot,
            HALF_REAR=HALF_REAR, HALF_FRONT=HALF_FRONT, WHEEL_R=WHEEL_R,
            DROP_HALF_REAR=DROP_HALF_REAR, DROP_HALF_FRONT=DROP_HALF_FRONT)
