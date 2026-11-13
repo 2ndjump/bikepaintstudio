@@ -7,10 +7,12 @@ import { FinishPicker } from './components/Sidebar/FinishPicker';
 import { LayerStack } from './components/Sidebar/LayerStack';
 import { RimPanel } from './components/Sidebar/RimPanel';
 import { VariantPicker } from './components/Sidebar/VariantPicker';
+import { WheelPanel } from './components/Sidebar/WheelPanel';
+import { WheelSpinControls } from './components/Viewport/WheelSpinControls';
 import { Toolbar } from './components/Toolbar/Toolbar';
 import { preloadCommonFonts } from './fonts/fontLoader';
 import { useDesignStore } from './state/designStore';
-import { ALL_ZONES } from './state/types';
+import { ALL_ZONES, isRimZone } from './state/types';
 import { useHistoryShortcuts } from './state/useHistoryShortcuts';
 
 /** True only on small touch devices (phones). Requires BOTH a coarse primary
@@ -48,9 +50,24 @@ export default function App() {
     }
   }, [activeZone]);
 
-  const isRim = activeZone === 'frontRim' || activeZone === 'rearRim';
+  const isRim = isRimZone(activeZone);
 
-  const paintSections = (
+  // Frame mode: model, frame paint, zones, dividers. Wheel mode: which wheel,
+  // its paint (independent of the frame) and the rim geometry.
+  const paintSections = isRim ? (
+    <>
+      <section className="m3-section">
+        <WheelPanel />
+      </section>
+      <section className="m3-section space-y-3">
+        <FinishPicker zone={activeZone} />
+        <PalettePanel />
+      </section>
+      <section className="m3-section">
+        <RimPanel />
+      </section>
+    </>
+  ) : (
     <>
       <section className="m3-section">
         <VariantPicker />
@@ -65,11 +82,6 @@ export default function App() {
       <section className="m3-section">
         <DividerPanel />
       </section>
-      {isRim && (
-        <section className="m3-section">
-          <RimPanel />
-        </section>
-      )}
     </>
   );
 
@@ -104,6 +116,8 @@ export default function App() {
       </main>
 
       <Toolbar floating />
+
+      {isRim && <WheelSpinControls />}
 
       <aside data-overlay="left" className="glass glass-panel left-[var(--glass-gap)]">
         {paintSections}

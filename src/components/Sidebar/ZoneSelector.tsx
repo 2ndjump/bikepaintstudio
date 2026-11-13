@@ -1,6 +1,6 @@
 import { useDesignStore } from '../../state/designStore';
 import { useUIStore } from '../../state/uiStore';
-import { ZONE_LABELS, ZONES_PARAMETRIC, type ZoneId } from '../../state/types';
+import { isRimZone, ZONE_LABELS, ZONES_PARAMETRIC, type ZoneId } from '../../state/types';
 import { useT } from '../../i18n/useT';
 import { ColorPicker } from '../ui/ColorPicker';
 
@@ -9,9 +9,6 @@ interface Props {
    *  wider right panel / mobile). */
   columns?: 1 | 2;
 }
-
-const RIM_ZONES: ZoneId[] = ['frontRim', 'rearRim'];
-const isRimZone = (z: ZoneId) => RIM_ZONES.includes(z);
 
 export function ZoneSelector({ columns = 1 }: Props) {
   const activeZone = useDesignStore((s) => s.activeZone);
@@ -31,7 +28,6 @@ export function ZoneSelector({ columns = 1 }: Props) {
   const compact = columns === 2;
 
   const frameZones = ZONES_PARAMETRIC.filter((z) => !isRimZone(z));
-  const rimZones = ZONES_PARAMETRIC.filter(isRimZone);
 
   const renderZone = (z: ZoneId) => {
     const active = z === activeZone;
@@ -74,18 +70,6 @@ export function ZoneSelector({ columns = 1 }: Props) {
     <div className="space-y-2">
       <div className="m3-section-title">{t('zones')}</div>
       <div className={gridClass}>{frameZones.map(renderZone)}</div>
-
-      {/* Wheel zones are visually separated from the frame zones — they carry
-          their own paint/finish (not the shared global frame colour). */}
-      {rimZones.length > 0 && (
-        <div
-          className="space-y-2 pt-2 mt-1"
-          style={{ borderTop: '1px solid var(--md-outline-variant)' }}
-        >
-          <div className="m3-section-title">{t('rims')}</div>
-          <div className={gridClass}>{rimZones.map(renderZone)}</div>
-        </div>
-      )}
     </div>
   );
 }

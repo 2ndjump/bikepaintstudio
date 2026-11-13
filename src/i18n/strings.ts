@@ -137,7 +137,20 @@ export type I18nKey =
   | 'variantGravel'
   | 'variantRoad'
   | 'variantClassic'
-  | 'variantAero';
+  | 'variantAero'
+  | 'modeFrame'
+  | 'modeWheels'
+  | 'wheelFront'
+  | 'wheelRear'
+  | 'wheel'
+  | 'copyToRear'
+  | 'copyToFront'
+  | 'wheelsSame'
+  | 'wheelsDiffer'
+  | 'rimGeometryBoth'
+  | 'spinPause'
+  | 'spinPlay'
+  | 'dragToTurn';
 
 const STRINGS: Record<I18nKey, Record<Lang, string>> = {
   active: { de: 'Aktiv', en: 'Active' },
@@ -277,6 +290,19 @@ const STRINGS: Record<I18nKey, Record<Lang, string>> = {
   variantRoad: { de: 'Rennrad', en: 'Road' },
   variantClassic: { de: 'Klassisch', en: 'Classic' },
   variantAero: { de: 'Aero', en: 'Aero' },
+  modeFrame: { de: 'Rahmen', en: 'Frame' },
+  modeWheels: { de: 'Laufräder', en: 'Wheels' },
+  wheelFront: { de: 'Vorderrad', en: 'Front wheel' },
+  wheelRear: { de: 'Hinterrad', en: 'Rear wheel' },
+  wheel: { de: 'Laufrad', en: 'Wheel' },
+  copyToRear: { de: 'Design aufs Hinterrad kopieren', en: 'Copy design to rear wheel' },
+  copyToFront: { de: 'Design aufs Vorderrad kopieren', en: 'Copy design to front wheel' },
+  wheelsSame: { de: 'Vorder- und Hinterrad sind gleich', en: 'Front and rear wheel match' },
+  wheelsDiffer: { de: 'Vorder- und Hinterrad sind verschieden', en: 'Front and rear wheel differ' },
+  rimGeometryBoth: { de: 'Gilt für beide Laufräder', en: 'Applies to both wheels' },
+  spinPause: { de: 'Pause', en: 'Pause' },
+  spinPlay: { de: 'Drehen', en: 'Spin' },
+  dragToTurn: { de: 'Ziehen zum Drehen', en: 'Drag to turn' },
 };
 
 export function translate(key: I18nKey, lang: Lang): string {

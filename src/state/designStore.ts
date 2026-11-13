@@ -170,6 +170,8 @@ interface DesignActions {
   reorderLayer(zone: ZoneId, layerId: string, direction: -1 | 1): void;
   duplicateLayer(zone: ZoneId, layerId: string, options: DuplicateOptions): void;
   setRim(patch: Partial<DesignState['rim']>): void;
+  /** Copy one rim's whole paint (finish, colours, layers) onto the other. */
+  copyRimDesign(from: ZoneId, to: ZoneId): void;
   setVariant(patch: Partial<BikeVariant>): void;
   addDivider(): void;
   addDividerShape(): void;
@@ -341,6 +343,15 @@ export const useDesignStore = create<Store>((set, get) => {
     setRim: (patch) => {
       const history = recordHistory();
       set((s) => ({ history, rim: { ...s.rim, ...patch } }));
+    },
+
+    copyRimDesign: (from, to) => {
+      const history = recordHistory();
+      set((s) => {
+        const src = structuredClone(s.zones[from]);
+        src.layers = src.layers.map((l) => ({ ...l, id: newLayerId(l.type) }));
+        return { history, zones: { ...s.zones, [to]: src } };
+      });
     },
 
     // Swap the frame model; the paint (zones, layers, dividers) carries over.

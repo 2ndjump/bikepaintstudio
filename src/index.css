@@ -132,6 +132,22 @@ canvas {
 }
 .toolbar:not(.toolbar-floating) { border-radius: 0; padding-top: 0.4rem; padding-bottom: 0.4rem; }
 
+/* Centred under the subject, in the free area between the side panels. */
+.viewport-dock {
+  position: absolute;
+  z-index: 5;
+  bottom: calc(var(--glass-gap) * 2);
+  left: calc(var(--glass-gap) * 2 + 19rem);
+  right: var(--glass-gap);
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+}
+.viewport-dock > * { pointer-events: auto; }
+@media (min-width: 1024px) {
+  .viewport-dock { right: calc(var(--glass-gap) * 2 + 19rem); }
+}
+
 /* Sections inside a panel, separated by hairlines instead of nested cards. */
 .m3-section { padding: 0.875rem 0; }
 .m3-section + .m3-section { border-top: 1px solid var(--md-outline-variant); }

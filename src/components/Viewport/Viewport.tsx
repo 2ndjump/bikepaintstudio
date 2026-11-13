@@ -7,6 +7,8 @@ import { DividerHandles } from './DividerHandles';
 import { EditControls } from './EditControls';
 import { Turntable } from './Turntable';
 import { Wheel } from './Wheel';
+import { WheelStage } from './WheelStage';
+import { isRimZone } from '../../state/types';
 import { ALL_VARIANTS, useBikeModel, variantUrl } from '../../geometry/bikeModel';
 import { Suspense, useEffect } from 'react';
 import { useUIStore } from '../../state/uiStore';
@@ -24,6 +26,8 @@ function DebugExpose() {
 /** Width the bike needs (incl. turntable swing), as a multiple of the canvas
  *  height at camera zoom 1 — below that, the view zooms out to fit. */
 const FIT_ASPECT = 1.2;
+/** The same for the wheel designer's single wheel. */
+const FIT_ASPECT_WHEEL = 1.0;
 
 /**
  * Keep the subject centred and fully visible in the free area between the
@@ -33,6 +37,7 @@ const FIT_ASPECT = 1.2;
  */
 function ViewFit() {
   const size = useThree((s) => s.size);
+  const aspect = useDesignStore((s) => (isRimZone(s.activeZone) ? FIT_ASPECT_WHEEL : FIT_ASPECT));
   const get = useThree((s) => s.get);
 
   useEffect(() => {
@@ -55,14 +60,14 @@ function ViewFit() {
       const fw = Math.max(1, right - left);
       const fh = Math.max(1, H - top);
       camera.setViewOffset(W, H, W / 2 - (left + right) / 2, H / 2 - (top + H) / 2, W, H);
-      camera.zoom = Math.min(1, fw / (FIT_ASPECT * H), fh / H);
+      camera.zoom = Math.min(1, fw / (aspect * H), fh / H);
       camera.updateProjectionMatrix();
     };
     update();
     const ro = new ResizeObserver(update);
     document.querySelectorAll('[data-overlay]').forEach((el) => ro.observe(el));
     return () => ro.disconnect();
-  }, [size, get]);
+  }, [size, get, aspect]);
 
   return null;
 }
@@ -83,7 +88,11 @@ function DividerSync() {
  */
 function Bike() {
   const variant = useDesignStore((s) => s.variant);
+  const activeZone = useDesignStore((s) => s.activeZone);
   const model = useBikeModel(variant);
+  // Wheel designer: the bike is hidden (keeping its turntable angle) and the
+  // selected wheel is shown alone.
+  const wheelMode = isRimZone(activeZone);
   const { frontHub, rearHub } = model;
 
   // Fetch the other variants once the first bike is up, so switching is instant.
@@ -92,31 +101,37 @@ function Bike() {
   }, []);
 
   return (
-    <Turntable axisX={(frontHub.x + rearHub.x) / 2}>
-      <DividerHandles />
-      <group position={[0, FLOOR_Y, 0]}>
-        <BikeFrame model={model} />
-        <Wheel
-          position={[frontHub.x, frontHub.y, frontHub.z]}
-          zone="frontRim"
-          tireWidth={model.tireWidth / 2}
-          wheelRadius={model.wheelRadius}
-          hubHalf={model.hubHalfFront}
-        />
-        <Wheel
-          position={[rearHub.x, rearHub.y, rearHub.z]}
-          zone="rearRim"
-          tireWidth={model.tireWidth / 2}
-          wheelRadius={model.wheelRadius}
-          hubHalf={model.hubHalfRear}
-        />
+    <>
+      <group visible={!wheelMode}>
+        <Turntable axisX={(frontHub.x + rearHub.x) / 2} enabled={!wheelMode}>
+          <DividerHandles />
+          <group position={[0, FLOOR_Y, 0]}>
+            <BikeFrame model={model} />
+            <Wheel
+              position={[frontHub.x, frontHub.y, frontHub.z]}
+              zone="frontRim"
+              tireWidth={model.tireWidth / 2}
+              wheelRadius={model.wheelRadius}
+              hubHalf={model.hubHalfFront}
+            />
+            <Wheel
+              position={[rearHub.x, rearHub.y, rearHub.z]}
+              zone="rearRim"
+              tireWidth={model.tireWidth / 2}
+              wheelRadius={model.wheelRadius}
+              hubHalf={model.hubHalfRear}
+            />
+          </group>
+        </Turntable>
       </group>
-    </Turntable>
+      {wheelMode && <WheelStage zone={activeZone} model={model} />}
+    </>
   );
 }
 
 export function Viewport() {
   const tool = useUIStore((s) => s.tool);
+  const wheelMode = useDesignStore((s) => isRimZone(s.activeZone));
 
   return (
     <Canvas
@@ -153,7 +168,9 @@ export function Viewport() {
       <OrbitControls
         makeDefault
         enabled={tool === 'camera'}
-        enablePan
+        // The wheel designer turns the wheel on drag instead; only zoom stays.
+        enablePan={!wheelMode}
+        enableRotate={!wheelMode}
         minDistance={0.5}
         maxDistance={6}
         minAzimuthAngle={0}

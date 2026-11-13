@@ -21,6 +21,13 @@ export const ALL_ZONES: ZoneId[] = [
   'rearRim',
 ];
 
+export type RimZone = Extract<ZoneId, 'frontRim' | 'rearRim'>;
+
+/** Rim zones are edited in the wheel designer; all others belong to the frame. */
+export function isRimZone(z: ZoneId): z is RimZone {
+  return z === 'frontRim' || z === 'rearRim';
+}
+
 export const ZONE_LABELS: Record<ZoneId, string> = {
   headTube: 'Head Tube',
   topTube: 'Top Tube',

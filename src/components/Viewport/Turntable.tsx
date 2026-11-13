@@ -16,14 +16,23 @@ const START_YAW = -0.7;
  * space — and the inverse transform is published to the divider shader so
  * dividers stay glued to the frame.
  */
-export function Turntable({ axisX, children }: { axisX: number; children: ReactNode }) {
+export function Turntable({
+  axisX,
+  enabled = true,
+  children,
+}: {
+  axisX: number;
+  /** false while the bike is hidden (wheel designer): drags don't spin it. */
+  enabled?: boolean;
+  children: ReactNode;
+}) {
   const spin = useRef<THREE.Group>(null);
   const bike = useRef<THREE.Group>(null);
   const gl = useThree((s) => s.gl);
   const tool = useUIStore((s) => s.tool);
 
   useEffect(() => {
-    if (tool !== 'camera') return;
+    if (tool !== 'camera' || !enabled) return;
     const dom = gl.domElement;
     let lastX: number | null = null;
     const onDown = (e: PointerEvent) => {
@@ -46,7 +55,7 @@ export function Turntable({ axisX, children }: { axisX: number; children: ReactN
       window.removeEventListener('pointermove', onMove);
       window.removeEventListener('pointerup', onUp);
     };
-  }, [tool, gl]);
+  }, [tool, gl, enabled]);
 
   useFrame(() => {
     if (!bike.current) return;

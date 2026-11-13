@@ -15,12 +15,15 @@ interface UIState {
   activeDividerId: string | null;
   /** Active viewport tool: orbit the bike, or drag text/shape layers. */
   tool: Tool;
+  /** Wheel designer: the preview wheel turns by itself (pause/play). */
+  wheelSpin: boolean;
   setLang(lang: Lang): void;
   addPaletteColor(color: string): void;
   removePaletteColor(color: string): void;
   setPalette(palette: string[]): void;
   setActiveDividerId(id: string | null): void;
   setTool(tool: Tool): void;
+  setWheelSpin(on: boolean): void;
 }
 
 export const useUIStore = create<UIState>((set) => ({
@@ -28,9 +31,11 @@ export const useUIStore = create<UIState>((set) => ({
   palette: DEFAULT_PALETTE,
   activeDividerId: null,
   tool: 'camera',
+  wheelSpin: true,
   setLang: (lang) => set({ lang }),
   setActiveDividerId: (activeDividerId) => set({ activeDividerId }),
   setTool: (tool) => set({ tool }),
+  setWheelSpin: (wheelSpin) => set({ wheelSpin }),
   addPaletteColor: (color) =>
     set((s) => {
       const c = color.toLowerCase();

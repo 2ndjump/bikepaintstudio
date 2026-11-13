@@ -3,6 +3,7 @@ import type { DesignState } from '../../state/types';
 import { useUIStore, type Lang } from '../../state/uiStore';
 import { useT } from '../../i18n/useT';
 import { ToolSelector } from '../Viewport/ToolSelector';
+import { ModeTabs } from './ModeTabs';
 
 /** Minimal shape of the File System Access API's save picker (not in lib.dom). */
 type ShowSaveFilePicker = (opts: {
@@ -116,6 +117,7 @@ export function Toolbar({ floating = false }: { floating?: boolean }) {
       className={`glass toolbar flex items-center gap-2 px-3 ${floating ? 'toolbar-floating' : ''}`}
     >
       <h1 className="m3-title text-base mr-1 whitespace-nowrap">Bike Paint Studio</h1>
+      <ModeTabs />
       <ToolSelector />
       <div className="flex-1 min-w-0" />
 
