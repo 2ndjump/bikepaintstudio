@@ -1,5 +1,5 @@
-"""Wheels: 50mm-deep carbon rims (622 BSD, 30mm external width), 700x40c gravel
-tires with tan sidewalls, straight-pull bladed spokes, hubs and 160mm rotors.
+"""Wheels: 50mm-deep carbon rims (622 BSD, 30mm external width), tires with tan
+sidewalls sized from KEY (700x40c gravel / 700x28c road), straight-pull bladed spokes, hubs and 160mm rotors.
 Wheel axis = world Y, drive side = -Y. Run after build_frame.py (uses KEY)."""
 import bpy, bmesh, math
 from mathutils import Vector
@@ -201,7 +201,7 @@ def thru_axle(name, center, y_out, outward, r=0.0095, depth=0.0040):
             (0.0, y_out + s * (depth - 0.0015))]
     return lathe(name, prof, Vector((center.x, 0, center.z)), seg=64, closed=False)
 
-def build_wheel(prefix, center, rim_zone, half_axle, flange_y, rotor_y, axle_face):
+def build_wheel(prefix, center, rim_zone, half_axle, flange_y, rotor_y, axle_face, tire_w, outer_r):
     coll = bpy.data.collections.get("Wheels") or bpy.data.collections.new("Wheels")
     if coll.name not in bpy.context.scene.collection.children:
         bpy.context.scene.collection.children.link(coll)
@@ -209,9 +209,9 @@ def build_wheel(prefix, center, rim_zone, half_axle, flange_y, rotor_y, axle_fac
     rim = lathe(f"{prefix}Rim", rim_profile(), center)
     rim.data.materials.append(mat(rim_zone))
     objs.append(rim)
-    tp = tire_profile()
+    tp = tire_profile(tire_w, outer_r)
     tire = lathe(f"{prefix}Tire", tp, center,
-                 mat_idx=lambda j: 0 if min(tp[j][0], tp[(j + 1) % len(tp)][0]) > 0.3385 else 1)
+                 mat_idx=lambda j: 0 if min(tp[j][0], tp[(j + 1) % len(tp)][0]) > outer_r - 0.0115 else 1)
     tire.data.materials.append(mat("Tire_Tread"))
     tire.data.materials.append(mat("Tire_Sidewall"))
     objs.append(tire)
@@ -249,6 +249,7 @@ def build(KEY):
     # sit on the outside face.
     hf, hr = KEY["HALF_FRONT"], KEY["HALF_REAR"]
     df, dr = KEY["DROP_HALF_FRONT"], KEY["DROP_HALF_REAR"]
-    front = build_wheel("Front", KEY["front_hub"], "frontRim", hf - df, 0.030, 0.0445, hf + df)
-    rear = build_wheel("Rear", KEY["rear_hub"], "rearRim", hr - dr, 0.034, 0.0515, hr + dr)
+    tw, wr = KEY["TIRE_W"], KEY["WHEEL_R"]
+    front = build_wheel("Front", KEY["front_hub"], "frontRim", hf - df, 0.030, 0.0445, hf + df, tw, wr)
+    rear = build_wheel("Rear", KEY["rear_hub"], "rearRim", hr - dr, 0.034, 0.0515, hr + dr, tw, wr)
     return front, rear

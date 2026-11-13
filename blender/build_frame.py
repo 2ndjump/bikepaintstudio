@@ -1,4 +1,7 @@
-"""Gravel frame + fork generator for Blender 5.x.
+"""Frame + fork generator for Blender 5.x, in four variants (56cm):
+discipline "gravel" | "road" (geometry, tire size, clearances) x style
+"classic" | "aero" (tube profiles). Set VARIANT in the exec namespace
+(e.g. "road_aero"); default "gravel_classic".
 
 Builds every tube as a closed tapered/oval sweep, fuses them through an SDF
 grid with a fillet pass (one seamless shell, "aus einem Guss"), then tags each
@@ -12,16 +15,36 @@ from mathutils.kdtree import KDTree
 
 D2R = math.pi / 180
 
-# ---------------------------------------------------------------- geometry (56cm gravel)
-WHEEL_R = 0.350          # 700x40c outer radius
-BB_DROP = 0.072
-STA, HTA = 73.5 * D2R, 71.5 * D2R
-ST_LEN = 0.540           # BB -> seat tube top
-REACH = 0.385
-HT_LEN = 0.165
-CS_LEN = 0.425
-RAKE = 0.050
-FORK_A2C = 0.403        # axle-to-crown (axle -> crown race), sets tire clearance
+VARIANT = globals().get("VARIANT", "gravel_classic")
+DISCIPLINE, STYLE = VARIANT.split("_")
+AERO = STYLE == "aero"
+
+# ---------------------------------------------------------------- geometry (56cm)
+GEO = {
+    # 700x40c gravel: slack front, long stays, roomy clearances
+    "gravel": dict(WHEEL_R=0.350, TIRE_W=0.040, BB_DROP=0.072, STA=73.5, HTA=71.5, ST_LEN=0.540,
+                   REACH=0.385, HT_LEN=0.165, CS_LEN=0.425, RAKE=0.050, FORK_A2C=0.403,
+                   CROWN_D=0.032, STAY_W=1.0, CLEAR=0.012, DT_TOP=0.18, DT_SAG=0.006),
+    # 700x28c road race: steep front, short stays, tight clearances
+    "road": dict(WHEEL_R=0.3385, TIRE_W=0.028, BB_DROP=0.070, STA=73.5, HTA=73.0, ST_LEN=0.540,
+                 REACH=0.390, HT_LEN=0.150, CS_LEN=0.408, RAKE=0.045, FORK_A2C=0.372,
+                 CROWN_D=0.024, STAY_W=0.86, CLEAR=0.007, DT_TOP=0.40, DT_SAG=0.0),
+}[DISCIPLINE]
+WHEEL_R = GEO["WHEEL_R"]          # outer tire radius
+TIRE_W = GEO["TIRE_W"]
+BB_DROP = GEO["BB_DROP"]
+STA, HTA = GEO["STA"] * D2R, GEO["HTA"] * D2R
+ST_LEN = GEO["ST_LEN"]           # BB -> seat tube top
+REACH = GEO["REACH"]
+HT_LEN = GEO["HT_LEN"]
+CS_LEN = GEO["CS_LEN"]
+RAKE = GEO["RAKE"]
+FORK_A2C = GEO["FORK_A2C"]       # axle-to-crown (axle -> crown race), sets tire clearance
+CROWN_D = GEO["CROWN_D"]         # crown depth below the crown race
+STAY_W = GEO["STAY_W"]           # lateral spread of the rear stays (1 = gravel mud room)
+CLEAR = GEO["CLEAR"]             # min tire -> seat tube gap the aero cut-out keeps
+DT_TOP = GEO["DT_TOP"]           # down tube attach height on the head tube (0 = bottom)
+DT_SAG = GEO["DT_SAG"]           # down tube mid sag; road keeps it straight to clear the steeper front wheel
 HALF_REAR = 0.066        # 142mm thru-axle, stay centerline
 HALF_FRONT = 0.056       # 100mm thru-axle
 DROP_HALF_REAR = 0.0065  # half thickness of the dropout bosses (lateral)
@@ -46,6 +69,22 @@ front_hub = ht_bot - ht_up * (CROWN_RACE + FORK_AXIAL) + fwd_n * RAKE
 
 def st_at(f):
     return BB + st_dir * (ST_LEN * f)
+st_fwd = Vector((math.sin(STA), 0, math.cos(STA)))           # perpendicular to the seat tube, forward
+
+def st_cutout(fs, rear_extent):
+    """Seat tube control points, pushed forward wherever the tube's rear face
+    (rear_extent(f) behind the centreline) would come closer than CLEAR to the
+    rear tire: the wheel cut-out of aero / short-stay frames."""
+    pts = []
+    for f in fs:
+        p = st_at(f)
+        for _ in range(6):
+            gap = (p - st_fwd * rear_extent(f) - rear_hub).length - WHEEL_R - CLEAR
+            if gap >= 0 or f == 0:
+                break
+            p = p + st_fwd * (-gap)
+        pts.append(p)
+    return pts
 def ht_at(f):  # 0 = bottom, 1 = top
     return ht_bot + ht_up * (HT_LEN * f)
 
@@ -84,6 +123,7 @@ def superellipse(theta, a, b, e):
     return x, y
 
 TUBES = []  # (zone, samples[(point, radius)]) for zone classification
+SECTIONS = {}  # part name -> [(centre, ring points)] for the paint UVs (export_variants.py)
 
 def kamm_tail(x, y, a, b, k):
     """Truncated-airfoil section: rounded nose at +y, tail (−y) narrows and is
@@ -121,6 +161,7 @@ def sweep(name, zone, ctrl, r_keys, wy_keys=((0, 1.0),), wz_keys=((0, 1.0),), ex
             vs.append(bm.verts.new(p + lat * x + nrm * y))
         rings.append(vs)
         samples.append((p.copy(), min(a, b), max(a, b)))
+    SECTIONS[name] = [(s[0], [v.co.copy() for v in r]) for s, r in zip(samples, rings)]
     for r0, r1 in zip(rings, rings[1:]):
         for j in range(ring):
             bm.faces.new((r0[j], r0[(j + 1) % ring], r1[(j + 1) % ring], r1[j]))
@@ -144,39 +185,73 @@ def cylinder_y(name, zone, center, r, half_w, ring=64, edge=0.0):
                  keys, n=8 if edge == 0 else 40, ring=ring, side=Vector((0, 0, 1)))
 
 # ---------------------------------------------------------------- frame tubes
+def S(classic, aero):
+    """Pick the tube parameter for the build style."""
+    return aero if AERO else classic
+
+FWD = Vector((1, 0, 0))
+
+# Seat tube section (classic: round 31.6 post; aero: deep Kamm-tail airfoil, nose forward)
+ST_R = S(((0, 0.021), (0.35, 0.0175), (0.975, 0.0175), (1, 0.0158)),
+         ((0, 0.021), (0.35, 0.0165), (0.975, 0.0160), (1, 0.0145)))
+ST_WY = S(((0, 1.55), (0.35, 1.05), (1, 1.0)), ((0, 1.55), (0.3, 0.9), (1, 0.85)))
+ST_WZ = S(((0, 1.0),), ((0, 1.0), (0.25, 1.7), (1, 1.6)))
+ST_KAMM = S(((0, 0.0),), ((0, 0.0), (0.25, 0.9), (1, 0.9)))
+
+def st_rear(f):
+    """How far the seat tube's rear face sits behind its centreline at f."""
+    k = lerp_key(ST_KAMM, f)
+    return lerp_key(ST_R, f) * lerp_key(ST_WZ, f) * (1 - 0.32 * k)
+
+def st_on(f):
+    """Point on the (possibly cut-out) seat tube centreline at fraction f."""
+    return st_cutout((f,), st_rear)[0]
+
 def frame_parts():
     parts = []
-    # Head tube: tapered 1.5" -> 1 1/8", slight waist, extends a few mm past bearings
+    # Head tube: tapered 1.5" -> 1 1/8", slight waist, extends a few mm past bearings.
+    # Aero: deep fore-aft with a Kamm tail the top/down tubes melt into.
     parts.append(sweep("headTube", "headTube", [ht_at(-0.04), ht_at(0.5), ht_at(1.0)],
-                       ((0, 0.0285), (0.45, 0.0235), (1, 0.0215)), n=40, ring=64,
-                       side=Vector((0, 1, 0))))
-    # Top tube: slim, slightly taller than wide, flares only right at the head tube
-    tt_rear = st_at(0.885)
+                       ((0, 0.0285), (0.45, 0.0235), (1, 0.0215)),
+                       wy_keys=S(((0, 1.0),), ((0, 0.95), (1, 0.9))),
+                       wz_keys=S(((0, 1.0),), ((0, 1.3), (0.45, 1.4), (1, 1.3))),
+                       kamm_keys=S(((0, 0.0),), ((0, 0.6),)), expo=S(2.0, 2.3),
+                       n=40, ring=64, side=Vector((0, 1, 0)), lead=FWD))
+    # Top tube: slim, slightly taller than wide, flares only right at the head tube.
+    # Aero: tall and narrow, sloping down to a lower seat tube junction.
+    tt_rear = st_on(S(0.885, 0.80))
     tt_front = ht_at(0.80)
     parts.append(sweep("topTube", "topTube",
                        [tt_rear, tt_rear.lerp(tt_front, 0.5) + Vector((0, 0, 0.004)), tt_front],
-                       ((0, 0.0122), (0.55, 0.0122), (0.85, 0.0132), (1, 0.0158)),
-                       wy_keys=((0, 1.0), (0.8, 1.02), (1, 1.2)), wz_keys=((0, 1.12), (1, 1.05)),
-                       expo=2.2))
+                       S(((0, 0.0122), (0.55, 0.0122), (0.85, 0.0132), (1, 0.0158)),
+                         ((0, 0.0115), (0.55, 0.0115), (0.85, 0.0128), (1, 0.0158))),
+                       wy_keys=S(((0, 1.0), (0.8, 1.02), (1, 1.2)), ((0, 0.85), (0.8, 0.9), (1, 1.15))),
+                       wz_keys=S(((0, 1.12), (1, 1.05)), ((0, 1.4), (1, 1.3))),
+                       expo=S(2.2, 2.4)))
     # Down tube: bulky truncated-airfoil (Kamm tail) section, nose facing forward/down,
-    # flares wide and flat into the BB
-    dt_front = ht_at(0.18)
+    # flares wide and flat into the BB. Aero: deeper and narrower, full Kamm tail.
+    dt_front = ht_at(DT_TOP)
     parts.append(sweep("downTube", "downTube",
-                       [BB + Vector((0.0, 0, -0.002)), BB.lerp(dt_front, 0.5) + Vector((0, 0, -0.006)), dt_front],
+                       [BB + Vector((0.0, 0, -0.002)), BB.lerp(dt_front, 0.5) + Vector((0, 0, -DT_SAG)), dt_front],
                        ((0, 0.0265), (0.3, 0.0270), (1, 0.0265)),
-                       wy_keys=((0, 1.55), (0.18, 1.25), (0.4, 0.98), (1, 0.98)),
-                       wz_keys=((0, 0.92), (0.2, 1.22), (0.4, 1.42), (0.85, 1.36), (1, 1.15)),
-                       kamm_keys=((0, 0.0), (0.25, 0.85), (0.85, 0.85), (1, 0.3)),
+                       wy_keys=S(((0, 1.55), (0.18, 1.25), (0.4, 0.98), (1, 0.98)),
+                                 ((0, 1.55), (0.18, 1.1), (0.4, 0.82), (1, 0.85))),
+                       wz_keys=S(((0, 0.92), (0.2, 1.22), (0.4, 1.42), (0.85, 1.36), (1, 1.15)),
+                                 ((0, 0.92), (0.2, 1.4), (0.4, 1.75), (0.7, 1.7), (1, 1.2))),
+                       kamm_keys=S(((0, 0.0), (0.25, 0.85), (0.85, 0.85), (1, 0.3)),
+                                   ((0, 0.0), (0.25, 1.0), (0.85, 1.0), (1, 0.5))),
                        expo=2.3, n=80, ring=64))
-    # Seat tube: round up top (31.6 post), widens laterally at the BB
-    parts.append(sweep("seatTube", "seatTube", [BB, st_at(0.5), st_at(1.0)],
-                       ((0, 0.021), (0.35, 0.0175), (0.975, 0.0175), (1, 0.0158)),  # rounded top rim
-                       wy_keys=((0, 1.55), (0.35, 1.05), (1, 1.0)), expo=2.0))
+    # Seat tube: round up top (31.6 post), widens laterally at the BB. Aero: airfoil
+    # whose tail is cut out around the rear wheel, rising past the top tube as a mast.
+    # Short stays push the tube forward where the tire would come too close.
+    parts.append(sweep("seatTube", "seatTube", st_cutout((0, 0.17, 0.34, 0.5, 0.75, 1.0), st_rear),
+                       ST_R, wy_keys=ST_WY, wz_keys=ST_WZ, kamm_keys=ST_KAMM, expo=S(2.0, 2.3),
+                       n=S(60, 80), ring=S(48, 64), lead=FWD))
     # BB shell (86.5 press fit)
     parts.append(cylinder_y("bbShell", "downTube", BB, 0.0262, 0.0435, edge=0.0055))  # molded BB body, soft rims
     # BB junction: a broad molded gusset that carries the chainstay tops smoothly
     # into the seat tube base (no pinched crease in close-ups)
-    parts.append(sweep("bbJunction", "seatTube", [BB + Vector((-0.012, 0, -0.002)), st_at(0.06), st_at(0.13)],
+    parts.append(sweep("bbJunction", "seatTube", [BB + Vector((-0.012, 0, -0.002)), st_on(0.06), st_on(0.13)],
                        ((0, 0.0215), (0.55, 0.0200), (1, 0.0180)),
                        wy_keys=((0, 1.95), (0.5, 1.6), (1, 1.2)), wz_keys=((0, 1.05), (1, 1.0)),
                        expo=2.4, n=30, ring=64))
@@ -185,20 +260,22 @@ def frame_parts():
         hub = rear_hub + Vector((0, s * HALF_REAR, 0))
         parts.append(sweep(f"chainStay{tag}", "chainStays",
                            [BB + Vector((-0.004, s * 0.031, -0.003)),
-                            P(-0.090, s * 0.047, 0.010),
-                            P(-0.240, s * 0.060, 0.040),
+                            P(-0.090, s * 0.047 * STAY_W, 0.010),
+                            P(-0.240, s * 0.060 * STAY_W, 0.040),
                             hub + Vector((0.012, 0, -0.003))],
                            ((0, 0.0170), (0.12, 0.0145), (0.4, 0.0115), (1, 0.0085)),
                            wy_keys=((0, 0.8), (0.4, 0.75), (1, 0.85)),
                            wz_keys=((0, 1.35), (1, 1.15)), expo=2.4, n=70, ring=40,
                            side=Vector((0, 1, 0))))
-        ss_top = st_at(0.79) + Vector((-0.004, s * 0.011, 0))
+        # classic: joins just under the top tube; aero: dropped low, thin flat blades
+        ss_top = st_on(S(0.79, 0.60)) + Vector((S(-0.004, -0.010), s * 0.011, 0))
         mid = hub.lerp(ss_top, 0.82)
-        mid.y = s * 0.036
+        mid.y = s * 0.036 * STAY_W
         parts.append(sweep(f"seatStay{tag}", "seatStays",
                            [hub + Vector((0.004, 0, 0.012)), hub.lerp(ss_top, 0.45) + Vector((0, s * 0.002, 0)), mid, ss_top],
-                           ((0, 0.0085), (0.6, 0.0080), (1, 0.0095)),
-                           wy_keys=((0, 0.75), (1, 0.85)), wz_keys=((0, 1.15), (1, 1.25)),
+                           S(((0, 0.0085), (0.6, 0.0080), (1, 0.0095)), ((0, 0.0080), (0.6, 0.0072), (1, 0.0088))),
+                           wy_keys=S(((0, 0.75), (1, 0.85)), ((0, 0.62), (1, 0.65))),
+                           wz_keys=S(((0, 1.15), (1, 1.25)), ((0, 1.5), (1, 1.75))),
                            expo=2.2, n=70, ring=40, side=Vector((0, 1, 0))))
         # dropout boss: as thick as the stays, rounded faces, wraps the axle
         parts.append(cylinder_y(f"dropout{tag}", "chainStays", hub, 0.0165, DROP_HALF_REAR, edge=0.0025))
@@ -206,21 +283,24 @@ def frame_parts():
 
 def fork_parts():
     parts = []
-    crown_c = ht_bot - ht_up * 0.018
+    cd = CROWN_D / 0.032            # crown depth relative to the gravel crown
     for s, tag in ((1, "R"), (-1, "L")):
         tip = front_hub + Vector((0, s * HALF_FRONT, 0))
         # blades grow out of the crown centre: wide at the top, splitting into a "Y"
-        top = ht_at(-0.04) - ht_up * 0.012 + Vector((0, s * 0.013, 0))
-        sh = top - ht_up * 0.050 + Vector((0, s * 0.040, 0))
+        top = ht_at(-0.04) - ht_up * 0.012 * cd + Vector((0, s * 0.013, 0))
+        sh = top - ht_up * 0.050 * cd + Vector((0, s * 0.040, 0))
         mid = sh.lerp(tip, 0.5)
         mid.y = s * 0.0565
         # aero blade: deep, narrow Kamm-tail section that relaxes to an oval at the tip
         parts.append(sweep(f"forkBlade{tag}", "fork",
                            [top, sh, mid, tip],
                            ((0, 0.0205), (0.18, 0.0165), (0.45, 0.0150), (0.92, 0.0118), (1, 0.0112)),
-                           wy_keys=((0, 0.92), (0.2, 0.66), (0.85, 0.68), (1, 0.66)),
-                           wz_keys=((0, 1.3), (0.2, 1.75), (0.8, 1.65), (1, 1.3)),
-                           kamm_keys=((0, 0.0), (0.2, 0.75), (0.8, 0.75), (0.97, 0.0)),
+                           wy_keys=S(((0, 0.92), (0.2, 0.66), (0.85, 0.68), (1, 0.66)),
+                                     ((0, 0.92), (0.2, 0.58), (0.85, 0.6), (1, 0.64))),
+                           wz_keys=S(((0, 1.3), (0.2, 1.75), (0.8, 1.65), (1, 1.3)),
+                                     ((0, 1.3), (0.2, 2.15), (0.8, 2.05), (1, 1.35))),
+                           kamm_keys=S(((0, 0.0), (0.2, 0.75), (0.8, 0.75), (0.97, 0.0)),
+                                       ((0, 0.0), (0.2, 0.95), (0.8, 0.95), (0.97, 0.0))),
                            expo=2.2, n=80, ring=48, side=Vector((0, 1, 0))))
         # dropout boss centred on the axle, same width as the blade tip
         parts.append(cylinder_y(f"forkDropout{tag}", "fork", tip, 0.0150, DROP_HALF_FRONT, edge=0.0030))
@@ -228,10 +308,12 @@ def fork_parts():
     # headset gap) and widens laterally to swallow the blade tops
     gap_top = ht_at(-0.04) - ht_up * 0.001
     parts.append(sweep("forkCrown", "fork",
-                       [gap_top, gap_top - ht_up * 0.016, gap_top - ht_up * 0.032],
+                       [gap_top, gap_top - ht_up * CROWN_D / 2, gap_top - ht_up * CROWN_D],
                        ((0, 0.0285), (0.5, 0.0280), (1, 0.0245)),
-                       wy_keys=((0, 1.0), (0.5, 1.2), (1, 1.6)), wz_keys=((0, 1.0), (1, 1.12)),
-                       expo=2.2, n=24, ring=64, side=Vector((0, 1, 0))))
+                       wy_keys=S(((0, 1.0), (0.5, 1.2), (1, 1.6)), ((0, 0.95), (0.5, 1.2), (1, 1.6))),
+                       wz_keys=S(((0, 1.0), (1, 1.12)), ((0, 1.3), (1, 1.3))),
+                       kamm_keys=S(((0, 0.0),), ((0, 0.6), (1, 0.4))),
+                       expo=S(2.2, 2.3), n=24, ring=64, side=Vector((0, 1, 0)), lead=FWD))
     return parts
 
 # ---------------------------------------------------------------- fuse via SDF + fillet
@@ -340,5 +422,5 @@ def build(voxel=0.0008, fillet=12, band=14, smooth=0):
     return frame, fork
 
 KEY = dict(STACK=STACK, FORK_A2C=FORK_A2C, BB=BB, rear_hub=rear_hub, front_hub=front_hub, ht_top=ht_top, ht_bot=ht_bot,
-           HALF_REAR=HALF_REAR, HALF_FRONT=HALF_FRONT, WHEEL_R=WHEEL_R,
+           HALF_REAR=HALF_REAR, HALF_FRONT=HALF_FRONT, WHEEL_R=WHEEL_R, TIRE_W=TIRE_W,
            DROP_HALF_REAR=DROP_HALF_REAR, DROP_HALF_FRONT=DROP_HALF_FRONT)
