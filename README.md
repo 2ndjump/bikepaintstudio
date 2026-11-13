@@ -11,8 +11,10 @@ colour zones, and drag decals straight onto the model.
 
 ### 3D model & view
 - Fully procedural frameset (head tube, top/down/seat tubes, seat & chain
-  stays, fork) plus both wheels, lit in a studio environment.
-- Orbit / pan / zoom camera, dark or light background, PNG snapshot export.
+  stays, fork) plus both wheels, in a bright white studio (cyclorama + softbox
+  lights, a web port of the Blender studio).
+- Turntable view: right‑drag spins the bike (the studio stays put) and tilts
+  the camera; pan / zoom, PNG snapshot export.
 
 ### Paint zones
 - Paint each part independently: the frame tubes, the fork, and each rim are

@@ -40,6 +40,9 @@ export const dividerUniforms = {
   uDivExt: { value: new Float32Array(DIV_MAX * 4) }, // shape w, h (metres), pattern tiles/metre (0 = none)
   // Optional per-divider pattern filling the region (sampled by world XY).
   uDivAtlas: { value: atlasTex as THREE.Texture },
+  // World → bike space (inverse of the turntable transform, set by <Turntable>),
+  // so the dividers stay glued to the bike while it spins in the fixed studio.
+  uDivBikeInv: { value: new THREE.Matrix4() },
 };
 
 /** smoothstep half-width in metres for a crisp-but-anti-aliased edge. */
@@ -144,10 +147,11 @@ interface CompileShader {
 
 function injectVertex(shader: CompileShader): void {
   shader.vertexShader = shader.vertexShader
-    .replace('#include <common>', '#include <common>\nvarying vec3 vWorldPosDiv;')
+    .replace('#include <common>', '#include <common>\nvarying vec3 vWorldPosDiv;\nuniform mat4 uDivBikeInv;')
     .replace(
       '#include <begin_vertex>',
-      '#include <begin_vertex>\nvWorldPosDiv = (modelMatrix * vec4(transformed, 1.0)).xyz;',
+      // Bike space (= world space at turntable angle 0), not world space.
+      '#include <begin_vertex>\nvWorldPosDiv = (uDivBikeInv * modelMatrix * vec4(transformed, 1.0)).xyz;',
     );
 }
 
@@ -157,6 +161,7 @@ function wireUniforms(shader: CompileShader): void {
   shader.uniforms.uDivColor = dividerUniforms.uDivColor;
   shader.uniforms.uDivExt = dividerUniforms.uDivExt;
   shader.uniforms.uDivAtlas = dividerUniforms.uDivAtlas;
+  shader.uniforms.uDivBikeInv = dividerUniforms.uDivBikeInv;
 }
 
 /**

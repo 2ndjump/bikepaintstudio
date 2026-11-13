@@ -4,8 +4,10 @@ import * as THREE from 'three';
 import { useDesignStore } from '../../state/designStore';
 import { useUIStore } from '../../state/uiStore';
 import type { Divider } from '../../state/types';
+import { dividerUniforms } from '../../rendering/dividers';
 
-// The divider line lives in the scene's XY plane (z = 0, the bike centreline).
+// The divider line lives in the bike's XY plane (z = 0, the bike centreline).
+// This component renders inside <Turntable>, so all positions are bike space.
 const PLANE = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
 const _ray = new THREE.Raycaster();
 const _ndc = new THREE.Vector2();
@@ -47,6 +49,7 @@ export function DividerHandles() {
       _ndc.x = ((ev.clientX - rect.left) / rect.width) * 2 - 1;
       _ndc.y = -((ev.clientY - rect.top) / rect.height) * 2 + 1;
       _ray.setFromCamera(_ndc, camera);
+      _ray.ray.applyMatrix4(dividerUniforms.uDivBikeInv.value); // world → bike space
       if (_ray.ray.intersectPlane(PLANE, _hit)) onMove(_hit.x, _hit.y, ev);
     };
     const up = () => {

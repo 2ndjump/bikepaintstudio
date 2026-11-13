@@ -1,6 +1,6 @@
 import { useDesignStore } from '../../state/designStore';
 import type { DesignState } from '../../state/types';
-import { useUIStore, type BackgroundMode, type Lang } from '../../state/uiStore';
+import { useUIStore, type Lang } from '../../state/uiStore';
 import { useT } from '../../i18n/useT';
 import { ToolSelector } from '../Viewport/ToolSelector';
 
@@ -20,8 +20,6 @@ export function Toolbar() {
   const t = useT();
   const lang = useUIStore((s) => s.lang);
   const setLang = useUIStore((s) => s.setLang);
-  const background = useUIStore((s) => s.background);
-  const setBackground = useUIStore((s) => s.setBackground);
   const undo = useDesignStore((s) => s.undo);
   const redo = useDesignStore((s) => s.redo);
   const pastLen = useDesignStore((s) => s.history.past.length);
@@ -108,11 +106,6 @@ export function Toolbar() {
     }, 'image/png');
   }
 
-  const bgOptions: { value: BackgroundMode; labelKey: 'bgDark' | 'bgLight' }[] = [
-    { value: 'dark', labelKey: 'bgDark' },
-    { value: 'light', labelKey: 'bgLight' },
-  ];
-
   const langOptions: Lang[] = ['de', 'en'];
 
   return (
@@ -123,18 +116,6 @@ export function Toolbar() {
       <h1 className="m3-title text-base mr-1">Bike Paint Studio</h1>
       <ToolSelector />
       <div className="flex-1 min-w-0" />
-
-      <SegmentedControl>
-        {bgOptions.map((opt) => (
-          <SegmentButton
-            key={opt.value}
-            active={background === opt.value}
-            onClick={() => setBackground(opt.value)}
-          >
-            {t(opt.labelKey)}
-          </SegmentButton>
-        ))}
-      </SegmentedControl>
 
       <SegmentedControl>
         {langOptions.map((l) => (
