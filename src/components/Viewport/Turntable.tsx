@@ -1,24 +1,22 @@
 import { useEffect, useRef, type ReactNode } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
-import { FRONT_HUB, REAR_HUB } from '../../geometry/frameModel';
 import { dividerUniforms } from '../../rendering/dividers';
 import { useUIStore } from '../../state/uiStore';
 
-/** Spin axis: the vertical through the middle of the wheelbase (metres). */
-const AXIS_X = (FRONT_HUB.x + REAR_HUB.x) / 2;
 /** Start angle: the 3/4 view the orbit camera used to open with. */
 const START_YAW = -0.7;
 
 /**
  * Turntable for the bike inside the fixed studio. With the camera tool, a
  * horizontal rotate-drag (right mouse / one finger) spins the bike about the
- * vertical axis; OrbitControls keeps zoom, pan and the vertical tilt (its
- * azimuth is locked in Viewport). Children live in bike space — at angle 0
- * exactly the old world space — and the inverse transform is published to the
- * divider shader so dividers stay glued to the frame.
+ * vertical axis through x = axisX (the middle of the wheelbase, metres);
+ * OrbitControls keeps zoom, pan and the vertical tilt (its azimuth is locked
+ * in Viewport). Children live in bike space — at angle 0 exactly the world
+ * space — and the inverse transform is published to the divider shader so
+ * dividers stay glued to the frame.
  */
-export function Turntable({ children }: { children: ReactNode }) {
+export function Turntable({ axisX, children }: { axisX: number; children: ReactNode }) {
   const spin = useRef<THREE.Group>(null);
   const bike = useRef<THREE.Group>(null);
   const gl = useThree((s) => s.gl);
@@ -57,8 +55,8 @@ export function Turntable({ children }: { children: ReactNode }) {
   });
 
   return (
-    <group ref={spin} position={[AXIS_X, 0, 0]} rotation={[0, START_YAW, 0]}>
-      <group ref={bike} position={[-AXIS_X, 0, 0]}>
+    <group ref={spin} position={[axisX, 0, 0]} rotation={[0, START_YAW, 0]}>
+      <group ref={bike} position={[-axisX, 0, 0]}>
         {children}
       </group>
     </group>

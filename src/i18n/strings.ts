@@ -130,7 +130,12 @@ export type I18nKey =
   | 'requestSystemFonts'
   | 'chameleonColorA'
   | 'chameleonColorB'
-  | 'chameleonColorC';
+  | 'chameleonColorC'
+  | 'bikeModel'
+  | 'variantGravel'
+  | 'variantRoad'
+  | 'variantClassic'
+  | 'variantAero';
 
 const STRINGS: Record<I18nKey, Record<Lang, string>> = {
   active: { de: 'Aktiv', en: 'Active' },
@@ -263,6 +268,11 @@ const STRINGS: Record<I18nKey, Record<Lang, string>> = {
   chameleonColorA: { de: 'Farbe A', en: 'Color A' },
   chameleonColorB: { de: 'Farbe B', en: 'Color B' },
   chameleonColorC: { de: 'Farbe C', en: 'Color C' },
+  bikeModel: { de: 'Modell', en: 'Model' },
+  variantGravel: { de: 'Gravel', en: 'Gravel' },
+  variantRoad: { de: 'Rennrad', en: 'Road' },
+  variantClassic: { de: 'Klassisch', en: 'Classic' },
+  variantAero: { de: 'Aero', en: 'Aero' },
 };
 
 export function translate(key: I18nKey, lang: Lang): string {

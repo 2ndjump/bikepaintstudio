@@ -26,5 +26,6 @@ export function snapshotDesign(state: DesignState): DesignState {
     zones: structuredClone(state.zones),
     rim: { ...state.rim },
     dividers: structuredClone(state.dividers),
+    variant: { ...state.variant },
   };
 }

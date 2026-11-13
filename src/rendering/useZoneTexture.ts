@@ -22,36 +22,34 @@ function getOrCreateTextures(zoneId: ZoneId): ZoneTextures {
   if (existing) return existing;
   const compositor = getCompositor(zoneId);
 
+  // u wraps around the tube. Past a tube's ends (v outside 0..1: BB shell,
+  // dropouts, fork crown) the paint continues mirrored instead of smearing.
   const map = new THREE.CanvasTexture(compositor.canvas);
   map.colorSpace = THREE.SRGBColorSpace;
   map.anisotropy = 8;
   map.wrapS = THREE.RepeatWrapping;
-  map.wrapT = THREE.RepeatWrapping;
+  map.wrapT = THREE.MirroredRepeatWrapping;
 
   // Only the alpha channel matters, so keep it in linear/no colour space.
   const coverage = new THREE.CanvasTexture(compositor.coverageCanvas);
   coverage.anisotropy = 8;
   coverage.wrapS = THREE.RepeatWrapping;
-  coverage.wrapT = THREE.RepeatWrapping;
+  coverage.wrapT = THREE.MirroredRepeatWrapping;
 
   const textures = { map, coverage };
   zoneTextures.set(zoneId, textures);
   return textures;
 }
 
-/**
- * @param compose  Whether this consumer actually renders the layer texture.
- *   Pass `false` for base-colour-only meshes: they don't use the map, and
- *   driving the (per-zone, non-re-entrant) compositor from several meshes at
- *   once races on the shared canvas and can leave a zone's texture stuck.
- */
-export function useZoneTexture(zoneId: ZoneId, compose = true): ZoneTextures {
+export function useZoneTexture(zoneId: ZoneId): ZoneTextures {
   const layers = useDesignStore((s) => s.zones[zoneId]?.layers ?? EMPTY_LAYERS);
   const baseColor = useDesignStore((s) => s.zones[zoneId]?.baseColor ?? '#888888');
+  // A variant switch changes the measured zone aspect (zoneMetrics) the decals
+  // are drawn with, so it re-composites too.
+  const variant = useDesignStore((s) => s.variant);
   const [textures] = useState(() => getOrCreateTextures(zoneId));
 
   useEffect(() => {
-    if (!compose) return;
     const compositor = getCompositor(zoneId);
     let cancelled = false;
     compositor.render(layers, baseColor).then(() => {
@@ -62,7 +60,7 @@ export function useZoneTexture(zoneId: ZoneId, compose = true): ZoneTextures {
     return () => {
       cancelled = true;
     };
-  }, [layers, baseColor, zoneId, textures, compose]);
+  }, [layers, baseColor, variant, zoneId, textures]);
 
   return textures;
 }

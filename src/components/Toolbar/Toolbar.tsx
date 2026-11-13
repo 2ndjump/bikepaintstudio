@@ -31,6 +31,7 @@ export function Toolbar() {
       zones: state.zones,
       rim: state.rim,
       dividers: state.dividers,
+      variant: state.variant,
       palette: useUIStore.getState().palette,
     };
     const json = JSON.stringify(snapshot, null, 2);

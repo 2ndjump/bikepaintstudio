@@ -247,12 +247,22 @@ export interface Divider {
   patternScale?: number;
 }
 
+/** Which of the four Blender-built frame models (public/assets/bike_*.glb) is shown. */
+export interface BikeVariant {
+  discipline: 'gravel' | 'road';
+  style: 'classic' | 'aero';
+}
+
+export const DEFAULT_VARIANT: BikeVariant = { discipline: 'gravel', style: 'classic' };
+
 export interface DesignState {
   activeZone: ZoneId;
   zones: Record<ZoneId, ZoneState>;
   rim: RimParams;
   /** Global colour dividers (world-space), applied over every zone's paint. */
   dividers: Divider[];
+  /** Frame model; absent in older saved designs (→ DEFAULT_VARIANT). */
+  variant: BikeVariant;
 }
 
 // Brighter, saturated defaults so the chameleon shift reads clearly (a dark

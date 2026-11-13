@@ -132,13 +132,6 @@ float dividerMask(int di) {
 }
 `;
 
-const FRAG_BODY = /* glsl */ `
-for (int di = 0; di < DIV_MAX; di++) {
-  if (di >= uDivCount) break;
-  diffuseColor.rgb = mix(diffuseColor.rgb, dividerFill(di), dividerMask(di));
-}
-`;
-
 interface CompileShader {
   uniforms: Record<string, THREE.IUniform>;
   vertexShader: string;
@@ -204,18 +197,6 @@ export async function syncDividerPatterns(dividers: Divider[]): Promise<void> {
     E[i * 4 + 2] = (d.patternScale ?? 12) / 3; // world tiles per metre
   }
   atlasTex.needsUpdate = true;
-}
-
-/**
- * onBeforeCompile for base-colour-only meshes (no layer map): tint fragments
- * below each divider line (world XY).
- */
-export function applyDividerShader(shader: CompileShader): void {
-  wireUniforms(shader);
-  injectVertex(shader);
-  shader.fragmentShader = shader.fragmentShader
-    .replace('#include <common>', '#include <common>' + FRAG_HEAD)
-    .replace('#include <map_fragment>', '#include <map_fragment>' + FRAG_BODY);
 }
 
 const FRAG_HEAD_MAPPED = FRAG_HEAD + '\nuniform sampler2D uDivCoverage;';

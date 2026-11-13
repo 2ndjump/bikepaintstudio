@@ -1,7 +1,7 @@
 # Bike Paint Studio
 
 An interactive 3D bike‑frame paint configurator. Design a road/gravel bike's
-paint scheme in real time on a fully procedural 3D model — pick colours and
+paint scheme in real time on a 3D model built in Blender — pick colours and
 finishes per part, stack patterns / images / text / shapes, cut the frame into
 colour zones, and drag decals straight onto the model.
 
@@ -10,9 +10,12 @@ colour zones, and drag decals straight onto the model.
 ## Features
 
 ### 3D model & view
-- Fully procedural frameset (head tube, top/down/seat tubes, seat & chain
-  stays, fork) plus both wheels, in a bright white studio (cyclorama + softbox
-  lights, a web port of the Blender studio).
+- Four framesets built in Blender (one seamless carbon shell each: head tube,
+  top/down/seat tubes, seat & chain stays, fork): **Road / Gravel** (geometry,
+  tire width, clearances) × **Classic / Aero** (tube profiles). Switching keeps
+  the design. The wheels are procedural (adjustable rims); everything stands in
+  a bright white studio (cyclorama + softbox lights, a web port of the Blender
+  studio).
 - Turntable view: right‑drag spins the bike (the studio stays put) and tilts
   the camera; pan / zoom, PNG snapshot export.
 
@@ -84,6 +87,13 @@ npm run lint       # run ESLint
 Paint is composited per zone onto a 2D canvas that is applied as the material's
 colour map, so patterns, images, text, and shapes all share one layer pipeline;
 colour dividers are drawn in the material shader in world space.
+
+The frame models come from `blender/`: `build_frame.py` builds a variant,
+`export_variants.py` adds the paint UVs (u around each tube, v along it) and
+writes `public/assets/bike_<road|gravel>_<classic|aero>.glb`. Run it inside
+Blender (`exec(open(r"<repo>/blender/export_variants.py").read())`) after
+changing the frame scripts; `run_all.py` builds the full Blender scene with
+wheels and studio for renders.
 
 ## Deployment
 

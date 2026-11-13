@@ -2,13 +2,11 @@ import { useEffect, useMemo } from 'react';
 import { useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { RectAreaLightUniformsLib } from 'three/examples/jsm/lights/RectAreaLightUniformsLib.js';
-import { ROAD_GEO } from '../../geometry/frame';
-import { REAR_HUB } from '../../geometry/frameModel';
 
 RectAreaLightUniformsLib.init();
 
-/** Studio floor: the bottom of the wheels (metres). */
-const FLOOR_Y = REAR_HUB.y - ROAD_GEO.wheelRadius - 0.002;
+/** Studio floor height (metres); the bike's tires stand on it. */
+export const FLOOR_Y = -0.266;
 
 /** Blender studio coords (x fwd, y away from the side camera, z up, floor at
  *  z = 0) → scene coords (x fwd, y up, z toward the camera). */

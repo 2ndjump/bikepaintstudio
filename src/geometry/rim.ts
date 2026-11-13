@@ -105,11 +105,12 @@ export function buildTireGeometry(
   return new THREE.TorusGeometry(centerR, tireMinor, 28, 140);
 }
 
-/** Disc-brake era hub: flanges, center barrel, axle ends. */
-export function buildHubGeometry(): THREE.BufferGeometry {
+/** Disc-brake era hub: flanges, center barrel, axle ends reaching ±half
+ *  (the dropout inner faces). */
+export function buildHubGeometry(half: number): THREE.BufferGeometry {
   const profile: THREE.Vector2[] = [
-    new THREE.Vector2(0.0, -0.054),
-    new THREE.Vector2(0.0065, -0.054),
+    new THREE.Vector2(0.0, -half),
+    new THREE.Vector2(0.0065, -half),
     new THREE.Vector2(0.0065, -0.046),
     new THREE.Vector2(0.0155, -0.042),
     new THREE.Vector2(0.0235, -0.040),
@@ -122,8 +123,8 @@ export function buildHubGeometry(): THREE.BufferGeometry {
     new THREE.Vector2(0.0235, 0.040),
     new THREE.Vector2(0.0155, 0.042),
     new THREE.Vector2(0.0065, 0.046),
-    new THREE.Vector2(0.0065, 0.054),
-    new THREE.Vector2(0.0, 0.054),
+    new THREE.Vector2(0.0065, half),
+    new THREE.Vector2(0.0, half),
   ];
   const geo = new THREE.LatheGeometry(profile, 36);
   geo.computeVertexNormals();

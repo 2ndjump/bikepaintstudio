@@ -1,15 +1,14 @@
 import { Canvas, useThree } from '@react-three/fiber';
-import { OrbitControls } from '@react-three/drei';
+import { OrbitControls, useGLTF } from '@react-three/drei';
 import * as THREE from 'three';
 import { BikeFrame } from './BikeFrame';
-import { BACKDROP_COLOR, StudioEnvironment } from './StudioEnvironment';
+import { BACKDROP_COLOR, FLOOR_Y, StudioEnvironment } from './StudioEnvironment';
 import { DividerHandles } from './DividerHandles';
 import { EditControls } from './EditControls';
 import { Turntable } from './Turntable';
 import { Wheel } from './Wheel';
-import { ROAD_GEO } from '../../geometry/frame';
-import { FRONT_HUB, REAR_HUB } from '../../geometry/frameModel';
-import { useEffect } from 'react';
+import { ALL_VARIANTS, useBikeModel, variantUrl } from '../../geometry/bikeModel';
+import { Suspense, useEffect } from 'react';
 import { useUIStore } from '../../state/uiStore';
 import { useDesignStore } from '../../state/designStore';
 import { syncDividerUniforms, syncDividerPatterns } from '../../rendering/dividers';
@@ -32,9 +31,46 @@ function DividerSync() {
   return null;
 }
 
+/**
+ * The selected variant's bike on the turntable: Blender frameset + procedural
+ * wheels at its hubs, standing on the studio floor. Suspends while the GLB loads.
+ */
+function Bike() {
+  const variant = useDesignStore((s) => s.variant);
+  const model = useBikeModel(variant);
+  const { frontHub, rearHub } = model;
+
+  // Fetch the other variants once the first bike is up, so switching is instant.
+  useEffect(() => {
+    ALL_VARIANTS.forEach((v) => useGLTF.preload(variantUrl(v)));
+  }, []);
+
+  return (
+    <Turntable axisX={(frontHub.x + rearHub.x) / 2}>
+      <DividerHandles />
+      <group position={[0, FLOOR_Y, 0]}>
+        <BikeFrame model={model} />
+        <Wheel
+          position={[frontHub.x, frontHub.y, frontHub.z]}
+          zone="frontRim"
+          tireWidth={model.tireWidth / 2}
+          wheelRadius={model.wheelRadius}
+          hubHalf={model.hubHalfFront}
+        />
+        <Wheel
+          position={[rearHub.x, rearHub.y, rearHub.z]}
+          zone="rearRim"
+          tireWidth={model.tireWidth / 2}
+          wheelRadius={model.wheelRadius}
+          hubHalf={model.hubHalfRear}
+        />
+      </group>
+    </Turntable>
+  );
+}
+
 export function Viewport() {
   const tool = useUIStore((s) => s.tool);
-  const geo = ROAD_GEO;
 
   return (
     <Canvas
@@ -60,22 +96,9 @@ export function Viewport() {
       <DebugExpose />
       <DividerSync />
       <EditControls />
-      <Turntable>
-        <DividerHandles />
-        <BikeFrame />
-        <Wheel
-          position={[FRONT_HUB.x, FRONT_HUB.y, FRONT_HUB.z]}
-          zone="frontRim"
-          tireWidth={geo.tireWidth}
-          wheelRadius={geo.wheelRadius}
-        />
-        <Wheel
-          position={[REAR_HUB.x, REAR_HUB.y, REAR_HUB.z]}
-          zone="rearRim"
-          tireWidth={geo.tireWidth}
-          wheelRadius={geo.wheelRadius}
-        />
-      </Turntable>
+      <Suspense fallback={null}>
+        <Bike />
+      </Suspense>
 
       {/* The studio stays put: the camera only zooms, pans and tilts within
           limits (azimuth locked straight at the back wall); horizontal

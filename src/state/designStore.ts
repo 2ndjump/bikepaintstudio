@@ -2,6 +2,8 @@ import { create } from 'zustand';
 import {
   ALL_ZONES,
   DEFAULT_CHAMELEON_COLORS,
+  DEFAULT_VARIANT,
+  type BikeVariant,
   type DesignState,
   type Divider,
   type FinishType,
@@ -101,6 +103,10 @@ function migrateDesign(state: DesignState): DesignState {
       spokeCount: state.rim?.spokeCount ?? 20,
     },
     dividers: Array.isArray(state.dividers) ? state.dividers : [],
+    variant: {
+      discipline: state.variant?.discipline === 'road' ? 'road' : DEFAULT_VARIANT.discipline,
+      style: state.variant?.style === 'aero' ? 'aero' : DEFAULT_VARIANT.style,
+    },
   };
 }
 
@@ -164,6 +170,7 @@ interface DesignActions {
   reorderLayer(zone: ZoneId, layerId: string, direction: -1 | 1): void;
   duplicateLayer(zone: ZoneId, layerId: string, options: DuplicateOptions): void;
   setRim(patch: Partial<DesignState['rim']>): void;
+  setVariant(patch: Partial<BikeVariant>): void;
   addDivider(): void;
   addDividerShape(): void;
   updateDivider(id: string, patch: Partial<Divider>): void;
@@ -194,6 +201,7 @@ export const useDesignStore = create<Store>((set, get) => {
     zones: buildInitialZones(),
     rim: { depth: 50, width: 25, spokeCount: 20 },
     dividers: [],
+    variant: DEFAULT_VARIANT,
     history: makeEmptyHistory(),
 
     setActiveZone: (zone) => set({ activeZone: zone }),
@@ -335,6 +343,12 @@ export const useDesignStore = create<Store>((set, get) => {
       set((s) => ({ history, rim: { ...s.rim, ...patch } }));
     },
 
+    // Swap the frame model; the paint (zones, layers, dividers) carries over.
+    setVariant: (patch) => {
+      const history = recordHistory();
+      set((s) => ({ history, variant: { ...s.variant, ...patch } }));
+    },
+
     // Global colour dividers (world-space cut lines). New ones default to a
     // slightly tilted line across the mid of the bike, tinting below it; the
     // handles sit on the seat tube (rear) and fork (front) so they're easy to
@@ -409,6 +423,7 @@ export const useDesignStore = create<Store>((set, get) => {
         zones: migrated.zones,
         rim: migrated.rim,
         dividers: migrated.dividers,
+        variant: migrated.variant,
       });
     },
 
@@ -422,6 +437,7 @@ export const useDesignStore = create<Store>((set, get) => {
         zones: prev.zones,
         rim: prev.rim,
         dividers: prev.dividers,
+        variant: prev.variant,
         history: {
           past: s.history.past.slice(0, -1),
           future: [...s.history.future, current],
@@ -439,6 +455,7 @@ export const useDesignStore = create<Store>((set, get) => {
         zones: next.zones,
         rim: next.rim,
         dividers: next.dividers,
+        variant: next.variant,
         history: {
           past: [...s.history.past, current],
           future: s.history.future.slice(0, -1),

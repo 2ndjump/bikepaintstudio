@@ -18,14 +18,16 @@ interface WheelProps {
   tireWidth?: number;
   /** Outer wheel radius where tire meets road. Default: 0.339 */
   wheelRadius?: number;
+  /** Hub half-length up to the dropout inner faces. */
+  hubHalf: number;
 }
 
-export function Wheel({ position, zone, tireWidth = 0.014, wheelRadius = 0.339 }: WheelProps) {
+export function Wheel({ position, zone, tireWidth = 0.014, wheelRadius = 0.339, hubHalf }: WheelProps) {
   const rim = useDesignStore((s) => s.rim);
 
   const rimGeo = useMemo(() => buildRimProfileGeometry(rim), [rim]);
   const tireGeo = useMemo(() => buildTireGeometry(tireWidth, wheelRadius), [tireWidth, wheelRadius]);
-  const hubGeo = useMemo(() => buildHubGeometry(), []);
+  const hubGeo = useMemo(() => buildHubGeometry(hubHalf), [hubHalf]);
 
   const mergedSpokes = useMemo(() => {
     const spokeGeos = buildSpokeGeometry(rim);

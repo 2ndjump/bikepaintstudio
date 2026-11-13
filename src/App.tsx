@@ -6,6 +6,7 @@ import { DividerPanel } from './components/Sidebar/DividerPanel';
 import { FinishPicker } from './components/Sidebar/FinishPicker';
 import { LayerStack } from './components/Sidebar/LayerStack';
 import { RimPanel } from './components/Sidebar/RimPanel';
+import { VariantPicker } from './components/Sidebar/VariantPicker';
 import { Toolbar } from './components/Toolbar/Toolbar';
 import { preloadCommonFonts } from './fonts/fontLoader';
 import { useDesignStore } from './state/designStore';
@@ -59,6 +60,9 @@ export default function App() {
             <Viewport />
           </main>
           <div className="p-3 space-y-3">
+            <div className="m3-card">
+              <VariantPicker />
+            </div>
             <div className="m3-card space-y-3">
               <FinishPicker />
               <div className="pt-3" style={{ borderTop: '1px solid var(--md-outline-variant)' }}>
@@ -100,6 +104,9 @@ export default function App() {
           className="hidden lg:flex flex-col min-h-0 overflow-y-auto p-3 gap-3 m3-panel"
           style={{ borderRight: '1px solid var(--md-outline-variant)' }}
         >
+          <div className="m3-card">
+            <VariantPicker />
+          </div>
           <div className="m3-card space-y-3">
             <FinishPicker />
             <div className="pt-3" style={{ borderTop: '1px solid var(--md-outline-variant)' }}>
@@ -130,6 +137,9 @@ export default function App() {
           <div className="space-y-3">
             {/* On wide screens the paint + zones live in the left sidebar; below
                 lg the left rail is hidden so they appear here instead. */}
+            <div className="lg:hidden m3-card">
+              <VariantPicker />
+            </div>
             <div className="lg:hidden m3-card space-y-3">
               <FinishPicker />
               <div className="pt-3" style={{ borderTop: '1px solid var(--md-outline-variant)' }}>
