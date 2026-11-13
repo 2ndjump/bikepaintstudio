@@ -1,30 +1,12 @@
 import { useDesignStore } from '../../state/designStore';
 import { useUIStore } from '../../state/uiStore';
-import type { PatternKind } from '../../state/types';
-import type { I18nKey } from '../../i18n/strings';
 import { useT } from '../../i18n/useT';
 import { ColorPicker } from '../ui/ColorPicker';
 import { Slider } from '../ui/Slider';
+import { PatternPicker } from '../ui/PatternPicker';
 import { ShapeKindSelect } from '../LayerTypes/ShapeLayer';
 import { ShapeIcon } from './LayerStack';
 import { DIV_MAX } from '../../rendering/dividers';
-
-const PATTERNS: { value: PatternKind; labelKey: I18nKey }[] = [
-  { value: 'hexagons', labelKey: 'patternHexagons' },
-  { value: 'stripes', labelKey: 'patternStripes' },
-  { value: 'carbon', labelKey: 'patternCarbon' },
-  { value: 'smoke', labelKey: 'patternSmoke' },
-  { value: 'thread', labelKey: 'patternThread' },
-  { value: 'splashes', labelKey: 'patternSplashes' },
-  { value: 'topo', labelKey: 'patternTopo' },
-  { value: 'marble', labelKey: 'patternMarble' },
-  { value: 'voronoi', labelKey: 'patternVoronoi' },
-  { value: 'camo', labelKey: 'patternCamo' },
-  { value: 'digicamo', labelKey: 'patternDigiCamo' },
-  { value: 'circuit', labelKey: 'patternCircuit' },
-  { value: 'mesh', labelKey: 'patternMesh' },
-  { value: 'forged', labelKey: 'patternForged' },
-];
 
 /**
  * Global colour dividers: world-space cut lines that tint everything below them
@@ -190,22 +172,13 @@ export function DividerPanel() {
                     />
                   )}
 
-                  <select
-                    value={d.pattern ?? ''}
-                    onChange={(e) =>
-                      updateDivider(d.id, {
-                        pattern: e.target.value ? (e.target.value as PatternKind) : undefined,
-                      })
-                    }
-                    className="m3-field"
-                  >
-                    <option value="">{t('dividerPatternNone')}</option>
-                    {PATTERNS.map((p) => (
-                      <option key={p.value} value={p.value}>
-                        {t(p.labelKey)}
-                      </option>
-                    ))}
-                  </select>
+                  <PatternPicker
+                    value={d.pattern}
+                    onChange={(pattern) => updateDivider(d.id, { pattern })}
+                    color={d.patternColor ?? '#0a0a0a'}
+                    background={d.color}
+                    noneLabel={t('dividerPatternNone')}
+                  />
 
                   {d.pattern && (
                     <>

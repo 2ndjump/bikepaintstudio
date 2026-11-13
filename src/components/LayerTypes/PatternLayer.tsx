@@ -1,52 +1,27 @@
 import { useDesignStore } from '../../state/designStore';
-import type { PatternKind, PatternLayer, ZoneId } from '../../state/types';
+import type { PatternLayer, ZoneId } from '../../state/types';
 import { useT } from '../../i18n/useT';
-import type { I18nKey } from '../../i18n/strings';
 import { ColorPicker } from '../ui/ColorPicker';
 import { Slider } from '../ui/Slider';
+import { PatternPicker } from '../ui/PatternPicker';
 
 interface Props {
   layer: PatternLayer;
   zoneId: ZoneId;
 }
 
-const PATTERNS: { value: PatternKind; labelKey: I18nKey }[] = [
-  { value: 'hexagons', labelKey: 'patternHexagons' },
-  { value: 'stripes', labelKey: 'patternStripes' },
-  { value: 'carbon', labelKey: 'patternCarbon' },
-  { value: 'smoke', labelKey: 'patternSmoke' },
-  { value: 'thread', labelKey: 'patternThread' },
-  { value: 'splashes', labelKey: 'patternSplashes' },
-  { value: 'topo', labelKey: 'patternTopo' },
-  { value: 'marble', labelKey: 'patternMarble' },
-  { value: 'voronoi', labelKey: 'patternVoronoi' },
-  { value: 'camo', labelKey: 'patternCamo' },
-  { value: 'digicamo', labelKey: 'patternDigiCamo' },
-  { value: 'circuit', labelKey: 'patternCircuit' },
-  { value: 'mesh', labelKey: 'patternMesh' },
-  { value: 'forged', labelKey: 'patternForged' },
-];
-
 export function PatternLayerEditor({ layer, zoneId }: Props) {
   const updateLayer = useDesignStore((s) => s.updateLayer);
+  const baseColor = useDesignStore((s) => s.zones[zoneId]?.baseColor ?? '#888888');
   const t = useT();
   return (
     <div className="space-y-2">
-      <select
+      <PatternPicker
         value={layer.pattern}
-        onChange={(e) =>
-          updateLayer(zoneId, layer.id, {
-            pattern: e.target.value as PatternKind,
-          })
-        }
-        className="m3-field"
-      >
-        {PATTERNS.map((p) => (
-          <option key={p.value} value={p.value}>
-            {t(p.labelKey)}
-          </option>
-        ))}
-      </select>
+        onChange={(pattern) => pattern && updateLayer(zoneId, layer.id, { pattern })}
+        color={layer.color}
+        background={baseColor}
+      />
       <ColorPicker
         value={layer.color}
         label={t('color')}

@@ -68,6 +68,7 @@ export type I18nKey =
   | 'depth'
   | 'width'
   | 'spokes'
+  | 'pattern'
   | 'patternHexagons'
   | 'patternStripes'
   | 'patternCarbon'
@@ -206,6 +207,7 @@ const STRINGS: Record<I18nKey, Record<Lang, string>> = {
   depth: { de: 'Tiefe', en: 'Depth' },
   width: { de: 'Breite', en: 'Width' },
   spokes: { de: 'Speichen', en: 'Spokes' },
+  pattern: { de: 'Muster', en: 'Pattern' },
   patternHexagons: { de: 'Hexagons', en: 'Hexagons' },
   patternStripes: { de: 'Streifen', en: 'Stripes' },
   patternCarbon: { de: 'Carbon', en: 'Carbon' },

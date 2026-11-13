@@ -43,6 +43,18 @@ export async function renderPattern(layer: PatternLayer): Promise<HTMLCanvasElem
   const ctx = canvas.getContext('2d')!;
 
   // Transparent background: the layer below (or the base color) shows through.
+  drawPatternTile(ctx, size, layer);
+
+  cache.set(key, canvas);
+  if (cache.size > 48) {
+    const first = cache.keys().next().value;
+    if (first) cache.delete(first);
+  }
+  return canvas;
+}
+
+/** Draw one periodic tile of `layer.pattern` (layer colour, intensity as alpha). */
+function drawPatternTile(ctx: CanvasRenderingContext2D, size: number, layer: PatternLayer) {
   ctx.globalAlpha = layer.intensity;
 
   if (layer.pattern === 'hexagons') drawHexagons(ctx, size, layer);
@@ -59,13 +71,36 @@ export async function renderPattern(layer: PatternLayer): Promise<HTMLCanvasElem
   else if (layer.pattern === 'circuit') drawCircuit(ctx, size, layer);
   else if (layer.pattern === 'mesh') drawMesh(ctx, size, layer);
   else if (layer.pattern === 'forged') drawForged(ctx, size, layer);
+}
 
-  cache.set(key, canvas);
-  if (cache.size > 48) {
-    const first = cache.keys().next().value;
-    if (first) cache.delete(first);
-  }
-  return canvas;
+const thumbCache = new Map<PatternKind, string>();
+
+/**
+ * A small preview of `pattern` as a white-on-transparent PNG data URL, drawn
+ * by the same tile code as the paint. Used as a CSS mask, so the swatch can
+ * take any colours without re-rendering (cached once per pattern). Organic
+ * patterns spread 4× more features over their tile (patternRepeat), so only
+ * a matching crop is shown to keep their feature size readable.
+ */
+export function patternThumbnail(pattern: PatternKind, size: number): string {
+  const cached = thumbCache.get(pattern);
+  if (cached) return cached;
+  const full = size * patternRepeat(pattern);
+  const tile = document.createElement('canvas');
+  tile.width = full;
+  tile.height = full;
+  drawPatternTile(tile.getContext('2d')!, full, {
+    pattern,
+    color: '#ffffff',
+    intensity: 1,
+  } as PatternLayer);
+  const out = document.createElement('canvas');
+  out.width = size;
+  out.height = size;
+  out.getContext('2d')!.drawImage(tile, 0, 0, size, size, 0, 0, size, size);
+  const url = out.toDataURL();
+  thumbCache.set(pattern, url);
+  return url;
 }
 
 function drawHexagons(ctx: CanvasRenderingContext2D, size: number, layer: PatternLayer) {
