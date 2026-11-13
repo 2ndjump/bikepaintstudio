@@ -94,7 +94,7 @@ export function ColorPicker({
 
   return (
     <div ref={triggerRef} className="relative">
-      {label && <div className="text-xs text-neutral-400 mb-1">{label}</div>}
+      {label && <div className="m3-label mb-1">{label}</div>}
       {triggerContent !== undefined ? (
         <button type="button" onClick={toggle} aria-label="Pick colour" className={triggerClassName}>
           {triggerContent}
@@ -104,7 +104,7 @@ export function ColorPicker({
           type="button"
           onClick={toggle}
           aria-label="Pick colour"
-          className={`rounded-md border border-neutral-600 shadow-inner shrink-0 ${
+          className={`rounded-md border border-black/15 shadow-inner shrink-0 ${
             swatchClassName ?? 'h-6 w-6'
           }`}
           style={{ backgroundColor: value }}
@@ -113,13 +113,13 @@ export function ColorPicker({
         <button
           type="button"
           onClick={toggle}
-          className="flex items-center gap-2 w-full rounded-lg border border-neutral-700 bg-neutral-800 hover:bg-neutral-750 px-2 py-1.5 transition"
+          className="flex items-center gap-2 w-full rounded-lg border border-[var(--md-outline-variant)] bg-[var(--md-surface-container-high)] hover:border-[var(--md-outline)] px-2 py-1.5 transition"
         >
           <span
-            className="inline-block h-4 w-6 rounded shadow-inner border border-neutral-600 flex-shrink-0"
+            className="inline-block h-4 w-6 rounded shadow-inner border border-black/15 flex-shrink-0"
             style={{ backgroundColor: value }}
           />
-          <span className="text-xs font-mono text-neutral-300 uppercase">{value}</span>
+          <span className="text-xs font-mono text-[var(--md-on-surface)] uppercase">{value}</span>
         </button>
       )}
 
@@ -127,20 +127,20 @@ export function ColorPicker({
         createPortal(
           <div
             ref={popRef}
-            className="fixed z-50 rounded-xl border border-neutral-700 bg-neutral-900 shadow-2xl p-3 flex flex-col gap-2.5 w-52"
+            className="glass fixed z-50 p-3 flex flex-col gap-2.5 w-52"
             style={{ top: coords.top, left: coords.left }}
           >
             {/* Hue/saturation picker */}
             <HexColorPicker color={value} onChange={commit} style={{ width: '100%', height: '140px' }} />
 
             {/* Hex input */}
-            <div className="flex items-center gap-1.5 bg-neutral-800 rounded-lg border border-neutral-700 px-2 py-1">
-              <span className="text-neutral-500 text-xs font-mono">#</span>
+            <div className="flex items-center gap-1.5 bg-[var(--md-surface-container-high)] rounded-lg border border-[var(--md-outline-variant)] px-2 py-1">
+              <span className="text-[var(--md-on-surface-variant)] text-xs font-mono">#</span>
               <HexColorInput
                 color={value}
                 onChange={commit}
                 prefixed={false}
-                className="bg-transparent text-neutral-100 text-xs font-mono w-full outline-none uppercase tracking-wider"
+                className="bg-transparent text-[var(--md-on-surface)] text-xs font-mono w-full outline-none uppercase tracking-wider"
               />
             </div>
 
@@ -148,7 +148,7 @@ export function ColorPicker({
                 Hidden in the palette's own add flow (onConfirm). */}
             {!onConfirm && palette.length > 0 && (
               <div>
-                <div className="text-[10px] text-neutral-500 uppercase tracking-wider mb-1">
+                <div className="m3-section-title mb-1">
                   {t('palette')}
                 </div>
                 <div className="flex flex-wrap gap-1">
@@ -161,7 +161,7 @@ export function ColorPicker({
                         setOpen(false);
                       }}
                       title={c}
-                      className="h-5 w-5 rounded-md border border-neutral-600 hover:scale-110 transition-transform"
+                      className="h-5 w-5 rounded-md border border-black/15 hover:scale-110 transition-transform"
                       style={{ backgroundColor: c }}
                     />
                   ))}
@@ -177,7 +177,7 @@ export function ColorPicker({
                   onConfirm(value);
                   setOpen(false);
                 }}
-                className="w-full py-1.5 text-xs rounded-lg border border-neutral-600 bg-neutral-800 hover:bg-neutral-700 text-neutral-100 transition"
+                className="m3-btn m3-btn-filled m3-btn-sm w-full"
               >
                 {confirmLabel ?? '✓'}
               </button>

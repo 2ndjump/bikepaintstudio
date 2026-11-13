@@ -2,6 +2,7 @@ import { useDesignStore } from '../../state/designStore';
 import type { EffectKind, Layer, ZoneId } from '../../state/types';
 import { useT } from '../../i18n/useT';
 import type { I18nKey } from '../../i18n/strings';
+import { Slider } from '../ui/Slider';
 
 interface Props {
   layer: Layer;
@@ -54,37 +55,25 @@ export function EffectEditor({ layer, zoneId }: Props) {
 
       {effect && (
         <>
-          <label className="m3-label flex flex-col gap-1">
-            {t('amount')} {effect.amount.toFixed(1)}px
-            <input
-              type="range"
-              min={0}
-              max={40}
-              step={0.5}
-              value={effect.amount}
-              onChange={(e) =>
-                updateLayer(zoneId, layer.id, {
-                  effect: { ...effect, amount: parseFloat(e.target.value) },
-                })
-              }
-            />
-          </label>
+          <Slider
+            label={t('amount')}
+            unit="px"
+            min={0}
+            max={40}
+            step={0.5}
+            value={effect.amount}
+            onChange={(v) => updateLayer(zoneId, layer.id, { effect: { ...effect, amount: v } })}
+          />
           {effect.kind !== 'gaussian' && (
-            <label className="m3-label flex flex-col gap-1">
-              {t('angle')} {effect.angle.toFixed(0)}°
-              <input
-                type="range"
-                min={0}
-                max={360}
-                step={15}
-                value={effect.angle}
-                onChange={(e) =>
-                  updateLayer(zoneId, layer.id, {
-                    effect: { ...effect, angle: parseFloat(e.target.value) },
-                  })
-                }
-              />
-            </label>
+            <Slider
+              label={t('angle')}
+              unit="°"
+              min={0}
+              max={360}
+              step={15}
+              value={effect.angle}
+              onChange={(v) => updateLayer(zoneId, layer.id, { effect: { ...effect, angle: v } })}
+            />
           )}
         </>
       )}

@@ -21,6 +21,52 @@ function DebugExpose() {
   return null;
 }
 
+/** Width the bike needs (incl. turntable swing), as a multiple of the canvas
+ *  height at camera zoom 1 — below that, the view zooms out to fit. */
+const FIT_ASPECT = 1.2;
+
+/**
+ * Keep the subject centred and fully visible in the free area between the
+ * floating panels (elements marked `data-overlay="left|right|top"`): the
+ * projection's centre is shifted onto that area (setViewOffset) and the view
+ * zooms out when the area is narrower than FIT_ASPECT × its height.
+ */
+function ViewFit() {
+  const size = useThree((s) => s.size);
+  const get = useThree((s) => s.get);
+
+  useEffect(() => {
+    const update = () => {
+      const { camera, gl } = get() as { camera: THREE.PerspectiveCamera; gl: THREE.WebGLRenderer };
+      const c = gl.domElement.getBoundingClientRect();
+      const W = size.width;
+      const H = size.height;
+      let left = 0;
+      let right = W;
+      let top = 0;
+      document.querySelectorAll<HTMLElement>('[data-overlay]').forEach((el) => {
+        const r = el.getBoundingClientRect();
+        if (r.width === 0) return; // hidden (e.g. the right panel below lg)
+        const side = el.dataset.overlay;
+        if (side === 'left') left = Math.max(left, r.right - c.left);
+        else if (side === 'right') right = Math.min(right, r.left - c.left);
+        else if (side === 'top') top = Math.max(top, r.bottom - c.top);
+      });
+      const fw = Math.max(1, right - left);
+      const fh = Math.max(1, H - top);
+      camera.setViewOffset(W, H, W / 2 - (left + right) / 2, H / 2 - (top + H) / 2, W, H);
+      camera.zoom = Math.min(1, fw / (FIT_ASPECT * H), fh / H);
+      camera.updateProjectionMatrix();
+    };
+    update();
+    const ro = new ResizeObserver(update);
+    document.querySelectorAll('[data-overlay]').forEach((el) => ro.observe(el));
+    return () => ro.disconnect();
+  }, [size, get]);
+
+  return null;
+}
+
 /** Push the global colour dividers into the shared shader uniforms. */
 function DividerSync() {
   const dividers = useDesignStore((s) => s.dividers);
@@ -94,6 +140,7 @@ export function Viewport() {
       <StudioEnvironment />
 
       <DebugExpose />
+      <ViewFit />
       <DividerSync />
       <EditControls />
       <Suspense fallback={null}>

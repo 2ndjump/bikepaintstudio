@@ -15,7 +15,8 @@ type ShowSaveFilePicker = (opts: {
   }>;
 }>;
 
-export function Toolbar() {
+/** `floating`: the desktop glass bar over the full-window studio. */
+export function Toolbar({ floating = false }: { floating?: boolean }) {
   const state = useDesignStore();
   const t = useT();
   const lang = useUIStore((s) => s.lang);
@@ -111,10 +112,10 @@ export function Toolbar() {
 
   return (
     <header
-      className="flex items-center flex-wrap gap-x-2 gap-y-2 px-3 sm:px-4 py-2 m3-panel"
-      style={{ borderBottom: '1px solid var(--md-outline-variant)' }}
+      data-overlay="top"
+      className={`glass toolbar flex items-center gap-2 px-3 ${floating ? 'toolbar-floating' : ''}`}
     >
-      <h1 className="m3-title text-base mr-1">Bike Paint Studio</h1>
+      <h1 className="m3-title text-base mr-1 whitespace-nowrap">Bike Paint Studio</h1>
       <ToolSelector />
       <div className="flex-1 min-w-0" />
 

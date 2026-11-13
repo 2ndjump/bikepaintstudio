@@ -45,11 +45,11 @@ function FontRow({
       ref={ref}
       type="button"
       onClick={onClick}
-      className={`w-full text-left px-3 py-2 flex items-center gap-2 hover:bg-neutral-700 transition ${
-        selected ? 'bg-neutral-700 text-white' : 'text-neutral-200'
+      className={`w-full text-left px-3 py-2 flex items-center gap-2 hover:bg-[var(--md-secondary-container)] transition ${
+        selected ? 'bg-[var(--md-primary-container)] text-[var(--md-on-primary-container)]' : 'text-[var(--md-on-surface)]'
       }`}
     >
-      <span className="text-[9px] text-neutral-500 w-3 shrink-0">{SOURCE_BADGE[entry.source]}</span>
+      <span className="text-[9px] text-[var(--md-on-surface-variant)] w-3 shrink-0">{SOURCE_BADGE[entry.source]}</span>
       <span
         style={{ fontFamily: loaded ? `'${entry.family}', sans-serif` : undefined }}
         className="text-sm truncate"
@@ -89,7 +89,7 @@ export function FontPicker({ value, options, onChange }: Props) {
         style={{ fontFamily: `'${value}', sans-serif` }}
       >
         <span className="truncate">{value}</span>
-        <span className="text-neutral-500 text-xs font-sans shrink-0">▾</span>
+        <span className="text-[var(--md-on-surface-variant)] text-xs font-sans shrink-0">▾</span>
       </button>
 
       {open && (
@@ -112,7 +112,7 @@ export function FontPicker({ value, options, onChange }: Props) {
           </div>
           <div className="max-h-56 overflow-y-auto">
             {filtered.length === 0 && (
-              <div className="px-3 py-2 text-xs text-neutral-500">No fonts found</div>
+              <div className="px-3 py-2 text-xs text-[var(--md-on-surface-variant)]">No fonts found</div>
             )}
             {filtered.map((f) => (
               <FontRow

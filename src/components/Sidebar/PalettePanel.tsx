@@ -21,7 +21,7 @@ export function PalettePanel() {
 
       <div className="flex flex-wrap items-center gap-1.5">
         {palette.length === 0 && (
-          <div className="text-xs text-neutral-500">{t('paletteEmpty')}</div>
+          <div className="m3-label">{t('paletteEmpty')}</div>
         )}
         {palette.map((c) => (
           <button
@@ -29,7 +29,7 @@ export function PalettePanel() {
             type="button"
             onClick={() => removePaletteColor(c)}
             title={`${c} — ${t('removeColor')}`}
-            className="group relative h-7 w-7 rounded-md border border-neutral-600"
+            className="group relative h-7 w-7 rounded-md border border-black/15"
             style={{ backgroundColor: c }}
           >
             <span className="absolute inset-0 flex items-center justify-center rounded-md bg-black/45 text-white text-sm leading-none opacity-0 group-hover:opacity-100 transition-opacity">
@@ -45,7 +45,7 @@ export function PalettePanel() {
           onConfirm={(c) => addPaletteColor(c)}
           confirmLabel={t('addColor')}
           triggerContent="+"
-          triggerClassName="h-7 w-7 rounded-md border border-dashed border-neutral-500 text-neutral-300 text-lg leading-none flex items-center justify-center hover:border-neutral-300 hover:text-white transition-colors"
+          triggerClassName="h-7 w-7 rounded-md border border-dashed border-[var(--md-outline)] text-[var(--md-on-surface-variant)] text-lg leading-none flex items-center justify-center hover:border-[var(--md-primary)] hover:text-[var(--md-primary)] transition-colors"
         />
       </div>
     </div>

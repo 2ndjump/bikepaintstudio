@@ -1,37 +1,43 @@
 @import "tailwindcss";
 
 /* ============================================================
-   Material 3 (Material You) — dark scheme tokens
+   Light "liquid glass" scheme (Material 3 token names kept).
+   The UI floats over the bright white studio as frosted cards: a mostly
+   opaque white tint (so dark text stays legible even when a dark or
+   saturated bike passes behind) + blur/saturation of what's behind.
    ============================================================ */
 :root {
   /* Primary */
-  --md-primary: #a8c7fa;
-  --md-on-primary: #0a305f;
-  --md-primary-container: #284777;
-  --md-on-primary-container: #d6e3ff;
+  --md-primary: #2457d6;
+  --md-on-primary: #ffffff;
+  --md-primary-container: #dce6ff;
+  --md-on-primary-container: #0b2a6b;
 
-  /* Secondary / tertiary containers (used for tonal/selected states) */
-  --md-secondary-container: #3b4858;
-  --md-on-secondary-container: #d7e3f7;
-  --md-tertiary-container: #5c3f5d;
-  --md-on-tertiary-container: #fdd7fa;
+  /* Tonal / selected states */
+  --md-secondary-container: #e1e8f7;
+  --md-on-secondary-container: #102446;
 
-  /* Surfaces (dark) — increasing elevation */
-  --md-surface: #111418;
-  --md-surface-dim: #111418;
-  --md-surface-container-lowest: #0b0e12;
-  --md-surface-container-low: #191c20;
-  --md-surface-container: #1d2125;
-  --md-surface-container-high: #282a2f;
-  --md-surface-container-highest: #33353a;
+  /* Surfaces — page, then increasingly "solid" fills inside the glass */
+  --md-surface: #f2f3f5;
+  --md-surface-container-low: rgba(255, 255, 255, 0.55);
+  --md-surface-container: rgba(255, 255, 255, 0.72);
+  --md-surface-container-high: #ffffff;
+  --md-surface-container-highest: rgba(15, 23, 42, 0.12);
 
   /* Content */
-  --md-on-surface: #e2e2e6;
-  --md-on-surface-variant: #c3c7cf;
-  --md-outline: #8d9199;
-  --md-outline-variant: #42474e;
+  --md-on-surface: #14171c;
+  --md-on-surface-variant: #4a515e;
+  --md-outline: #8a909c;
+  --md-outline-variant: rgba(15, 23, 42, 0.12);
 
-  --md-error: #ffb4ab;
+  --md-error: #c62828;
+
+  /* Glass panels */
+  --glass-bg: rgba(248, 249, 252, 0.76);
+  --glass-border: rgba(255, 255, 255, 0.75);
+  --glass-shadow: 0 10px 34px rgba(18, 28, 48, 0.14), 0 1px 3px rgba(18, 28, 48, 0.08);
+  --glass-gap: 12px;
+  --toolbar-h: 3.25rem;
 
   /* Shape */
   --md-radius-xs: 4px;
@@ -91,6 +97,46 @@ canvas {
 /* ============================================================
    Surfaces / cards
    ============================================================ */
+/* Floating frosted-glass panel (toolbar, side panels, viewport overlays). */
+.glass {
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: blur(22px) saturate(170%);
+  backdrop-filter: blur(22px) saturate(170%);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  box-shadow: var(--glass-shadow), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  color: var(--md-on-surface);
+}
+
+/* Floating side panel: below the toolbar, as tall as its content, scrolling
+   internally when the content is longer than the window. */
+.glass-panel {
+  position: absolute;
+  top: calc(var(--glass-gap) * 2 + var(--toolbar-h));
+  width: 19rem;
+  max-height: calc(100% - var(--glass-gap) * 3 - var(--toolbar-h));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 0.25rem 0.875rem;
+}
+
+/* Top bar: floating on desktop, a plain bar above the viewport on phones. */
+.toolbar { min-height: var(--toolbar-h); flex-wrap: wrap; }
+.toolbar-floating {
+  position: absolute;
+  z-index: 10;
+  top: var(--glass-gap);
+  left: var(--glass-gap);
+  right: var(--glass-gap);
+  flex-wrap: nowrap;
+}
+.toolbar:not(.toolbar-floating) { border-radius: 0; padding-top: 0.4rem; padding-bottom: 0.4rem; }
+
+/* Sections inside a panel, separated by hairlines instead of nested cards. */
+.m3-section { padding: 0.875rem 0; }
+.m3-section + .m3-section { border-top: 1px solid var(--md-outline-variant); }
+
+/* A card inside a glass panel: a lighter sheet of glass. */
 .m3-card {
   background: var(--md-surface-container-low);
   border: 1px solid var(--md-outline-variant);
@@ -126,10 +172,10 @@ canvas {
 .m3-btn:disabled { opacity: 0.38; cursor: default; pointer-events: none; }
 
 .m3-btn-filled { background: var(--md-primary); color: var(--md-on-primary); }
-.m3-btn-filled:hover { box-shadow: 0 1px 3px rgba(0,0,0,0.5); filter: brightness(1.05); }
+.m3-btn-filled:hover { box-shadow: 0 1px 3px rgba(0,0,0,0.25); filter: brightness(1.08); }
 
 .m3-btn-tonal { background: var(--md-secondary-container); color: var(--md-on-secondary-container); }
-.m3-btn-tonal:hover { filter: brightness(1.12); }
+.m3-btn-tonal:hover { filter: brightness(0.95); }
 
 .m3-btn-outlined { background: transparent; color: var(--md-primary); border-color: var(--md-outline); }
 .m3-btn-outlined:hover { background: color-mix(in srgb, var(--md-primary) 8%, transparent); }
@@ -172,7 +218,7 @@ canvas {
   cursor: pointer;
   transition: filter 0.15s;
 }
-.m3-add-btn:hover { filter: brightness(1.15); }
+.m3-add-btn:hover { filter: brightness(0.94); }
 
 /* Legacy alias — keep .btn-mini working with the new look */
 .btn-mini {
@@ -188,14 +234,15 @@ canvas {
   cursor: pointer;
   transition: filter 0.15s, opacity 0.15s;
 }
-.btn-mini:hover { filter: brightness(1.12); }
+.btn-mini:hover { filter: brightness(0.95); }
 
 /* ============================================================
    Segmented button (M3)
    ============================================================ */
 .m3-segmented {
   display: inline-flex;
-  border: 1px solid var(--md-outline);
+  border: 1px solid var(--md-outline-variant);
+  background: var(--md-surface-container);
   border-radius: var(--md-radius-full);
   overflow: hidden;
   height: 2rem;
@@ -210,13 +257,15 @@ canvas {
   color: var(--md-on-surface-variant);
   background: transparent;
   border: none;
-  border-left: 1px solid var(--md-outline);
+  border-left: 1px solid var(--md-outline-variant);
   cursor: pointer;
   transition: background-color 0.15s, color 0.15s;
 }
 .m3-seg:first-child { border-left: none; }
 .m3-seg:hover { background: color-mix(in srgb, var(--md-on-surface) 8%, transparent); }
-.m3-seg-active { background: var(--md-secondary-container); color: var(--md-on-secondary-container); }
+.m3-seg-active { background: var(--md-primary); color: var(--md-on-primary); }
+.m3-seg-active:hover { background: var(--md-primary); }
+.m3-seg:disabled { opacity: 0.38; cursor: default; }
 
 /* ============================================================
    Chips (zones, choices)
@@ -236,9 +285,9 @@ canvas {
 }
 .m3-chip:hover { background: color-mix(in srgb, var(--md-on-surface) 6%, transparent); }
 .m3-chip-active {
-  background: var(--md-secondary-container);
-  color: var(--md-on-secondary-container);
-  border-color: transparent;
+  background: var(--md-primary-container);
+  color: var(--md-on-primary-container);
+  border-color: var(--md-primary);
 }
 
 /* ============================================================
@@ -255,8 +304,31 @@ canvas {
   outline: none;
   transition: border-color 0.15s;
 }
-.m3-field:focus { border-color: var(--md-primary); }
+.m3-field:focus { border-color: var(--md-primary); box-shadow: 0 0 0 3px color-mix(in srgb, var(--md-primary) 18%, transparent); }
 select.m3-field { cursor: pointer; }
+
+/* Compact numeric value field next to a slider label (see ui/Slider). */
+.m3-num {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  flex: none;
+  font-variant-numeric: tabular-nums;
+  color: var(--md-on-surface);
+}
+.m3-num input {
+  width: 3.4rem;
+  text-align: right;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--md-radius-xs);
+  padding: 0 0.25rem;
+  font: inherit;
+  color: inherit;
+  outline: none;
+}
+.m3-num input:hover { border-color: var(--md-outline-variant); background: var(--md-surface-container-high); }
+.m3-num input:focus { border-color: var(--md-primary); background: var(--md-surface-container-high); }
 
 } /* end @layer components */
 
@@ -287,17 +359,17 @@ input[type="range"]::-webkit-slider-thumb {
   margin-top: -6px;
   border-radius: 50%;
   background: var(--md-primary);
-  border: none;
-  box-shadow: 0 0 0 0 color-mix(in srgb, var(--md-primary) 30%, transparent);
+  border: 2px solid #fff;
+  box-shadow: 0 1px 3px rgba(18, 28, 48, 0.35);
   transition: box-shadow 0.12s;
 }
-input[type="range"]::-webkit-slider-thumb:hover { box-shadow: 0 0 0 6px color-mix(in srgb, var(--md-primary) 22%, transparent); }
+input[type="range"]::-webkit-slider-thumb:hover { box-shadow: 0 1px 3px rgba(18, 28, 48, 0.35), 0 0 0 6px color-mix(in srgb, var(--md-primary) 18%, transparent); }
 input[type="range"]::-moz-range-thumb {
   width: 16px;
   height: 16px;
   border-radius: 50%;
   background: var(--md-primary);
-  border: none;
+  border: 2px solid #fff;
 }
 
 input[type="color"] { cursor: pointer; padding: 0; }
@@ -319,22 +391,17 @@ input[type="color"] { cursor: pointer; padding: 0; }
   font-weight: 500;
   border: none;
   cursor: pointer;
-  box-shadow: 0 3px 8px rgba(0,0,0,0.45);
+  box-shadow: var(--glass-shadow);
   transition: filter 0.15s;
 }
-.m3-fab:hover { filter: brightness(1.1); }
-
-.m3-panel {
-  background: var(--md-surface-container-low);
-}
-.m3-scrim { background: rgba(0, 0, 0, 0.5); }
+.m3-fab:hover { filter: brightness(0.96); }
 
 /* ---- Overflow / context menu ---- */
 .m3-menu {
   background: var(--md-surface-container-high);
   border: 1px solid var(--md-outline-variant);
   border-radius: var(--md-radius-md);
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
+  box-shadow: var(--glass-shadow);
   padding: 0.25rem;
 }
 .m3-menu-item {

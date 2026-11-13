@@ -4,6 +4,7 @@ import type { PatternKind } from '../../state/types';
 import type { I18nKey } from '../../i18n/strings';
 import { useT } from '../../i18n/useT';
 import { ColorPicker } from '../ui/ColorPicker';
+import { Slider } from '../ui/Slider';
 import { ShapeKindSelect } from '../LayerTypes/ShapeLayer';
 import { ShapeIcon } from './LayerStack';
 import { DIV_MAX } from '../../rendering/dividers';
@@ -82,7 +83,7 @@ export function DividerPanel() {
       </div>
 
       {dividers.length === 0 && (
-        <div className="text-xs text-neutral-500">{t('dividersEmpty')}</div>
+        <div className="m3-label">{t('dividersEmpty')}</div>
       )}
 
       <div className="space-y-1.5">
@@ -106,11 +107,11 @@ export function DividerPanel() {
                   onClick={() => setActiveId(active ? null : d.id)}
                   title={t('dividerEdit')}
                   className={`flex-1 min-w-0 text-left text-xs truncate bg-transparent ${
-                    active ? 'text-[var(--md-primary)]' : 'text-neutral-300'
+                    active ? 'text-[var(--md-primary)] font-medium' : 'text-[var(--md-on-surface)]'
                   }`}
                 >
                   {t(isShape ? 'dividerShapeLabel' : 'dividerLabel')} {i + 1}
-                  {active && <span className="text-neutral-500"> · {t('dividerEditing')}</span>}
+                  {active && <span className="text-[var(--md-on-surface-variant)] font-normal"> · {t('dividerEditing')}</span>}
                 </button>
                 <button
                   type="button"
@@ -151,47 +152,42 @@ export function DividerPanel() {
                         value={d.shape ?? 'star'}
                         onChange={(shape) => updateDivider(d.id, { shape })}
                       />
-                      {(['w', 'h'] as const).map((k) => (
-                        <label key={k} className="flex flex-col gap-1 text-xs text-neutral-400">
-                          {t(k === 'w' ? 'width' : 'height')} {Math.round((d[k] ?? 0.1) * 100)} cm
-                          <input
-                            type="range"
+                      <div className="grid grid-cols-2 gap-x-3 gap-y-2">
+                        {(['w', 'h'] as const).map((k) => (
+                          <Slider
+                            key={k}
+                            label={t(k === 'w' ? 'width' : 'height')}
+                            unit="cm"
+                            scale={100}
                             min={0.02}
                             max={k === 'w' ? 2 : 0.8} // width spans past the whole bike (~1.8 m)
                             step={0.005}
                             value={d[k] ?? 0.1}
-                            onChange={(e) => updateDivider(d.id, { [k]: parseFloat(e.target.value) })}
+                            onChange={(v) => updateDivider(d.id, { [k]: v })}
                           />
-                        </label>
-                      ))}
-                      <label className="flex flex-col gap-1 text-xs text-neutral-400">
-                        {t('rotationShort')} {(d.rotation ?? 0).toFixed(0)}°
-                        <input
-                          type="range"
-                          min={0}
-                          max={360}
-                          step={1}
-                          value={d.rotation ?? 0}
-                          onChange={(e) =>
-                            updateDivider(d.id, { rotation: parseFloat(e.target.value) })
-                          }
-                        />
-                      </label>
+                        ))}
+                      </div>
+                      <Slider
+                        label={t('rotation')}
+                        unit="°"
+                        min={0}
+                        max={360}
+                        step={1}
+                        value={d.rotation ?? 0}
+                        onChange={(v) => updateDivider(d.id, { rotation: v })}
+                      />
                     </>
                   ) : (
-                    <label className="flex flex-col gap-1 text-xs text-neutral-400">
-                      {t('dividerSoftness')} {Math.round((d.softness ?? 0) * 100)}%
-                      <input
-                        type="range"
-                        min={0}
-                        max={1}
-                        step={0.01}
-                        value={d.softness ?? 0}
-                        onChange={(e) =>
-                          updateDivider(d.id, { softness: parseFloat(e.target.value) })
-                        }
-                      />
-                    </label>
+                    <Slider
+                      label={t('dividerSoftness')}
+                      unit="%"
+                      scale={100}
+                      min={0}
+                      max={1}
+                      step={0.01}
+                      value={d.softness ?? 0}
+                      onChange={(v) => updateDivider(d.id, { softness: v })}
+                    />
                   )}
 
                   <select
@@ -218,19 +214,14 @@ export function DividerPanel() {
                         label={t('color')}
                         onChange={(c) => updateDivider(d.id, { patternColor: c })}
                       />
-                      <label className="flex flex-col gap-1 text-xs text-neutral-400">
-                        {t('scale')} {(d.patternScale ?? 12).toFixed(0)}
-                        <input
-                          type="range"
-                          min={1}
-                          max={60}
-                          step={1}
-                          value={d.patternScale ?? 12}
-                          onChange={(e) =>
-                            updateDivider(d.id, { patternScale: parseFloat(e.target.value) })
-                          }
-                        />
-                      </label>
+                      <Slider
+                        label={t('scale')}
+                        min={1}
+                        max={60}
+                        step={1}
+                        value={d.patternScale ?? 12}
+                        onChange={(v) => updateDivider(d.id, { patternScale: v })}
+                      />
                     </>
                   )}
                 </div>

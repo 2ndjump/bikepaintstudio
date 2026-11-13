@@ -50,6 +50,29 @@ export default function App() {
 
   const isRim = activeZone === 'frontRim' || activeZone === 'rearRim';
 
+  const paintSections = (
+    <>
+      <section className="m3-section">
+        <VariantPicker />
+      </section>
+      <section className="m3-section space-y-3">
+        <FinishPicker />
+        <PalettePanel />
+      </section>
+      <section className="m3-section">
+        <ZoneSelector columns={2} />
+      </section>
+      <section className="m3-section">
+        <DividerPanel />
+      </section>
+      {isRim && (
+        <section className="m3-section">
+          <RimPanel />
+        </section>
+      )}
+    </>
+  );
+
   if (isMobile) {
     // Mobile devices: stacked, scrollable — viewport on top, controls below.
     return (
@@ -59,119 +82,41 @@ export default function App() {
           <main className="relative w-full shrink-0 min-h-[55vh]">
             <Viewport />
           </main>
-          <div className="p-3 space-y-3">
-            <div className="m3-card">
-              <VariantPicker />
-            </div>
-            <div className="m3-card space-y-3">
-              <FinishPicker />
-              <div className="pt-3" style={{ borderTop: '1px solid var(--md-outline-variant)' }}>
-                <PalettePanel />
-              </div>
-            </div>
-            <div className="m3-card">
-              <ZoneSelector columns={2} />
-            </div>
-            <div className="m3-card">
-              <DividerPanel />
-            </div>
-            {isRim && (
-              <div className="m3-card">
-                <RimPanel />
-              </div>
-            )}
-            <Controls />
+          <div className="glass m-3 p-3">
+            {paintSections}
+            <section className="m3-section">
+              <LayerStack />
+            </section>
           </div>
         </div>
       </div>
     );
   }
 
-  // Desktop: the control menu is always a side panel, at any window width
-  // (narrowing shrinks the viewport, never drops the menu). On wide windows the
-  // zone rail sits on the left and the controls on the right; when narrowed
-  // below lg the rail drops out and the controls collapse to the LEFT.
+  // Desktop: the studio fills the window and the controls float over it as
+  // frosted-glass panels (the viewport keeps the bike centred in the free area
+  // between them, see ViewFit). Wide windows: paint + zones on the left,
+  // layers on the right; below lg everything collapses into the left panel.
   return (
-    <div className="flex flex-col h-full w-full">
-      <Toolbar />
-      {/* CSS grid: the viewport track is minmax(0,1fr) so it can shrink to any
-          size, while the panel track is fixed — the menu can never be pushed
-          off-screen no matter how the 3D canvas sizes itself. The left rail is
-          display:none below lg, so it drops out of the grid (2 tracks). */}
-      <div className="flex-1 min-h-0 overflow-hidden grid grid-cols-[18rem_minmax(0,1fr)] lg:grid-cols-[18rem_minmax(0,1fr)_18rem]">
-        {/* Left sidebar — only on wide windows: global frame paint + zones */}
-        <aside
-          className="hidden lg:flex flex-col min-h-0 overflow-y-auto p-3 gap-3 m3-panel"
-          style={{ borderRight: '1px solid var(--md-outline-variant)' }}
-        >
-          <div className="m3-card">
-            <VariantPicker />
-          </div>
-          <div className="m3-card space-y-3">
-            <FinishPicker />
-            <div className="pt-3" style={{ borderTop: '1px solid var(--md-outline-variant)' }}>
-              <PalettePanel />
-            </div>
-          </div>
-          <div className="m3-card">
-            <ZoneSelector columns={2} />
-          </div>
-          <div className="m3-card">
-            <DividerPanel />
-          </div>
-          {isRim && (
-            <div className="m3-card">
-              <RimPanel />
-            </div>
-          )}
-        </aside>
+    <div className="relative h-full w-full overflow-hidden">
+      <main className="absolute inset-0">
+        <Viewport />
+      </main>
 
-        <main className="relative min-w-0 min-h-0 overflow-hidden">
-          <Viewport />
-        </main>
+      <Toolbar floating />
 
-        {/* Control menu — on the right at lg, collapses to the LEFT when narrow */}
-        <aside
-          className="order-first lg:order-none min-w-0 min-h-0 overflow-y-auto p-3 m3-panel border-[var(--md-outline-variant)] border-r lg:border-r-0 lg:border-l"
-        >
-          <div className="space-y-3">
-            {/* On wide screens the paint + zones live in the left sidebar; below
-                lg the left rail is hidden so they appear here instead. */}
-            <div className="lg:hidden m3-card">
-              <VariantPicker />
-            </div>
-            <div className="lg:hidden m3-card space-y-3">
-              <FinishPicker />
-              <div className="pt-3" style={{ borderTop: '1px solid var(--md-outline-variant)' }}>
-                <PalettePanel />
-              </div>
-            </div>
-            <div className="lg:hidden m3-card">
-              <ZoneSelector columns={2} />
-            </div>
-            <div className="lg:hidden m3-card">
-              <DividerPanel />
-            </div>
-            {isRim && (
-              <div className="lg:hidden m3-card">
-                <RimPanel />
-              </div>
-            )}
-            <Controls />
-          </div>
-        </aside>
-      </div>
-    </div>
-  );
-}
+      <aside data-overlay="left" className="glass glass-panel left-[var(--glass-gap)]">
+        {paintSections}
+        <section className="m3-section lg:hidden">
+          <LayerStack />
+        </section>
+      </aside>
 
-/** The per-zone layer controls (finish + base colour are global, shown
- *  separately at the top of the panel). The active zone is conveyed by the
- *  highlighted zone button, so no separate label is needed. */
-function Controls() {
-  return (
-    <div className="m3-card">
-      <LayerStack />
+      <aside data-overlay="right" className="glass glass-panel right-[var(--glass-gap)] hidden lg:block">
+        <section className="m3-section">
+          <LayerStack />
+        </section>
+      </aside>
     </div>
   );
 }

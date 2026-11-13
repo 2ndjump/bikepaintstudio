@@ -14,6 +14,7 @@ import { useT } from '../../i18n/useT';
 import type { I18nKey } from '../../i18n/strings';
 import { ColorPicker } from '../ui/ColorPicker';
 import { FontPicker } from '../ui/FontPicker';
+import { Slider } from '../ui/Slider';
 
 interface Props {
   layer: DecalLayer;
@@ -72,10 +73,10 @@ export function DecalLayerEditor({ layer, zoneId }: Props) {
               onClick={() =>
                 updateLayer(zoneId, layer.id, { [key]: !on } as Partial<DecalLayer>)
               }
-              className={`flex-1 rounded border py-1 text-sm ${cls} ${
+              className={`flex-1 rounded-md border py-1 text-sm ${cls} ${
                 on
-                  ? 'border-[var(--md-primary)] text-[var(--md-primary)]'
-                  : 'border-[var(--md-outline-variant)] text-neutral-400 hover:text-neutral-200'
+                  ? 'border-[var(--md-primary)] text-[var(--md-primary)] bg-[var(--md-primary-container)]'
+                  : 'border-[var(--md-outline-variant)] text-[var(--md-on-surface-variant)] hover:text-[var(--md-on-surface)]'
               }`}
             >
               {label}
@@ -103,7 +104,7 @@ export function DecalLayerEditor({ layer, zoneId }: Props) {
         <button
           type="button"
           onClick={() => fileInputRef.current?.click()}
-          className="flex-1 bg-neutral-800 hover:bg-neutral-700 text-neutral-200 text-xs rounded px-2 py-1 border border-neutral-700"
+          className="m3-btn m3-btn-tonal m3-btn-sm flex-1"
         >
           {t('uploadFont')}
         </button>
@@ -129,110 +130,73 @@ export function DecalLayerEditor({ layer, zoneId }: Props) {
         />
       </div>
 
-      <label className="text-xs text-neutral-400 flex flex-col gap-1">
-        {t('size')} {layer.size}px
-        <input
-          type="range"
-          min={8}
-          max={256}
-          step={1}
-          value={layer.size}
-          onChange={(e) =>
-            updateLayer(zoneId, layer.id, { size: parseFloat(e.target.value) })
-          }
-        />
-      </label>
-      <label className="text-xs text-neutral-400 flex flex-col gap-1">
-        {t('outlineWidth')} {layer.outlineWidth}px
-        <input
-          type="range"
+      <Slider
+        label={t('size')}
+        unit="px"
+        min={8}
+        max={256}
+        step={1}
+        value={layer.size}
+        onChange={(v) => updateLayer(zoneId, layer.id, { size: v })}
+      />
+      <div className="grid grid-cols-2 gap-x-3 gap-y-2">
+        <Slider
+          label={t('outlineWidth')}
+          unit="px"
           min={0}
           max={10}
           step={0.5}
           value={layer.outlineWidth}
-          onChange={(e) =>
-            updateLayer(zoneId, layer.id, {
-              outlineWidth: parseFloat(e.target.value),
-            })
-          }
+          onChange={(v) => updateLayer(zoneId, layer.id, { outlineWidth: v })}
         />
-      </label>
-      <label className="text-xs text-neutral-400 flex flex-col gap-1">
-        Letter spacing {layer.letterSpacing}px
-        <input
-          type="range"
+        <Slider
+          label={t('letterSpacing')}
+          unit="px"
           min={-20}
           max={100}
           step={1}
           value={layer.letterSpacing}
-          onChange={(e) =>
-            updateLayer(zoneId, layer.id, {
-              letterSpacing: parseFloat(e.target.value),
-            })
-          }
+          onChange={(v) => updateLayer(zoneId, layer.id, { letterSpacing: v })}
         />
-      </label>
-
-      <label className="text-xs text-neutral-400 flex flex-col gap-1">
-        X {(layer.x * 100).toFixed(0)}%
-        <input
-          type="range"
+        <Slider
+          label="X"
+          unit="%"
+          scale={100}
           min={-1}
           max={2}
           step={0.01}
           value={layer.x}
-          onChange={(e) =>
-            updateLayer(zoneId, layer.id, {
-              x: parseFloat(e.target.value),
-            })
-          }
+          onChange={(v) => updateLayer(zoneId, layer.id, { x: v })}
         />
-      </label>
-      <label className="text-xs text-neutral-400 flex flex-col gap-1">
-        Y {(layer.y * 100).toFixed(0)}%
-        <input
-          type="range"
+        <Slider
+          label="Y"
+          unit="%"
+          scale={100}
           min={-1}
           max={2}
           step={0.01}
           value={layer.y}
-          onChange={(e) =>
-            updateLayer(zoneId, layer.id, {
-              y: parseFloat(e.target.value),
-            })
-          }
+          onChange={(v) => updateLayer(zoneId, layer.id, { y: v })}
         />
-      </label>
-      <label className="text-xs text-neutral-400 flex flex-col gap-1">
-        {t('rotationShort')} {layer.rotation.toFixed(0)}°
-        <input
-          type="range"
+        <Slider
+          label={t('rotation')}
+          unit="°"
           min={-180}
           max={180}
           step={15}
           value={layer.rotation}
-          onChange={(e) =>
-            updateLayer(zoneId, layer.id, {
-              rotation: parseFloat(e.target.value),
-            })
-          }
+          onChange={(v) => updateLayer(zoneId, layer.id, { rotation: v })}
         />
-      </label>
-      <label className="text-xs text-neutral-400 flex flex-col gap-1">
-        {t('letterRotation')} {layer.glyphRotation.toFixed(0)}°
-        <input
-          type="range"
+        <Slider
+          label={t('letterRotation')}
+          unit="°"
           min={-180}
           max={180}
           step={15}
           value={layer.glyphRotation}
-          onChange={(e) =>
-            updateLayer(zoneId, layer.id, {
-              glyphRotation: parseFloat(e.target.value),
-            })
-          }
+          onChange={(v) => updateLayer(zoneId, layer.id, { glyphRotation: v })}
         />
-      </label>
+      </div>
     </div>
   );
 }

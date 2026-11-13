@@ -93,6 +93,7 @@ export type I18nKey =
   | 'size'
   | 'outlineWidth'
   | 'letterRotation'
+  | 'letterSpacing'
   | 'backgroundLabel'
   | 'undo'
   | 'redo'
@@ -230,6 +231,7 @@ const STRINGS: Record<I18nKey, Record<Lang, string>> = {
   size: { de: 'Größe', en: 'Size' },
   outlineWidth: { de: 'Outline Breite', en: 'Outline Width' },
   letterRotation: { de: 'Buchstaben-Rotation', en: 'Letter rotation' },
+  letterSpacing: { de: 'Zeichenabstand', en: 'Letter spacing' },
   backgroundLabel: { de: 'Hintergrund', en: 'Background' },
   undo: { de: 'Rückgängig', en: 'Undo' },
   redo: { de: 'Wiederh.', en: 'Redo' },
