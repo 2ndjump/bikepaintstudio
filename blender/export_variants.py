@@ -17,10 +17,18 @@ Paint UVs follow the app's old procedural tubes: u runs once around the tube
 (arc length, 0..1, extrapolated past the ends; the app mirrors there). Each
 face takes the UV frame of its zone's nearest main tube; junction parts (BB
 shell, dropouts, crown) continue their neighbour's mapping.
+
+The dense SDF shell is decimated (quadric collapse: triangles go to the fillets
+and curved sections), then cut along the true zone boundaries (where two zones'
+assign_zones scores are equal) so adjacent zones meet on a smooth line instead
+of a triangle staircase. Shading normals are the whole shell's smooth vertex
+normals, so both sides of a zone boundary share the same normal.
 """
 import bpy, math, os
+import numpy as np
 from mathutils import Vector
 from mathutils.kdtree import KDTree
+from io_scene_gltf2.io.exp import meshopt as gltf_meshopt
 
 HERE = os.path.dirname(os.path.abspath(__file__)) if "__file__" in dir() else r"C:\Users\Jannes\Documents\repo\bike frame designer\blender"
 OUT = os.path.normpath(os.path.join(HERE, "..", "public", "assets"))
@@ -28,7 +36,7 @@ VARIANTS = globals().get("VARIANTS", ("gravel_classic", "gravel_aero", "road_cla
 
 # Frame SDF resolution as in run_all.py; the shell is decimated for the web.
 VOXEL, FILLET, BAND, SMOOTH = 0.0008, 20, 16, 4
-FRAME_TRIS, FORK_TRIS = 70000, 16000
+FRAME_TRIS, FORK_TRIS = 300000, 58000
 
 # Lateral axis of the app's old tube frames (web +Z = Blender -Y).
 ZW = Vector((0, -1, 0))
@@ -177,6 +185,103 @@ def paint_uvs(ob, sections):
     me.uv_layers.active = uvl
 
 
+# ---------------------------------------------------------------- zone boundaries
+class ZoneField:
+    """build_frame.assign_zones' score per zone (distance to the zone's tube
+    samples minus their mean radius); a point belongs to the lowest score."""
+
+    def __init__(self, zones, tubes):
+        self.zones = []
+        for z in zones:
+            pts = []
+            for zone, samples in tubes:
+                if zone == z:
+                    for k in range(len(samples) - 1):
+                        p0, rmin, rmax = samples[k]
+                        for f in (0.0, 0.5):
+                            pts.append((*p0.lerp(samples[k + 1][0], f), 0.5 * (rmin + rmax)))
+            self.zones.append(np.array(pts))
+
+    def scores(self, co):
+        """(N, zones) scores for an (N, 3) array, over all samples of each zone
+        (not just the nearest few, which would make the field jump)."""
+        out = np.empty((len(co), len(self.zones)))
+        for z, pts in enumerate(self.zones):
+            for s in range(0, len(co), 2048):
+                d = np.linalg.norm(co[s:s + 2048, None, :] - pts[None, :, :3], axis=2) - pts[:, 3]
+                out[s:s + 2048, z] = d.min(axis=1)
+        return out
+
+
+def cut_zones(ob, tubes):
+    """Re-tag the faces by zone, splitting every triangle the boundary crosses
+    along the zero line of the two zones' score difference (linear along the
+    edges): the boundary becomes a smooth polyline across the triangles."""
+    me = ob.data
+    field = ZoneField([m.name for m in me.materials], tubes)
+    co = [v.co.copy() for v in me.vertices]
+    sc = field.scores(np.array([tuple(c) for c in co]))
+    lab = [int(z) for z in sc.argmin(axis=1)]
+    cuts = {}
+
+    def cut(a, b):
+        key = (a, b) if a < b else (b, a)
+        if key not in cuts:
+            za, zb = lab[a], lab[b]
+            fa, fb = float(sc[a, za] - sc[a, zb]), float(sc[b, za] - sc[b, zb])   # <= 0, >= 0
+            t = min(max(fa / (fa - fb) if fb != fa else 0.5, 0.02), 0.98)
+            cuts[key] = len(co)
+            co.append(co[a].lerp(co[b], t))
+        return cuts[key]
+
+    faces, mats = [], []
+    me.calc_loop_triangles()
+    for tri in me.loop_triangles:
+        i, j, k = tri.vertices
+        a, b, c = lab[i], lab[j], lab[k]
+        if a == b == c:
+            faces.append((i, j, k))
+            mats.append(a)
+        elif a != b and b != c and a != c:      # three zones: meet in the middle
+            qij, qjk, qki = cut(i, j), cut(j, k), cut(k, i)
+            m = len(co)
+            co.append((co[qij] + co[qjk] + co[qki]) / 3)
+            for v, q0, q1, z in ((i, qij, qki, a), (j, qjk, qij, b), (k, qki, qjk, c)):
+                faces += [(v, q0, m), (v, m, q1)]
+                mats += [z, z]
+        else:                                   # two zones: k is the odd corner
+            while lab[i] != lab[j]:
+                i, j, k = j, k, i
+            q1, q2 = cut(j, k), cut(k, i)
+            faces += [(q1, k, q2), (i, j, q1), (i, q1, q2)]
+            mats += [lab[k], lab[i], lab[i]]
+    new = bpy.data.meshes.new(me.name)
+    new.from_pydata(co, [], faces)
+    for m in me.materials:
+        new.materials.append(m)
+    new.polygons.foreach_set("material_index", mats)
+    new.polygons.foreach_set("use_smooth", [True] * len(faces))
+    ob.data = new
+    bpy.data.meshes.remove(me)
+
+
+# ---------------------------------------------------------------- normals
+class SurfaceNormals:
+    """Smooth vertex normals of the whole shell, looked up by position, so the
+    per-zone meshes keep them along their shared boundaries."""
+
+    def __init__(self, me):
+        self.kd = KDTree(len(me.vertices))
+        for v in me.vertices:
+            self.kd.insert(v.co, v.index)
+        self.kd.balance()
+        self.nor = [v.normal.copy() for v in me.vertices]
+
+    def apply(self, ob):
+        me = ob.data
+        me.normals_split_custom_set_from_vertices([self.nor[self.kd.find(v.co)[1]] for v in me.vertices])
+
+
 # ---------------------------------------------------------------- export
 def principled(name, color, metallic, roughness):
     m = bpy.data.materials.get(name) or bpy.data.materials.new(name)
@@ -224,10 +329,12 @@ def export_variant(variant):
     fns = load("build_frame.py", VARIANT=variant)
     K = fns["KEY"]
     frame, fork = fns["build"](voxel=VOXEL, fillet=FILLET, band=BAND, smooth=SMOOTH)
-    paint_uvs(frame, fns["SECTIONS"])
-    paint_uvs(fork, fns["SECTIONS"])
     decimate(frame, FRAME_TRIS)
     decimate(fork, FORK_TRIS)
+    cut_zones(frame, fns["TUBES"])
+    normals = {ob.name: SurfaceNormals(ob.data) for ob in (frame, fork)}
+    paint_uvs(frame, fns["SECTIONS"])
+    paint_uvs(fork, fns["SECTIONS"])
 
     # one object per zone
     zones = []
@@ -245,6 +352,7 @@ def export_variant(variant):
         me.materials.clear()
         me.materials.append(mat)
         me.polygons.foreach_set("material_index", [0] * len(me.polygons))
+        normals["Fork" if ob.name.startswith("Fork") else "Frame"].apply(ob)
         ob.name = me.name = f"zone_{mat.name}"
         zones.append(ob)
         principled(mat.name, (0.5, 0.5, 0.5), 0.0, 0.5)   # plain stand-in: the app paints the zones
@@ -279,6 +387,10 @@ def export_variant(variant):
     bpy.ops.object.select_all(action='DESELECT')
     for o in zones + hw:
         o.select_set(True)
+    # The exporter's meshopt EXPONENTIAL filter keeps 12 mantissa bits by default:
+    # ~0.5 mm position steps on a 1 m frame, which speckles the highlights of the
+    # fine mesh. 16 bits keep ~0.02 mm.
+    gltf_meshopt.EXP_FILTER_BITS = 16
     path = os.path.join(OUT, f"bike_{variant}.glb")
     bpy.ops.export_scene.gltf(filepath=path, export_format='GLB', use_selection=True, export_yup=True,
                               export_apply=True, export_extras=True, export_normals=True,

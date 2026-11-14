@@ -425,6 +425,7 @@ def build(voxel=0.0008, fillet=12, band=14, smooth=0):
     fork_tubes = list(TUBES)
     assign_zones(frame, ["headTube", "topTube", "downTube", "seatTube", "seatStays", "chainStays"], frame_tubes)
     assign_zones(fork, ["fork"], fork_tubes)
+    TUBES[:] = frame_tubes + fork_tubes      # export_variants.py cuts the zone boundaries with them
     for o in (frame, fork):
         shade(o)
     c = bpy.data.collections.get("_build")
