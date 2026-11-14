@@ -48,11 +48,13 @@ export function finishParams(finish: FinishType): FinishParams {
         envMapIntensity: 0.85,
       };
     case 'glossy':
+      // Paint under a thick, mirror-smooth clear coat (the coat carries the
+      // sharp softbox reflections, the base stays a touch softer).
       return {
-        roughness: 0.10,
+        roughness: 0.18,
         metalness: 0.00,
         clearcoat: 1.0,
-        clearcoatRoughness: 0.06,
+        clearcoatRoughness: 0.03,
         iridescence: 0,
         iridescenceIOR: 1.3,
         sheen: 0,
@@ -60,11 +62,12 @@ export function finishParams(finish: FinishType): FinishParams {
         envMapIntensity: 1.15,
       };
     case 'metallic':
+      // Flake base under a full gloss clear coat, like automotive metallic.
       return {
-        roughness: 0.34,
+        roughness: 0.36,
         metalness: 0.85,
-        clearcoat: 0.55,
-        clearcoatRoughness: 0.18,
+        clearcoat: 1.0,
+        clearcoatRoughness: 0.05,
         iridescence: 0,
         iridescenceIOR: 1.3,
         sheen: 0,

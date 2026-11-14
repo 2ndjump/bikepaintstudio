@@ -10,6 +10,8 @@ import {
 } from '../../geometry/rim';
 import type { ZoneId } from '../../state/types';
 import { ZonePaintedMaterial } from './ZoneMaterial';
+import { getTireMaps } from '../../rendering/tire';
+import { brushedMetal } from '../../rendering/brushed';
 
 interface WheelProps {
   position: [number, number, number];
@@ -56,6 +58,19 @@ export function Wheel({ position, zone, tireWidth = 0.014, wheelRadius = 0.339, 
     return g;
   }, [rim]);
 
+  const tireMaps = getTireMaps(wheelRadius);
+  // Black anodised hub shell, turned: brushed about its own axle (lathe y).
+  const hubMat = useMemo(
+    () =>
+      brushedMetal(
+        { color: '#1b1b1b', roughness: 0.32, metalness: 0.85, anisotropy: 0.5 },
+        [new THREE.Vector3()],
+        new THREE.Vector3(0, 1, 0),
+      ),
+    [],
+  );
+
+  useEffect(() => () => hubMat.dispose(), [hubMat]);
   useEffect(() => () => rimGeo.dispose(), [rimGeo]);
   useEffect(() => () => tireGeo.dispose(), [tireGeo]);
   useEffect(() => () => hubGeo.dispose(), [hubGeo]);
@@ -74,12 +89,17 @@ export function Wheel({ position, zone, tireWidth = 0.014, wheelRadius = 0.339, 
       </mesh>
 
       <mesh geometry={tireGeo} rotation={[Math.PI / 2, 0, 0]} castShadow receiveShadow>
-        <meshStandardMaterial color="#181818" roughness={0.88} metalness={0} />
+        {/* Matte rubber: file tread on the crown, ribbed casing on the sidewalls. */}
+        <meshStandardMaterial
+          color="#1c1c1c"
+          roughness={1}
+          roughnessMap={tireMaps.roughnessMap}
+          normalMap={tireMaps.normalMap}
+          metalness={0}
+        />
       </mesh>
 
-      <mesh geometry={hubGeo} castShadow receiveShadow>
-        <meshStandardMaterial color="#1b1b1b" roughness={0.35} metalness={0.8} />
-      </mesh>
+      <mesh geometry={hubGeo} material={hubMat} castShadow receiveShadow />
 
       <mesh geometry={mergedSpokes} castShadow receiveShadow>
         <meshStandardMaterial color="#2a2a2a" roughness={0.45} metalness={0.85} />
