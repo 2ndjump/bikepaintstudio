@@ -148,6 +148,88 @@ canvas {
   .viewport-dock { right: calc(var(--glass-gap) * 2 + 19rem); }
 }
 
+/* On-model transform handles for the selected layer (LayerGizmo). */
+.gizmo { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.gizmo-box {
+  fill: color-mix(in srgb, var(--md-primary) 6%, transparent);
+  stroke: var(--md-primary);
+  stroke-width: 1.5;
+  stroke-dasharray: 5 3;
+  filter: drop-shadow(0 0 1px #fff);
+}
+.gizmo-stem { stroke: var(--md-primary); stroke-width: 1.5; }
+.gizmo-handle {
+  position: absolute;
+  left: -7px;
+  top: -7px;
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  background: #fff;
+  border: 2px solid var(--md-primary);
+  box-shadow: 0 1px 3px rgba(18, 28, 48, 0.4);
+  touch-action: none;
+}
+.gizmo-handle:hover { background: var(--md-primary-container); }
+.gizmo-handle-edge { left: -5px; top: -5px; width: 10px; height: 10px; border-radius: 50%; cursor: move; }
+.gizmo-handle-rot {
+  left: -8px;
+  top: -8px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--md-primary);
+  border-color: #fff;
+  cursor: grab;
+}
+.gizmo-handle-rot:hover { background: var(--md-primary); filter: brightness(1.15); }
+.gizmo-label {
+  position: absolute;
+  left: 0;
+  top: 0;
+  max-width: 12rem;
+  padding: 1px 8px;
+  border-radius: var(--md-radius-full);
+  background: var(--md-primary);
+  color: var(--md-on-primary);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  box-shadow: 0 1px 3px rgba(18, 28, 48, 0.3);
+}
+
+/* Layer panel (Sidebar/LayerStack). */
+.layer-add-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.45rem 0.2rem 0.35rem;
+  border-radius: var(--md-radius-md);
+  background: var(--md-secondary-container);
+  color: var(--md-on-secondary-container);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: filter 0.15s;
+}
+.layer-add-btn:hover { filter: brightness(0.94); }
+.layer-row {
+  border-radius: var(--md-radius-md);
+  border: 1px solid transparent;
+  padding: 0 0.15rem;
+  margin: 0.25rem 0;
+  transition: background-color 0.15s, border-color 0.15s;
+}
+.layer-row:hover { background: var(--md-surface-container-low); }
+.layer-row-selected, .layer-row-selected:hover {
+  background: var(--md-surface-container);
+  border-color: var(--md-primary);
+}
+
 /* Sections inside a panel, separated by hairlines instead of nested cards. */
 .m3-section { padding: 0.875rem 0; }
 .m3-section + .m3-section { border-top: 1px solid var(--md-outline-variant); }

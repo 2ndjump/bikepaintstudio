@@ -93,7 +93,8 @@ export function WheelStage({ zone, model }: { zone: RimZone; model: BikeModel })
 
   useFrame((_, dt) => {
     // Clockwise seen from the camera = rolling forward (towards +x).
-    if (playing && !dragging.current && spin.current) spin.current.rotation.z -= dt * SPIN_SPEED;
+    const hold = dragging.current || useUIStore.getState().spinHold;
+    if (playing && !hold && spin.current) spin.current.rotation.z -= dt * SPIN_SPEED;
   });
 
   return (

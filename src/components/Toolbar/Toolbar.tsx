@@ -2,7 +2,6 @@ import { useDesignStore } from '../../state/designStore';
 import type { DesignState } from '../../state/types';
 import { useUIStore, type Lang } from '../../state/uiStore';
 import { useT } from '../../i18n/useT';
-import { ToolSelector } from '../Viewport/ToolSelector';
 import { ModeTabs } from './ModeTabs';
 
 /** Minimal shape of the File System Access API's save picker (not in lib.dom). */
@@ -95,10 +94,18 @@ export function Toolbar({ floating = false }: { floating?: boolean }) {
     input.click();
   }
 
-  function exportPNG() {
+  async function exportPNG() {
     const canvas = document.querySelector<HTMLCanvasElement>('canvas');
     if (!canvas) return;
+    // Hide on-canvas guides (divider lines, hover/selection tints) for a
+    // couple of frames so the image shows only the bike.
+    const ui = useUIStore.getState();
+    ui.setCapturing(true);
+    const frame = () => new Promise((r) => requestAnimationFrame(r));
+    await frame();
+    await frame();
     canvas.toBlob((blob) => {
+      useUIStore.getState().setCapturing(false);
       if (!blob) return;
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -118,7 +125,6 @@ export function Toolbar({ floating = false }: { floating?: boolean }) {
     >
       <h1 className="m3-title text-base mr-1 whitespace-nowrap">Bike Paint Studio</h1>
       <ModeTabs />
-      <ToolSelector />
       <div className="flex-1 min-w-0" />
 
       <SegmentedControl>

@@ -138,7 +138,9 @@ export function DividerHandles() {
 
   // Only the divider being edited shows its guide + handles; the colour itself
   // is always applied (in the shader).
-  const shown = dividers.filter((d) => d.id === activeId);
+  // Hidden while a PNG is captured.
+  const capturing = useUIStore((s) => s.capturing);
+  const shown = capturing ? [] : dividers.filter((d) => d.id === activeId);
 
   return (
     <>

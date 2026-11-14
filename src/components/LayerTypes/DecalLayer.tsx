@@ -114,7 +114,7 @@ export function DecalLayerEditor({ layer, zoneId }: Props) {
           accept=".ttf,.otf,.woff,.woff2"
           className="hidden"
           onChange={handleUpload}
-        />
+      />
       </div>
 
       <div className="grid grid-cols-2 gap-2">
@@ -122,12 +122,12 @@ export function DecalLayerEditor({ layer, zoneId }: Props) {
           value={layer.color}
           label={t('color')}
           onChange={(color) => updateLayer(zoneId, layer.id, { color })}
-        />
+      />
         <ColorPicker
           value={layer.outlineColor}
           label={t('outline')}
           onChange={(outlineColor) => updateLayer(zoneId, layer.id, { outlineColor })}
-        />
+      />
       </div>
 
       <Slider
@@ -139,25 +139,25 @@ export function DecalLayerEditor({ layer, zoneId }: Props) {
         value={layer.size}
         onChange={(v) => updateLayer(zoneId, layer.id, { size: v })}
       />
+      <Slider
+        label={t('outlineWidth')}
+        unit="px"
+        min={0}
+        max={10}
+        step={0.5}
+        value={layer.outlineWidth}
+        onChange={(v) => updateLayer(zoneId, layer.id, { outlineWidth: v })}
+      />
+      <Slider
+        label={t('letterSpacing')}
+        unit="px"
+        min={-20}
+        max={100}
+        step={1}
+        value={layer.letterSpacing}
+        onChange={(v) => updateLayer(zoneId, layer.id, { letterSpacing: v })}
+      />
       <div className="grid grid-cols-2 gap-x-3 gap-y-2">
-        <Slider
-          label={t('outlineWidth')}
-          unit="px"
-          min={0}
-          max={10}
-          step={0.5}
-          value={layer.outlineWidth}
-          onChange={(v) => updateLayer(zoneId, layer.id, { outlineWidth: v })}
-        />
-        <Slider
-          label={t('letterSpacing')}
-          unit="px"
-          min={-20}
-          max={100}
-          step={1}
-          value={layer.letterSpacing}
-          onChange={(v) => updateLayer(zoneId, layer.id, { letterSpacing: v })}
-        />
         <Slider
           label="X"
           unit="%"
@@ -178,25 +178,25 @@ export function DecalLayerEditor({ layer, zoneId }: Props) {
           value={layer.y}
           onChange={(v) => updateLayer(zoneId, layer.id, { y: v })}
         />
-        <Slider
-          label={t('rotation')}
-          unit="°"
-          min={-180}
-          max={180}
-          step={15}
-          value={layer.rotation}
-          onChange={(v) => updateLayer(zoneId, layer.id, { rotation: v })}
-        />
-        <Slider
-          label={t('letterRotation')}
-          unit="°"
-          min={-180}
-          max={180}
-          step={15}
-          value={layer.glyphRotation}
-          onChange={(v) => updateLayer(zoneId, layer.id, { glyphRotation: v })}
-        />
       </div>
+      <Slider
+        label={t('rotation')}
+        unit="°"
+        min={-180}
+        max={180}
+        step={15}
+        value={layer.rotation}
+        onChange={(v) => updateLayer(zoneId, layer.id, { rotation: v })}
+      />
+      <Slider
+        label={t('letterRotation')}
+        unit="°"
+        min={-180}
+        max={180}
+        step={15}
+        value={layer.glyphRotation}
+        onChange={(v) => updateLayer(zoneId, layer.id, { glyphRotation: v })}
+      />
     </div>
   );
 }

@@ -62,26 +62,24 @@ export function PatternLayerEditor({ layer, zoneId }: Props) {
         value={layer.rotation}
         onChange={(v) => updateLayer(zoneId, layer.id, { rotation: v })}
       />
-      <div className="grid grid-cols-2 gap-x-3 gap-y-2">
-        <Slider
-          label={t('rotationX')}
-          unit="°"
-          min={-75}
-          max={75}
-          step={15}
-          value={layer.rotationX ?? 0}
-          onChange={(v) => updateLayer(zoneId, layer.id, { rotationX: v })}
-        />
-        <Slider
-          label={t('rotationY')}
-          unit="°"
-          min={-75}
-          max={75}
-          step={15}
-          value={layer.rotationY ?? 0}
-          onChange={(v) => updateLayer(zoneId, layer.id, { rotationY: v })}
-        />
-      </div>
+      <Slider
+        label={t('rotationX')}
+        unit="°"
+        min={-75}
+        max={75}
+        step={15}
+        value={layer.rotationX ?? 0}
+        onChange={(v) => updateLayer(zoneId, layer.id, { rotationX: v })}
+      />
+      <Slider
+        label={t('rotationY')}
+        unit="°"
+        min={-75}
+        max={75}
+        step={15}
+        value={layer.rotationY ?? 0}
+        onChange={(v) => updateLayer(zoneId, layer.id, { rotationY: v })}
+      />
       <Slider
         label={t('intensity')}
         unit="%"

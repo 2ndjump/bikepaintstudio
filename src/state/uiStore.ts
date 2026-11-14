@@ -1,8 +1,6 @@
 import { create } from 'zustand';
 
 export type Lang = 'de' | 'en';
-/** 'camera' spins the bike / pans / zooms; 'edit' drags text/shape layers on the model. */
-export type Tool = 'camera' | 'edit';
 
 /** Starter set of session favourites — freely editable via the Palette panel. */
 const DEFAULT_PALETTE = ['#1a1a1a', '#e8e8e8', '#c62828', '#1565c0', '#2e7d32', '#f9a825'];
@@ -13,29 +11,41 @@ interface UIState {
   palette: string[];
   /** Divider currently being edited — only its guide line + handles are shown. */
   activeDividerId: string | null;
-  /** Active viewport tool: orbit the bike, or drag text/shape layers. */
-  tool: Tool;
+  /** Layer (of the active zone) being edited: expanded in the panel, with
+   *  move/scale/rotate handles on the model. */
+  selectedLayerId: string | null;
   /** Wheel designer: the preview wheel turns by itself (pause/play). */
   wheelSpin: boolean;
+  /** Holds the wheel still while the pointer is on a layer handle or a layer
+   *  is being dragged, so a moving target can be grabbed. */
+  spinHold: boolean;
+  /** True while a PNG is captured: on-canvas guides and highlights hide. */
+  capturing: boolean;
   setLang(lang: Lang): void;
   addPaletteColor(color: string): void;
   removePaletteColor(color: string): void;
   setPalette(palette: string[]): void;
   setActiveDividerId(id: string | null): void;
-  setTool(tool: Tool): void;
+  setSelectedLayerId(id: string | null): void;
   setWheelSpin(on: boolean): void;
+  setSpinHold(on: boolean): void;
+  setCapturing(on: boolean): void;
 }
 
 export const useUIStore = create<UIState>((set) => ({
   lang: 'de',
   palette: DEFAULT_PALETTE,
   activeDividerId: null,
-  tool: 'camera',
+  selectedLayerId: null,
   wheelSpin: true,
+  spinHold: false,
+  capturing: false,
   setLang: (lang) => set({ lang }),
   setActiveDividerId: (activeDividerId) => set({ activeDividerId }),
-  setTool: (tool) => set({ tool }),
+  setSelectedLayerId: (selectedLayerId) => set({ selectedLayerId }),
   setWheelSpin: (wheelSpin) => set({ wheelSpin }),
+  setSpinHold: (spinHold) => set({ spinHold }),
+  setCapturing: (capturing) => set({ capturing }),
   addPaletteColor: (color) =>
     set((s) => {
       const c = color.toLowerCase();

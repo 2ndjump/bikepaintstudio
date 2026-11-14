@@ -57,7 +57,7 @@ function applyEffect(
   }
 }
 
-const ZONE_CANVAS_DIMS: Record<ZoneId, { w: number; h: number }> = {
+export const ZONE_CANVAS_DIMS: Record<ZoneId, { w: number; h: number }> = {
   headTube: { w: 1024, h: 1024 },
   topTube: { w: 256, h: 1024 },
   downTube: { w: 320, h: 1024 },
@@ -81,6 +81,12 @@ const BLEND_MODE_MAP: Record<BlendMode, GlobalCompositeOperation> = {
 };
 
 const imageCache = new Map<string, HTMLImageElement>();
+
+/** The decoded image for `src` if it has been drawn already (else undefined). */
+export function getLoadedImage(src: string): HTMLImageElement | undefined {
+  const img = imageCache.get(src);
+  return img && img.complete ? img : undefined;
+}
 
 function loadImage(src: string): Promise<HTMLImageElement> {
   const cached = imageCache.get(src);

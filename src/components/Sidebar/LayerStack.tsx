@@ -1,7 +1,10 @@
-import { Fragment, useState } from 'react';
+import { Fragment } from 'react';
 import { useDesignStore, newLayerId } from '../../state/designStore';
-import type { DuplicateOptions } from '../../state/designStore';
-import type { BlendMode, Layer } from '../../state/types';
+import { ZONE_LABELS, isRimZone, type BlendMode, type Layer } from '../../state/types';
+import { useUIStore } from '../../state/uiStore';
+import { visibleSpot } from '../Viewport/viewportBridge';
+import { Slider } from '../ui/Slider';
+import type { I18nKey } from '../../i18n/strings';
 import { PatternLayerEditor } from '../LayerTypes/PatternLayer';
 import { ImageLayerEditor } from '../LayerTypes/ImageLayer';
 import { DecalLayerEditor } from '../LayerTypes/DecalLayer';
@@ -75,6 +78,30 @@ function LinkIcon() {
   );
 }
 
+/** Small stroke icons for the layer row actions. */
+function RowIcon({ d }: { d: string }) {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d={d} />
+    </svg>
+  );
+}
+const EYE = 'M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12zM12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6z';
+const EYE_OFF =
+  'M3 3l18 18M10.6 5.1A10 10 0 0 1 12 5c6.4 0 10 7 10 7a17 17 0 0 1-3.2 4.2M6.6 6.6C3.9 8.4 2 12 2 12s3.6 7 10 7a9.7 9.7 0 0 0 5.4-1.6M9.9 9.9a3 3 0 0 0 4.2 4.2';
+const UP = 'M12 19V5M5 12l7-7 7 7';
+const DOWN = 'M12 5v14M19 12l-7 7-7-7';
+const COPY = 'M9 9h11v11H9zM5 15H4V4h11v1';
+const TRASH = 'M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3';
+
+const TYPE_ICON: Record<Layer['type'], () => React.ReactElement> = {
+  pattern: PatternIcon,
+  image: ImageIcon,
+  decal: TextIcon,
+  shape: ShapeIcon,
+  solid: PatternIcon,
+};
+
 const BLEND_MODES: BlendMode[] = [
   'normal',
   'multiply',
@@ -86,47 +113,13 @@ const BLEND_MODES: BlendMode[] = [
   'colorBurn',
 ];
 
-function DuplicatePopover({ layerId, onClose }: { layerId: string; onClose: () => void }) {
-  const activeZone = useDesignStore((s) => s.activeZone);
-  const duplicateLayer = useDesignStore((s) => s.duplicateLayer);
-  const [opts, setOpts] = useState<DuplicateOptions>({ mirrorH: false, mirrorV: false });
-
-  function confirm() {
-    duplicateLayer(activeZone, layerId, opts);
-    onClose();
-  }
-
-  return (
-    <div className="m3-card-nested p-2.5 space-y-1.5">
-      <div className="m3-section-title">Duplicate options</div>
-      <label className="flex items-center gap-2 m3-label cursor-pointer">
-        <input
-          type="checkbox"
-          checked={opts.mirrorH}
-          onChange={(e) => setOpts((o) => ({ ...o, mirrorH: e.target.checked }))}
-        />
-        Mirror horizontal
-      </label>
-      <label className="flex items-center gap-2 m3-label cursor-pointer">
-        <input
-          type="checkbox"
-          checked={opts.mirrorV}
-          onChange={(e) => setOpts((o) => ({ ...o, mirrorV: e.target.checked }))}
-        />
-        Mirror vertical
-      </label>
-      <div className="flex gap-1.5 pt-1">
-        <button onClick={confirm} className="m3-btn m3-btn-filled m3-btn-sm flex-1">
-          Duplicate
-        </button>
-        <button onClick={onClose} className="m3-btn m3-btn-text m3-btn-sm">
-          Cancel
-        </button>
-      </div>
-    </div>
-  );
-}
-
+/**
+ * The active zone's layer stack (top layer first). Each row has visibility,
+ * reorder, duplicate and delete at hand; clicking a row (or the layer on the
+ * model) selects it, which expands its full editor below the row and shows
+ * move/scale/rotate handles on the model. New layers are placed on the side of
+ * the part facing the camera and selected right away.
+ */
 export function LayerStack() {
   const activeZone = useDesignStore((s) => s.activeZone);
   const layers = useDesignStore((s) => s.zones[s.activeZone]?.layers ?? EMPTY_LAYERS);
@@ -134,25 +127,29 @@ export function LayerStack() {
   const addLayer = useDesignStore((s) => s.addLayer);
   const removeLayer = useDesignStore((s) => s.removeLayer);
   const reorderLayer = useDesignStore((s) => s.reorderLayer);
+  const duplicateLayer = useDesignStore((s) => s.duplicateLayer);
   const hasDividers = useDesignStore((s) => s.dividers.length > 0);
+  const selectedId = useUIStore((s) => s.selectedLayerId);
+  const select = useUIStore((s) => s.setSelectedLayerId);
   const t = useT();
-  const [duplicatingId, setDuplicatingId] = useState<string | null>(null);
-  const [menuId, setMenuId] = useState<string | null>(null);
-  const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
 
-  function toggleCollapsed(id: string) {
-    setCollapsed((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
+  function addAndSelect(layer: Layer) {
+    addLayer(activeZone, layer);
+    select(layer.id);
+    useUIStore.getState().setActiveDividerId(null);
+  }
+
+  function duplicate(layerId: string, mirrorH: boolean, mirrorV: boolean) {
+    const before = new Set(useDesignStore.getState().zones[activeZone].layers.map((l) => l.id));
+    duplicateLayer(activeZone, layerId, { mirrorH, mirrorV });
+    const clone = useDesignStore.getState().zones[activeZone].layers.find((l) => !before.has(l.id));
+    if (clone) select(clone.id);
   }
 
   function addPattern() {
-    const layer: Layer = {
+    addAndSelect({
       id: newLayerId('pattern'),
-      name: 'Pattern',
+      name: t('pattern'),
       type: 'pattern',
       pattern: 'hexagons',
       color: '#ffffff',
@@ -166,8 +163,7 @@ export function LayerStack() {
       visible: true,
       opacity: 1,
       blendMode: 'normal',
-    };
-    addLayer(activeZone, layer);
+    });
   }
 
   function addImage() {
@@ -179,13 +175,14 @@ export function LayerStack() {
       if (!file) return;
       const reader = new FileReader();
       reader.onload = () => {
-        const layer: Layer = {
+        const { x, y } = visibleSpot(activeZone);
+        addAndSelect({
           id: newLayerId('image'),
           name: file.name,
           type: 'image',
           src: reader.result as string,
-          x: 0.5,
-          y: 0.5,
+          x,
+          y,
           scaleX: 1,
           scaleY: 1,
           rotation: 0,
@@ -201,8 +198,7 @@ export function LayerStack() {
           visible: true,
           opacity: 1,
           blendMode: 'normal',
-        };
-        addLayer(activeZone, layer);
+        });
       };
       reader.readAsDataURL(file);
     };
@@ -210,7 +206,8 @@ export function LayerStack() {
   }
 
   function addDecal() {
-    const layer: Layer = {
+    const { x, y } = visibleSpot(activeZone);
+    addAndSelect({
       id: newLayerId('decal'),
       name: 'Text',
       type: 'decal',
@@ -221,8 +218,8 @@ export function LayerStack() {
       outlineColor: '#000000',
       outlineWidth: 0,
       letterSpacing: 0,
-      x: 0.5,
-      y: 0.5,
+      x,
+      y,
       rotation: 0,
       glyphRotation: 0,
       bold: false,
@@ -232,242 +229,243 @@ export function LayerStack() {
       visible: true,
       opacity: 1,
       blendMode: 'normal',
-    };
-    addLayer(activeZone, layer);
+    });
   }
 
   function addShape() {
-    const layer: Layer = {
+    const { x, y } = visibleSpot(activeZone);
+    addAndSelect({
       id: newLayerId('shape'),
       name: t('shapeRectangle'),
       type: 'shape',
       shape: 'rectangle',
       color: '#ffffff',
-      x: 0.5,
-      y: 0.5,
+      x,
+      y,
       width: 0.4,
       height: 0.4,
       rotation: 0,
       visible: true,
       opacity: 1,
       blendMode: 'normal',
-    };
-    addLayer(activeZone, layer);
+    });
   }
+
+  const ADD: { key: I18nKey; icon: () => React.ReactElement; run: () => void }[] = [
+    { key: 'text', icon: TextIcon, run: addDecal },
+    { key: 'shape', icon: ShapeIcon, run: addShape },
+    { key: 'image', icon: ImageIcon, run: addImage },
+    { key: 'pattern', icon: PatternIcon, run: addPattern },
+  ];
+
+  const zoneName = isRimZone(activeZone)
+    ? t(activeZone === 'frontRim' ? 'wheelFront' : 'wheelRear')
+    : ZONE_LABELS[activeZone];
 
   return (
     <div className="space-y-3">
-      <div className="flex items-center gap-2 flex-wrap">
+      <div className="flex items-baseline justify-between gap-2">
         <div className="m3-section-title">{t('layers')}</div>
-        <button className="m3-add-btn" onClick={addPattern} title={t('addPattern').replace('+ ', '')}>
-          <PatternIcon />
-        </button>
-        <button className="m3-add-btn" onClick={addImage} title={t('addImage').replace('+ ', '')}>
-          <ImageIcon />
-        </button>
-        <button className="m3-add-btn" onClick={addDecal} title={t('addText').replace('+ ', '')}>
-          <TextIcon />
-        </button>
-        <button className="m3-add-btn" onClick={addShape} title={t('addShape').replace('+ ', '')}>
-          <ShapeIcon />
-        </button>
+        <div className="m3-label truncate">{zoneName}</div>
       </div>
 
-      <div className="space-y-2">
+      <div className="grid grid-cols-4 gap-1.5">
+        {ADD.map(({ key, icon: Icon, run }) => (
+          <button key={key} type="button" onClick={run} className="layer-add-btn" title={`+ ${t(key)}`}>
+            <Icon />
+            <span>{t(key)}</span>
+          </button>
+        ))}
+      </div>
+
+      {layers.length === 0 && (
+        <div className="m3-label space-y-1">
+          <p>{t('layersEmpty')}</p>
+          {!isRimZone(activeZone) && <p>{t('zoneClickHint')}</p>}
+        </div>
+      )}
+
+      <div>
         {[...layers].reverse().map((layer, ri, rev) => {
           // A layer can clip to the one below it unless it's the bottom layer.
           const hasBelow = ri < rev.length - 1;
           const isClipped = !!layer.clip && hasBelow; // this layer clips downward
           const isBase = ri > 0 && !!rev[ri - 1].clip; // the layer above clips to it
           const inClipGroup = isClipped || isBase;
-          const isCollapsed = collapsed.has(layer.id);
+          const selected = layer.id === selectedId;
+          const Icon = TYPE_ICON[layer.type];
+          const idx = layers.length - 1 - ri;
           return (
-          <Fragment key={layer.id}>
-          <div
-            className="m3-card-nested p-2.5 space-y-2.5"
-            style={inClipGroup ? { boxShadow: 'inset 3px 0 0 var(--md-primary)' } : undefined}
-          >
-            <div className="flex items-center gap-1">
-              <button
-                onClick={() => toggleCollapsed(layer.id)}
-                className="m3-icon-btn m3-icon-btn-sm"
-                title={isCollapsed ? t('tooltipExpand') : t('tooltipCollapse')}
+            <Fragment key={layer.id}>
+              <div
+                className={`layer-row ${selected ? 'layer-row-selected' : ''}`}
+                style={inClipGroup ? { boxShadow: 'inset 3px 0 0 var(--md-primary)' } : undefined}
               >
-                {isCollapsed ? '▸' : '▾'}
-              </button>
-              <input
-                className={`flex-1 min-w-0 bg-transparent text-sm outline-none border-b border-transparent focus:border-[var(--md-primary)] ${
-                  layer.visible ? '' : 'opacity-40 line-through'
-                }`}
-                value={layer.name}
-                onChange={(e) =>
-                  updateLayer(activeZone, layer.id, { name: e.target.value })
-                }
-              />
+                <div className="flex items-center gap-0.5">
+                  <button
+                    type="button"
+                    onClick={() => select(selected ? null : layer.id)}
+                    aria-expanded={selected}
+                    className={`flex-1 min-w-0 flex items-center gap-2 text-left text-sm py-1.5 pl-1 ${
+                      layer.visible ? '' : 'opacity-45'
+                    }`}
+                  >
+                    <span className="flex-none text-[var(--md-on-surface-variant)]">
+                      <Icon />
+                    </span>
+                    <span className="truncate">{layer.name}</span>
+                  </button>
+                  <button
+                    type="button"
+                    className="m3-icon-btn m3-icon-btn-sm"
+                    onClick={() => updateLayer(activeZone, layer.id, { visible: !layer.visible })}
+                    title={layer.visible ? t('layerHide') : t('layerShow')}
+                    aria-pressed={!layer.visible}
+                  >
+                    <RowIcon d={layer.visible ? EYE : EYE_OFF} />
+                  </button>
+                  <button
+                    type="button"
+                    className="m3-icon-btn m3-icon-btn-sm"
+                    onClick={() => reorderLayer(activeZone, layer.id, 1)}
+                    disabled={idx === layers.length - 1}
+                    title={t('tooltipMoveUp')}
+                  >
+                    <RowIcon d={UP} />
+                  </button>
+                  <button
+                    type="button"
+                    className="m3-icon-btn m3-icon-btn-sm"
+                    onClick={() => reorderLayer(activeZone, layer.id, -1)}
+                    disabled={idx === 0}
+                    title={t('tooltipMoveDown')}
+                  >
+                    <RowIcon d={DOWN} />
+                  </button>
+                  <button
+                    type="button"
+                    className="m3-icon-btn m3-icon-btn-sm"
+                    onClick={() => duplicate(layer.id, false, false)}
+                    title={t('layerDuplicate')}
+                  >
+                    <RowIcon d={COPY} />
+                  </button>
+                  <button
+                    type="button"
+                    className="m3-icon-btn m3-icon-btn-sm hover:text-[var(--md-error)]"
+                    onClick={() => {
+                      removeLayer(activeZone, layer.id);
+                      if (selected) select(null);
+                    }}
+                    title={t('tooltipDelete')}
+                  >
+                    <RowIcon d={TRASH} />
+                  </button>
+                </div>
 
-              {/* Overflow menu: show/hide, reorder, duplicate */}
-              <div className="relative">
-                <button
-                  className="m3-icon-btn m3-icon-btn-sm"
-                  onClick={() => setMenuId(menuId === layer.id ? null : layer.id)}
-                  title={t('layerOptions')}
-                >
-                  ⋮
-                </button>
-                {menuId === layer.id && (
-                  <>
-                    <div className="fixed inset-0 z-40" onClick={() => setMenuId(null)} />
-                    <div className="absolute right-0 z-50 mt-1 min-w-[150px] m3-menu">
-                      <button
-                        className="m3-menu-item"
-                        onClick={() =>
-                          updateLayer(activeZone, layer.id, { visible: !layer.visible })
-                        }
-                      >
-                        <span className="w-4 text-center">{layer.visible ? '○' : '●'}</span>
-                        {layer.visible ? t('layerHide') : t('layerShow')}
-                      </button>
-                      <button
-                        className="m3-menu-item"
-                        onClick={() => reorderLayer(activeZone, layer.id, 1)}
-                      >
-                        <span className="w-4 text-center">▲</span>
-                        {t('tooltipMoveUp')}
-                      </button>
-                      <button
-                        className="m3-menu-item"
-                        onClick={() => reorderLayer(activeZone, layer.id, -1)}
-                      >
-                        <span className="w-4 text-center">▼</span>
-                        {t('tooltipMoveDown')}
-                      </button>
-                      <button
-                        className="m3-menu-item"
-                        onClick={() => {
-                          setDuplicatingId(layer.id);
-                          setMenuId(null);
-                        }}
-                      >
-                        <span className="w-4 text-center">⧉</span>
-                        {t('layerDuplicate')}
-                      </button>
-                      {hasDividers && (
-                        <button
-                          className="m3-menu-item"
-                          onClick={() =>
-                            updateLayer(activeZone, layer.id, {
-                              belowDivider: !layer.belowDivider,
-                            })
+                {selected && (
+                  <div className="space-y-3 px-1 pt-2 pb-1">
+                    {layer.type !== 'pattern' && <div className="m3-label">{t('layerEditHint')}</div>}
+                    <label className="m3-label flex flex-col gap-1">
+                      {t('layerName')}
+                      <input
+                        className="m3-field"
+                        value={layer.name}
+                        onChange={(e) => updateLayer(activeZone, layer.id, { name: e.target.value })}
+                      />
+                    </label>
+                    <div className="grid grid-cols-2 gap-x-3 gap-y-2 items-end">
+                      <label className="m3-label flex flex-col gap-1">
+                        {t('blend')}
+                        <select
+                          value={layer.blendMode}
+                          onChange={(e) =>
+                            updateLayer(activeZone, layer.id, { blendMode: e.target.value as BlendMode })
                           }
+                          className="m3-field"
                         >
-                          <span className="w-4 text-center">{layer.belowDivider ? '●' : '○'}</span>
-                          {t('layerBelowDivider')}
+                          {BLEND_MODES.map((m) => (
+                            <option key={m} value={m}>
+                              {m}
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+                      <Slider
+                        label={t('opacity')}
+                        unit="%"
+                        scale={100}
+                        min={0}
+                        max={1}
+                        step={0.01}
+                        value={layer.opacity}
+                        onChange={(v) => updateLayer(activeZone, layer.id, { opacity: v })}
+                      />
+                    </div>
+
+                    {layer.type === 'pattern' && <PatternLayerEditor layer={layer} zoneId={activeZone} />}
+                    {layer.type === 'image' && <ImageLayerEditor layer={layer} zoneId={activeZone} />}
+                    {layer.type === 'decal' && <DecalLayerEditor layer={layer} zoneId={activeZone} />}
+                    {layer.type === 'shape' && <ShapeLayerEditor layer={layer} zoneId={activeZone} />}
+
+                    <div className="pt-2 border-t border-[var(--md-outline-variant)]">
+                      <EffectEditor layer={layer} zoneId={activeZone} />
+                    </div>
+
+                    <div className="pt-2 border-t border-[var(--md-outline-variant)] space-y-2">
+                      <div className="flex gap-1.5">
+                        <button
+                          type="button"
+                          className="m3-btn m3-btn-tonal m3-btn-sm flex-1"
+                          onClick={() => duplicate(layer.id, true, false)}
+                          title={t('layerDuplicate')}
+                        >
+                          {t('dupMirrorH')}
                         </button>
+                        <button
+                          type="button"
+                          className="m3-btn m3-btn-tonal m3-btn-sm flex-1"
+                          onClick={() => duplicate(layer.id, false, true)}
+                          title={t('layerDuplicate')}
+                        >
+                          {t('dupMirrorV')}
+                        </button>
+                      </div>
+                      {hasDividers && (
+                        <label className="flex items-center gap-2 m3-label cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={!!layer.belowDivider}
+                            onChange={(e) => updateLayer(activeZone, layer.id, { belowDivider: e.target.checked })}
+                          />
+                          {t('layerBelowDivider')}
+                        </label>
                       )}
                     </div>
-                  </>
+                  </div>
                 )}
               </div>
 
-              <button
-                className="m3-icon-btn m3-icon-btn-sm hover:text-[var(--md-error)]"
-                onClick={() => removeLayer(activeZone, layer.id)}
-                title={t('tooltipDelete')}
-              >
-                ✕
-              </button>
-            </div>
-
-            {duplicatingId === layer.id && (
-              <DuplicatePopover
-                layerId={layer.id}
-                onClose={() => setDuplicatingId(null)}
-              />
-            )}
-
-            {!isCollapsed && (
-              <>
-            <div className="grid grid-cols-2 gap-2">
-              <label className="m3-label flex flex-col gap-1">
-                Blend
-                <select
-                  value={layer.blendMode}
-                  onChange={(e) =>
-                    updateLayer(activeZone, layer.id, {
-                      blendMode: e.target.value as BlendMode,
-                    })
-                  }
-                  className="m3-field"
-                >
-                  {BLEND_MODES.map((m) => (
-                    <option key={m} value={m}>
-                      {m}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <label className="m3-label flex flex-col gap-1">
-                Opacity {Math.round(layer.opacity * 100)}%
-                <input
-                  type="range"
-                  min={0}
-                  max={1}
-                  step={0.01}
-                  value={layer.opacity}
-                  onChange={(e) =>
-                    updateLayer(activeZone, layer.id, {
-                      opacity: parseFloat(e.target.value),
-                    })
-                  }
-                />
-              </label>
-            </div>
-
-            {layer.type === 'pattern' && (
-              <PatternLayerEditor layer={layer} zoneId={activeZone} />
-            )}
-            {layer.type === 'image' && (
-              <ImageLayerEditor layer={layer} zoneId={activeZone} />
-            )}
-            {layer.type === 'decal' && (
-              <DecalLayerEditor layer={layer} zoneId={activeZone} />
-            )}
-            {layer.type === 'shape' && (
-              <ShapeLayerEditor layer={layer} zoneId={activeZone} />
-            )}
-
-            <div className="pt-1 border-t border-[var(--md-outline-variant)]">
-              <EffectEditor layer={layer} zoneId={activeZone} />
-            </div>
-              </>
-            )}
-          </div>
-
-          {/* Link connector to the layer below: toggles the clipping mask.
-              Accent when connected; both cards get an accent rail (inClipGroup). */}
-          {hasBelow && (
-            <div className="relative flex justify-center -my-1.5">
-              <button
-                type="button"
-                onClick={() => updateLayer(activeZone, layer.id, { clip: !layer.clip })}
-                title={t('layerClip')}
-                aria-pressed={!!layer.clip}
-                className={`relative z-10 flex h-6 w-6 items-center justify-center rounded-full border transition ${
-                  layer.clip
-                    ? 'border-[var(--md-primary)] text-[var(--md-primary)]'
-                    : 'border-[var(--md-outline-variant)] text-neutral-500 opacity-50 hover:opacity-100'
-                }`}
-                style={{
-                  background: layer.clip
-                    ? 'color-mix(in srgb, var(--md-primary) 16%, var(--md-surface-container-high))'
-                    : 'var(--md-surface-container-high)',
-                }}
-              >
-                <LinkIcon />
-              </button>
-            </div>
-          )}
-          </Fragment>
+              {/* Link connector to the layer below: toggles the clipping mask.
+                  Accent when connected; both rows get an accent rail (inClipGroup). */}
+              {hasBelow && (
+                <div className="relative flex justify-center -my-1.5">
+                  <button
+                    type="button"
+                    onClick={() => updateLayer(activeZone, layer.id, { clip: !layer.clip })}
+                    title={t('layerClip')}
+                    aria-pressed={!!layer.clip}
+                    className={`relative z-10 flex h-6 w-6 items-center justify-center rounded-full border transition ${
+                      layer.clip
+                        ? 'border-[var(--md-primary)] text-[var(--md-primary)] bg-[var(--md-primary-container)]'
+                        : 'border-[var(--md-outline-variant)] text-[var(--md-on-surface-variant)] bg-[var(--md-surface-container-high)] opacity-60 hover:opacity-100'
+                    }`}
+                  >
+                    <LinkIcon />
+                  </button>
+                </div>
+              )}
+            </Fragment>
           );
         })}
       </div>

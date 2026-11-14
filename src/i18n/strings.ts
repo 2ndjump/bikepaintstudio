@@ -2,8 +2,6 @@ import type { Lang } from '../state/uiStore';
 
 export type I18nKey =
   | 'active'
-  | 'toolCamera'
-  | 'toolEdit'
   | 'save'
   | 'load'
   | 'pngExport'
@@ -150,12 +148,21 @@ export type I18nKey =
   | 'rimGeometryBoth'
   | 'spinPause'
   | 'spinPlay'
-  | 'dragToTurn';
+  | 'dragToTurn'
+  | 'handleScale'
+  | 'handleStretch'
+  | 'handleRotate'
+  | 'shape'
+  | 'image'
+  | 'layersEmpty'
+  | 'layerEditHint'
+  | 'dupMirrorH'
+  | 'dupMirrorV'
+  | 'layerName'
+  | 'zoneClickHint';
 
 const STRINGS: Record<I18nKey, Record<Lang, string>> = {
   active: { de: 'Aktiv', en: 'Active' },
-  toolCamera: { de: 'Bike bewegen & drehen', en: 'Move & rotate bike' },
-  toolEdit: { de: 'Text/Form bewegen & drehen', en: 'Move & rotate text/shape' },
   save: { de: 'Speichern', en: 'Save' },
   load: { de: 'Laden', en: 'Load' },
   pngExport: { de: 'PNG Export', en: 'Export PNG' },
@@ -182,7 +189,7 @@ const STRINGS: Record<I18nKey, Record<Lang, string>> = {
   finishGlossy: { de: 'Glanz', en: 'Glossy' },
   finishMetallic: { de: 'Metallic', en: 'Metallic' },
   finishChameleon: { de: 'Chamäleon', en: 'Chameleon' },
-  layers: { de: 'Layers', en: 'Layers' },
+  layers: { de: 'Ebenen', en: 'Layers' },
   addColor: { de: '+ Farbe', en: '+ Color' },
   addPattern: { de: '+ Muster', en: '+ Pattern' },
   addImage: { de: '+ Bild', en: '+ Image' },
@@ -214,8 +221,8 @@ const STRINGS: Record<I18nKey, Record<Lang, string>> = {
   layerClip: { de: 'An Ebene darunter anheften', en: 'Clip to layer below' },
   layerBelowDivider: { de: 'Unter dem Divider', en: 'Below divider' },
   layerOptions: { de: 'Optionen', en: 'Options' },
-  blend: { de: 'Blend', en: 'Blend' },
-  opacity: { de: 'Opacity', en: 'Opacity' },
+  blend: { de: 'Mischmodus', en: 'Blend' },
+  opacity: { de: 'Deckkraft', en: 'Opacity' },
   rimGeometry: { de: 'Felgen-Geometrie', en: 'Rim Geometry' },
   depth: { de: 'Tiefe', en: 'Depth' },
   width: { de: 'Breite', en: 'Width' },
@@ -303,6 +310,17 @@ const STRINGS: Record<I18nKey, Record<Lang, string>> = {
   spinPause: { de: 'Pause', en: 'Pause' },
   spinPlay: { de: 'Drehen', en: 'Spin' },
   dragToTurn: { de: 'Ziehen zum Drehen', en: 'Drag to turn' },
+  handleScale: { de: 'Skalieren', en: 'Scale' },
+  handleStretch: { de: 'Strecken', en: 'Stretch' },
+  shape: { de: 'Form', en: 'Shape' },
+  image: { de: 'Bild', en: 'Image' },
+  layersEmpty: { de: 'Noch keine Ebenen auf diesem Teil. Füge oben Text, eine Form, ein Bild oder ein Muster hinzu.', en: 'No layers on this part yet. Add text, a shape, an image or a pattern above.' },
+  layerEditHint: { de: 'Auf dem Modell ziehen zum Verschieben, Griffe zum Skalieren und Drehen.', en: 'Drag it on the model to move; use the handles to scale and rotate.' },
+  dupMirrorH: { de: 'Gespiegelt ↔', en: 'Mirrored ↔' },
+  dupMirrorV: { de: 'Gespiegelt ↕', en: 'Mirrored ↕' },
+  layerName: { de: 'Name', en: 'Name' },
+  zoneClickHint: { de: 'Tipp: Klicke ein Rahmenteil im Bild an, um es auszuwählen.', en: 'Tip: click a part of the frame to select it.' },
+  handleRotate: { de: 'Drehen (Shift: 15°-Schritte)', en: 'Rotate (Shift: 15° steps)' },
 };
 
 export function translate(key: I18nKey, lang: Lang): string {

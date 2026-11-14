@@ -2,13 +2,12 @@ import { useEffect, useRef, type ReactNode } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { dividerUniforms } from '../../rendering/dividers';
-import { useUIStore } from '../../state/uiStore';
 
 /** Start angle: the 3/4 view the orbit camera used to open with. */
 const START_YAW = -0.7;
 
 /**
- * Turntable for the bike inside the fixed studio. With the camera tool, a
+ * Turntable for the bike inside the fixed studio. A
  * horizontal rotate-drag (right mouse / one finger) spins the bike about the
  * vertical axis through x = axisX (the middle of the wheelbase, metres);
  * OrbitControls keeps zoom, pan and the vertical tilt (its azimuth is locked
@@ -29,10 +28,9 @@ export function Turntable({
   const spin = useRef<THREE.Group>(null);
   const bike = useRef<THREE.Group>(null);
   const gl = useThree((s) => s.gl);
-  const tool = useUIStore((s) => s.tool);
 
   useEffect(() => {
-    if (tool !== 'camera' || !enabled) return;
+    if (!enabled) return;
     const dom = gl.domElement;
     let lastX: number | null = null;
     const onDown = (e: PointerEvent) => {
@@ -55,7 +53,7 @@ export function Turntable({
       window.removeEventListener('pointermove', onMove);
       window.removeEventListener('pointerup', onUp);
     };
-  }, [tool, gl, enabled]);
+  }, [gl, enabled]);
 
   useFrame(() => {
     if (!bike.current) return;

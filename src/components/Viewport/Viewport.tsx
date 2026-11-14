@@ -5,13 +5,14 @@ import { BikeFrame } from './BikeFrame';
 import { BACKDROP_COLOR, FLOOR_Y, StudioEnvironment } from './StudioEnvironment';
 import { DividerHandles } from './DividerHandles';
 import { EditControls } from './EditControls';
+import { LayerGizmo } from './LayerGizmo';
+import { ZoneHighlight } from './ZoneHighlight';
 import { Turntable } from './Turntable';
 import { Wheel } from './Wheel';
 import { WheelStage } from './WheelStage';
 import { isRimZone } from '../../state/types';
 import { ALL_VARIANTS, useBikeModel, variantUrl } from '../../geometry/bikeModel';
 import { Suspense, useEffect } from 'react';
-import { useUIStore } from '../../state/uiStore';
 import { useDesignStore } from '../../state/designStore';
 import { syncDividerUniforms, syncDividerPatterns } from '../../rendering/dividers';
 
@@ -26,6 +27,9 @@ function DebugExpose() {
 /** Width the bike needs (incl. turntable swing), as a multiple of the canvas
  *  height at camera zoom 1 — below that, the view zooms out to fit. */
 const FIT_ASPECT = 1.2;
+/** Share of the free height the subject may fill (wide windows): leaves room
+ *  for the floor shadow below the wheels. */
+const FIT_HEIGHT = 0.85;
 /** The same for the wheel designer's single wheel. */
 const FIT_ASPECT_WHEEL = 1.0;
 
@@ -60,7 +64,7 @@ function ViewFit() {
       const fw = Math.max(1, right - left);
       const fh = Math.max(1, H - top);
       camera.setViewOffset(W, H, W / 2 - (left + right) / 2, H / 2 - (top + H) / 2, W, H);
-      camera.zoom = Math.min(1, fw / (aspect * H), fh / H);
+      camera.zoom = Math.min(1, fw / (aspect * H), (FIT_HEIGHT * fh) / H);
       camera.updateProjectionMatrix();
     };
     update();
@@ -107,6 +111,7 @@ function Bike() {
           <DividerHandles />
           <group position={[0, FLOOR_Y, 0]}>
             <BikeFrame model={model} />
+            <ZoneHighlight model={model} />
             <Wheel
               position={[frontHub.x, frontHub.y, frontHub.z]}
               zone="frontRim"
@@ -130,61 +135,62 @@ function Bike() {
 }
 
 export function Viewport() {
-  const tool = useUIStore((s) => s.tool);
   const wheelMode = useDesignStore((s) => isRimZone(s.activeZone));
 
   return (
-    <Canvas
-      shadows="soft"
-      // Straight at the back wall; the bike's start angle gives the 3/4 view.
-      camera={{ position: [0.09, 0.75, 2.48], fov: 33 }}
-      gl={{
-        antialias: true,
-        preserveDrawingBuffer: true,
-        // Khronos PBR Neutral instead of ACES: in the bright white studio ACES
-        // washed saturated paint out (red → pink) and greyed the white backdrop;
-        // Neutral keeps the picked colours true and only rolls off highlights.
-        toneMapping: THREE.NeutralToneMapping,
-        toneMappingExposure: 1.0,
-      }}
-      dpr={[1, 2]}
-    >
-      <color attach="background" args={[BACKDROP_COLOR]} />
-
-      {/* Fixed studio: cyclorama, softbox lights, reflection environment. */}
-      <StudioEnvironment />
-
-      <DebugExpose />
-      <ViewFit />
-      <DividerSync />
-      <EditControls />
-      <Suspense fallback={null}>
-        <Bike />
-      </Suspense>
-
-      {/* The studio stays put: the camera only zooms, pans and tilts within
-          limits (azimuth locked straight at the back wall); horizontal
-          rotate-drag spins the bike instead (Turntable). */}
-      <OrbitControls
-        makeDefault
-        enabled={tool === 'camera'}
-        // The wheel designer turns the wheel on drag instead; only zoom stays.
-        enablePan={!wheelMode}
-        enableRotate={!wheelMode}
-        minDistance={0.5}
-        maxDistance={6}
-        minAzimuthAngle={0}
-        maxAzimuthAngle={0}
-        minPolarAngle={0.9}
-        maxPolarAngle={1.62}
-        target={[0.09, 0.32, 0]}
-        // Swap drag/turn: left mouse pans (drag), right mouse rotates (turn).
-        mouseButtons={{
-          LEFT: THREE.MOUSE.PAN,
-          MIDDLE: THREE.MOUSE.DOLLY,
-          RIGHT: THREE.MOUSE.ROTATE,
+    <div className="relative w-full h-full">
+      <Canvas
+        shadows="soft"
+        // Straight at the back wall; the bike's start angle gives the 3/4 view.
+        camera={{ position: [0.09, 0.75, 2.48], fov: 33 }}
+        gl={{
+          antialias: true,
+          preserveDrawingBuffer: true,
+          // Khronos PBR Neutral instead of ACES: in the bright white studio ACES
+          // washed saturated paint out (red → pink) and greyed the white backdrop;
+          // Neutral keeps the picked colours true and only rolls off highlights.
+          toneMapping: THREE.NeutralToneMapping,
+          toneMappingExposure: 1.0,
         }}
-      />
-    </Canvas>
+        dpr={[1, 2]}
+      >
+        <color attach="background" args={[BACKDROP_COLOR]} />
+
+        {/* Fixed studio: cyclorama, softbox lights, reflection environment. */}
+        <StudioEnvironment />
+
+        <DebugExpose />
+        <ViewFit />
+        <DividerSync />
+        <EditControls />
+        <Suspense fallback={null}>
+          <Bike />
+        </Suspense>
+
+        {/* The studio stays put: the camera only zooms, pans and tilts within
+            limits (azimuth locked straight at the back wall); horizontal
+            rotate-drag spins the bike instead (Turntable). */}
+        <OrbitControls
+          makeDefault
+          // The wheel designer turns the wheel on drag instead; only zoom stays.
+          enablePan={!wheelMode}
+          enableRotate={!wheelMode}
+          minDistance={0.5}
+          maxDistance={6}
+          minAzimuthAngle={0}
+          maxAzimuthAngle={0}
+          minPolarAngle={0.9}
+          maxPolarAngle={1.62}
+          target={[0.09, 0.32, 0]}
+          // Swap drag/turn: left mouse pans (drag), right mouse rotates (turn).
+          mouseButtons={{
+            LEFT: THREE.MOUSE.PAN,
+            MIDDLE: THREE.MOUSE.DOLLY,
+            RIGHT: THREE.MOUSE.ROTATE,
+          }}
+        />
+      </Canvas>
+      <LayerGizmo />
+    </div>
   );
 }
