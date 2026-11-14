@@ -12,6 +12,7 @@ import type {
 } from '../state/types';
 import { renderPattern, patternRepeat } from './patterns';
 import { getZoneAspect } from './zoneMetrics';
+import { ensureFontLoaded } from '../fonts/fontLoader';
 
 /** Apply a blur/smear effect to a canvas's own pixels, in place. Opacity/blend
  *  are handled by the caller when compositing the result. */
@@ -455,6 +456,9 @@ export class ZoneCompositor {
     const fontSpec = `${style}${weight} ${px}px "${layer.font}", sans-serif`;
 
     try {
+      // A Google font's stylesheet must be in first, or load() finds no face
+      // and the text stays in the fallback font.
+      await ensureFontLoaded(layer.font);
       await document.fonts.load(fontSpec);
     } catch {
       // fall back to whatever is available

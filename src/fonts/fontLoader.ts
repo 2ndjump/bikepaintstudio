@@ -102,7 +102,7 @@ export interface FontEntry {
   source: FontSource;
 }
 
-const googleLoaded = new Set<string>();
+const googleLoaded = new Map<string, Promise<void>>();
 const systemFonts = new Set<string>();
 const uploadedFonts = new Set<string>();
 
@@ -143,26 +143,37 @@ export function getGoogleFontOptions(): string[] {
   return CURATED_GOOGLE_FONTS;
 }
 
+/** Resolves once the family's stylesheet is in and its regular face is
+ *  loaded (or failed), so text drawn after it never falls back by accident.
+ *  Shared by every caller while the load is still in flight. */
 export function ensureFontLoaded(family: string): Promise<void> {
-  if (googleLoaded.has(family) || systemFonts.has(family) || uploadedFonts.has(family)) {
+  if (systemFonts.has(family) || uploadedFonts.has(family)) {
     return Promise.resolve();
   }
   if (!CURATED_GOOGLE_FONTS.includes(family)) {
     return Promise.resolve();
   }
-  googleLoaded.add(family);
+  const pending = googleLoaded.get(family);
+  if (pending) return pending;
 
   const encoded = family.replace(/ /g, '+');
   const href = `https://fonts.googleapis.com/css2?family=${encoded}:wght@400;700&display=swap`;
   const link = document.createElement('link');
   link.rel = 'stylesheet';
   link.href = href;
+  // document.fonts.load() only finds the face once the stylesheet's
+  // @font-face rules exist, so wait for the stylesheet first.
+  const loaded = new Promise<void>((resolve) => {
+    link.onload = link.onerror = () => resolve();
+  })
+    .then(() => document.fonts.load(`16px "${family}"`))
+    .then(
+      () => {},
+      () => {},
+    );
+  googleLoaded.set(family, loaded);
   document.head.appendChild(link);
-
-  if ('fonts' in document && document.fonts.load) {
-    return document.fonts.load(`16px "${family}"`).then(() => {});
-  }
-  return Promise.resolve();
+  return loaded;
 }
 
 export function preloadCommonFonts(): void {
