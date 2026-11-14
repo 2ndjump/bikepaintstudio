@@ -40,9 +40,11 @@ const SOFTBOXES = [
 ].map((b) => ({ ...b, radiance: (LIGHT_SCALE * b.energy) / (b.w * b.h) }));
 
 /** Accumulated floor shadow: blend window (frames) while something moves —
- *  short, so the shadow follows — and once everything is still (long, smooth). */
-const SHADOW_BLEND_MOVING = 8;
-const SHADOW_BLEND_STILL = 150;
+ *  short, so the shadow follows. Once everything is still the window grows
+ *  with every sample (a true running average, so the noisy moving-phase
+ *  samples fade out) for SHADOW_BLEND_STILL frames. */
+const SHADOW_BLEND_MOVING = 10;
+const SHADOW_BLEND_STILL = 200;
 /** Frames the short window is kept after the last change. */
 const SHADOW_MOVING_FRAMES = 12;
 /** Share of the floor's light from the open sky dome (contact darkening);
@@ -146,9 +148,9 @@ function FloorShadow() {
     s.pose = pose;
     if (s.moving > 0) {
       s.moving--;
-      api.blend = s.moving > 0 ? SHADOW_BLEND_MOVING : SHADOW_BLEND_STILL;
       api.count = 0; // (re)start accumulating
     }
+    api.blend = s.moving > 0 ? SHADOW_BLEND_MOVING : Math.max(SHADOW_BLEND_MOVING, api.count + 1);
     shadowAccumulating = s.moving > 0 || api.count < SHADOW_BLEND_STILL;
   });
 
