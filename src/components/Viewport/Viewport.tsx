@@ -35,7 +35,7 @@ const FIT_ASPECT_WHEEL = 1.0;
 
 /**
  * Keep the subject centred and fully visible in the free area between the
- * floating panels (elements marked `data-overlay="left|right|top"`): the
+ * floating panels (elements marked `data-overlay="left|right|top|bottom"`): the
  * projection's centre is shifted onto that area (setViewOffset) and the view
  * zooms out when the area is narrower than FIT_ASPECT × its height.
  */
@@ -53,6 +53,7 @@ function ViewFit() {
       let left = 0;
       let right = W;
       let top = 0;
+      let bottom = H;
       document.querySelectorAll<HTMLElement>('[data-overlay]').forEach((el) => {
         const r = el.getBoundingClientRect();
         if (r.width === 0) return; // hidden (e.g. the right panel below lg)
@@ -60,10 +61,11 @@ function ViewFit() {
         if (side === 'left') left = Math.max(left, r.right - c.left);
         else if (side === 'right') right = Math.min(right, r.left - c.left);
         else if (side === 'top') top = Math.max(top, r.bottom - c.top);
+        else if (side === 'bottom') bottom = Math.min(bottom, r.top - c.top);
       });
       const fw = Math.max(1, right - left);
-      const fh = Math.max(1, H - top);
-      camera.setViewOffset(W, H, W / 2 - (left + right) / 2, H / 2 - (top + H) / 2, W, H);
+      const fh = Math.max(1, bottom - top);
+      camera.setViewOffset(W, H, W / 2 - (left + right) / 2, H / 2 - (top + bottom) / 2, W, H);
       camera.zoom = Math.min(1, fw / (aspect * H), (FIT_HEIGHT * fh) / H);
       camera.updateProjectionMatrix();
     };

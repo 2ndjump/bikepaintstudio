@@ -143,18 +143,16 @@ export type I18nKey =
   | 'wheel'
   | 'copyToRear'
   | 'copyToFront'
-  | 'wheelsSame'
-  | 'wheelsDiffer'
   | 'rimGeometryBoth'
   | 'spinPause'
   | 'spinPlay'
   | 'dragToTurn'
+  | 'spinSpeed'
   | 'handleScale'
   | 'handleStretch'
   | 'handleRotate'
   | 'shape'
   | 'image'
-  | 'layersEmpty'
   | 'layerEditHint'
   | 'dupMirrorH'
   | 'dupMirrorV'
@@ -162,6 +160,7 @@ export type I18nKey =
   | 'zoneClickHint'
   | 'templates'
   | 'templatesHint'
+  | 'templatesWheelHint'
   | 'tplDiagonal'
   | 'tplRace'
   | 'tplFade'
@@ -265,8 +264,8 @@ const STRINGS: Record<I18nKey, Record<Lang, string>> = {
   letterRotation: { de: 'Buchstaben-Rotation', en: 'Letter rotation' },
   letterSpacing: { de: 'Zeichenabstand', en: 'Letter spacing' },
   backgroundLabel: { de: 'Hintergrund', en: 'Background' },
-  undo: { de: 'Rückgängig', en: 'Undo' },
-  redo: { de: 'Wiederh.', en: 'Redo' },
+  undo: { de: 'Rückgängig (Strg+Z)', en: 'Undo (Ctrl+Z)' },
+  redo: { de: 'Wiederholen (Strg+Umschalt+Z)', en: 'Redo (Ctrl+Shift+Z)' },
   hueShift: { de: 'Farbton', en: 'Hue' },
   dodge: { de: 'Dodge', en: 'Dodge' },
   burn: { de: 'Burn', en: 'Burn' },
@@ -314,17 +313,15 @@ const STRINGS: Record<I18nKey, Record<Lang, string>> = {
   wheel: { de: 'Laufrad', en: 'Wheel' },
   copyToRear: { de: 'Design aufs Hinterrad kopieren', en: 'Copy design to rear wheel' },
   copyToFront: { de: 'Design aufs Vorderrad kopieren', en: 'Copy design to front wheel' },
-  wheelsSame: { de: 'Vorder- und Hinterrad sind gleich', en: 'Front and rear wheel match' },
-  wheelsDiffer: { de: 'Vorder- und Hinterrad sind verschieden', en: 'Front and rear wheel differ' },
   rimGeometryBoth: { de: 'Gilt für beide Laufräder', en: 'Applies to both wheels' },
   spinPause: { de: 'Pause', en: 'Pause' },
   spinPlay: { de: 'Drehen', en: 'Spin' },
   dragToTurn: { de: 'Ziehen zum Drehen', en: 'Drag to turn' },
+  spinSpeed: { de: 'Tempo', en: 'Speed' },
   handleScale: { de: 'Skalieren', en: 'Scale' },
   handleStretch: { de: 'Strecken', en: 'Stretch' },
   shape: { de: 'Form', en: 'Shape' },
   image: { de: 'Bild', en: 'Image' },
-  layersEmpty: { de: 'Noch keine Ebenen auf diesem Teil. Füge oben Text, eine Form, ein Bild oder ein Muster hinzu.', en: 'No layers on this part yet. Add text, a shape, an image or a pattern above.' },
   layerEditHint: { de: 'Auf dem Modell ziehen zum Verschieben, Griffe zum Skalieren und Drehen.', en: 'Drag it on the model to move; use the handles to scale and rotate.' },
   dupMirrorH: { de: 'Gespiegelt ↔', en: 'Mirrored ↔' },
   dupMirrorV: { de: 'Gespiegelt ↕', en: 'Mirrored ↕' },
@@ -333,6 +330,7 @@ const STRINGS: Record<I18nKey, Record<Lang, string>> = {
   handleRotate: { de: 'Drehen (Shift: 15°-Schritte)', en: 'Rotate (Shift: 15° steps)' },
   templates: { de: 'Vorlagen', en: 'Templates' },
   templatesHint: { de: 'Ersetzt das aktuelle Design (Strg+Z macht es rückgängig).', en: 'Replaces the current design (Ctrl+Z undoes it).' },
+  templatesWheelHint: { de: 'Übernimmt nur die Laufräder dieser Vorlage (Strg+Z macht es rückgängig).', en: 'Takes only the wheels of this template (Ctrl+Z undoes it).' },
   tplDiagonal: { de: 'Diagonale', en: 'Diagonal Split' },
   tplRace: { de: 'Rennteam', en: 'Race Team' },
   tplFade: { de: 'Sonnenuntergang', en: 'Sunset Fade' },

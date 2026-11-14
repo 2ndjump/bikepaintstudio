@@ -180,6 +180,9 @@ interface DesignActions {
   reorderDivider(id: string, direction: -1 | 1): void;
   removeDivider(id: string): void;
   loadDesign(state: DesignState): void;
+  /** Take only a design's wheels (both rim zones + rim geometry); the frame,
+   *  dividers and variant stay. */
+  loadRims(state: DesignState): void;
   undo(): void;
   redo(): void;
   canUndo(): boolean;
@@ -437,6 +440,16 @@ export const useDesignStore = create<Store>((set, get) => {
         dividers: migrated.dividers,
         variant: migrated.variant,
       });
+    },
+
+    loadRims: (state) => {
+      const history = recordHistory();
+      const { zones, rim } = migrateDesign(state);
+      set((s) => ({
+        history,
+        zones: { ...s.zones, frontRim: zones.frontRim, rearRim: zones.rearRim },
+        rim,
+      }));
     },
 
     undo: () => {

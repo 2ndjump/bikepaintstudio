@@ -10,8 +10,10 @@ import { VariantPicker } from './components/Sidebar/VariantPicker';
 import { WheelPanel } from './components/Sidebar/WheelPanel';
 import { WheelSpinControls } from './components/Viewport/WheelSpinControls';
 import { Toolbar } from './components/Toolbar/Toolbar';
+import { TemplateGallery } from './components/Toolbar/TemplateGallery';
 import { preloadCommonFonts } from './fonts/fontLoader';
 import { useDesignStore } from './state/designStore';
+import { useUIStore } from './state/uiStore';
 import { ALL_ZONES, isRimZone } from './state/types';
 import { useHistoryShortcuts } from './state/useHistoryShortcuts';
 
@@ -35,6 +37,7 @@ function useIsMobileDevice(): boolean {
 export default function App() {
   const activeZone = useDesignStore((s) => s.activeZone);
   const isMobile = useIsMobileDevice();
+  const galleryOpen = useUIStore((s) => s.galleryOpen);
 
   useHistoryShortcuts();
 
@@ -94,6 +97,9 @@ export default function App() {
           <main className="relative w-full shrink-0 min-h-[55vh]">
             <Viewport />
           </main>
+          <div className="mx-3 mt-3">
+            <TemplateGallery />
+          </div>
           <div className="glass m-3 p-3">
             {paintSections}
             <section className="m3-section">
@@ -109,13 +115,15 @@ export default function App() {
   // frosted-glass panels (the viewport keeps the bike centred in the free area
   // between them, see ViewFit). Wide windows: paint + zones on the left,
   // layers on the right; below lg everything collapses into the left panel.
+  // The template strip sits at the bottom edge between the panels.
   return (
-    <div className="relative h-full w-full overflow-hidden">
+    <div className={`relative h-full w-full overflow-hidden ${galleryOpen ? 'gallery-open' : ''}`}>
       <main className="absolute inset-0">
         <Viewport />
       </main>
 
       <Toolbar floating />
+      <TemplateGallery floating />
 
       {isRim && <WheelSpinControls />}
 

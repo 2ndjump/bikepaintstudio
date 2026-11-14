@@ -1,5 +1,6 @@
-// Renders a thumbnail of every design template (src/templates/<id>.json) in the
-// running app and writes src/templates/thumbs/<id>.webp.
+// Renders thumbnails of every design template (src/templates/<id>.json) in the
+// running app: the whole bike (src/templates/thumbs/<id>.webp) and its front
+// wheel alone in the wheel designer (src/templates/thumbs/wheels/<id>.webp).
 //
 //   npm run dev        (then, in a second terminal)
 //   node scripts/render-template-thumbs.mjs [dev-server-url]
@@ -17,6 +18,8 @@ const DIR = path.resolve(import.meta.dirname, '../src/templates');
 const PORT = 9339;
 // The bike in the default 3/4 view at a 1600×1000 window, as a 4:3 crop.
 const CLIP = { x: 455, y: 302, width: 900, height: 675 };
+// The wheel designer's face-on wheel (with its floor shadow), also 4:3.
+const CLIP_WHEEL = { x: 387, y: 222, width: 826, height: 620 };
 const THUMB_W = 320;
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -67,27 +70,41 @@ try {
   await evaluate(`(async () => {
     const url = (f) => performance.getEntriesByType('resource').map((e) => e.name).find((n) => n.includes(f));
     window.__store = await import(url('/src/state/designStore.ts'));
-    // Only the bike: no panels, guides or highlights.
-    (await import(url('/src/state/uiStore.ts'))).useUIStore.getState().setCapturing(true);
+    // Only the bike: no panels, guides or highlights. The template strip is
+    // closed (not just hidden) so the framing doesn't make room for it; the
+    // still wheel faces the camera the same way in every shot.
+    const ui = (await import(url('/src/state/uiStore.ts'))).useUIStore.getState();
+    ui.setCapturing(true);
+    ui.setGalleryOpen(false);
+    ui.setWheelSpin(false);
     const style = document.createElement('style');
-    style.textContent = '[data-overlay] { visibility: hidden; }';
+    style.textContent = '[data-overlay], .viewport-dock { visibility: hidden; }';
     document.head.append(style);
   })()`);
+
+  const capture = async (clip) => {
+    const { data } = await send('Page.captureScreenshot', {
+      format: 'webp',
+      quality: 80,
+      clip: { ...clip, scale: THUMB_W / clip.width },
+    });
+    return Buffer.from(data, 'base64');
+  };
 
   // Collect first, write last: new files under src/ make Vite reload the page.
   const shots = [];
   for (const file of fs.readdirSync(DIR).filter((f) => f.endsWith('.json'))) {
     const design = fs.readFileSync(path.join(DIR, file), 'utf8');
+    const name = file.replace('.json', '.webp');
     await evaluate(`window.__store.loadDesignFile(${design})`);
     await sleep(6000); // GLB, fonts and layer textures
-    const { data } = await send('Page.captureScreenshot', {
-      format: 'webp',
-      quality: 80,
-      clip: { ...CLIP, scale: THUMB_W / CLIP.width },
-    });
-    shots.push([file.replace('.json', '.webp'), Buffer.from(data, 'base64')]);
+    shots.push([name, await capture(CLIP)]);
+    // Entering the wheel designer remounts the (unturned) preview wheel.
+    await evaluate(`window.__store.useDesignStore.getState().setActiveZone('frontRim')`);
+    await sleep(3000);
+    shots.push([`wheels/${name}`, await capture(CLIP_WHEEL)]);
   }
-  fs.mkdirSync(path.join(DIR, 'thumbs'), { recursive: true });
+  fs.mkdirSync(path.join(DIR, 'thumbs', 'wheels'), { recursive: true });
   for (const [name, buf] of shots) {
     fs.writeFileSync(path.join(DIR, 'thumbs', name), buf);
     console.log(`${name}  ${(buf.length / 1024).toFixed(1)} KB`);

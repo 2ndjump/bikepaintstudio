@@ -3,11 +3,13 @@ import type { DesignFile } from '../state/designStore';
 
 /**
  * Bundled ready-made designs: plain saved-design files (<id>.json, the Save
- * format) with a render of each as a thumbnail (thumbs/<id>.webp). Regenerate
- * the thumbnails with `npm run dev`, then `node scripts/render-template-thumbs.mjs`.
+ * format) with a render of each as a thumbnail — the whole bike
+ * (thumbs/<id>.webp) and its front wheel alone for the wheel designer
+ * (thumbs/wheels/<id>.webp). Regenerate both sets with `npm run dev`, then
+ * `node scripts/render-template-thumbs.mjs`.
  */
 const designs = import.meta.glob<DesignFile>('./*.json', { import: 'default' });
-const thumbs = import.meta.glob<string>('./thumbs/*.webp', {
+const thumbs = import.meta.glob<string>('./thumbs/**/*.webp', {
   eager: true,
   import: 'default',
   query: '?url',
@@ -27,6 +29,7 @@ const LIST: { id: string; nameKey: I18nKey }[] = [
 export const TEMPLATES = LIST.map((t) => ({
   ...t,
   thumb: thumbs[`./thumbs/${t.id}.webp`],
+  wheelThumb: thumbs[`./thumbs/wheels/${t.id}.webp`],
   /** Fetched on demand, so the designs stay out of the main bundle. */
   load: designs[`./${t.id}.json`],
 }));

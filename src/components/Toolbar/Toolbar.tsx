@@ -3,7 +3,7 @@ import type { DesignState } from '../../state/types';
 import { useUIStore, type Lang } from '../../state/uiStore';
 import { useT } from '../../i18n/useT';
 import { ModeTabs } from './ModeTabs';
-import { TemplateGallery } from './TemplateGallery';
+import { TemplateGalleryToggle } from './TemplateGallery';
 
 /** Minimal shape of the File System Access API's save picker (not in lib.dom). */
 type ShowSaveFilePicker = (opts: {
@@ -120,37 +120,48 @@ export function Toolbar({ floating = false }: { floating?: boolean }) {
       data-overlay="top"
       className={`glass toolbar flex items-center gap-2 px-3 ${floating ? 'toolbar-floating' : ''}`}
     >
-      <h1 className="m3-title text-base mr-1 whitespace-nowrap">Bike Paint Studio</h1>
-      <ModeTabs />
-      <div className="flex-1 min-w-0" />
+      {/* Left and right clusters share the free width equally, so undo/redo
+          sits in the middle whenever there is room (never overlapping). */}
+      <div className="flex-1 flex items-center gap-2 min-w-max">
+        <h1 className="m3-title text-base mr-1 whitespace-nowrap">Bike Paint Studio</h1>
+        <ModeTabs />
+      </div>
 
-      <SegmentedControl>
-        {langOptions.map((l) => (
-          <SegmentButton key={l} active={lang === l} onClick={() => setLang(l)}>
-            {l.toUpperCase()}
-          </SegmentButton>
-        ))}
-      </SegmentedControl>
-
-      <div className="m3-segmented" role="group" aria-label="history">
-        <button className="m3-seg" onClick={undo} disabled={pastLen === 0} title="Ctrl+Z">
-          ↶
+      <div className="history-group" role="group" aria-label="history">
+        <button className="history-btn" onClick={undo} disabled={pastLen === 0} title={t('undo')} aria-label={t('undo')}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M9 14 4 9l5-5" />
+            <path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11" />
+          </svg>
         </button>
-        <button className="m3-seg" onClick={redo} disabled={futureLen === 0} title="Ctrl+Shift+Z">
-          ↷
+        <button className="history-btn" onClick={redo} disabled={futureLen === 0} title={t('redo')} aria-label={t('redo')}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="m15 14 5-5-5-5" />
+            <path d="M20 9H9.5a5.5 5.5 0 0 0 0 11H13" />
+          </svg>
         </button>
       </div>
 
-      <TemplateGallery />
-      <button className="m3-btn m3-btn-tonal m3-btn-sm" onClick={exportPNG}>
-        {t('pngExport')}
-      </button>
-      <button className="m3-btn m3-btn-tonal m3-btn-sm" onClick={exportJSON}>
-        {t('save')}
-      </button>
-      <button className="m3-btn m3-btn-tonal m3-btn-sm" onClick={importJSON}>
-        {t('load')}
-      </button>
+      <div className="flex-1 flex items-center justify-end gap-2 min-w-max">
+        <SegmentedControl>
+          {langOptions.map((l) => (
+            <SegmentButton key={l} active={lang === l} onClick={() => setLang(l)}>
+              {l.toUpperCase()}
+            </SegmentButton>
+          ))}
+        </SegmentedControl>
+
+        <TemplateGalleryToggle />
+        <button className="m3-btn m3-btn-tonal m3-btn-sm" onClick={exportPNG}>
+          {t('pngExport')}
+        </button>
+        <button className="m3-btn m3-btn-tonal m3-btn-sm" onClick={exportJSON}>
+          {t('save')}
+        </button>
+        <button className="m3-btn m3-btn-tonal m3-btn-sm" onClick={importJSON}>
+          {t('load')}
+        </button>
+      </div>
     </header>
   );
 }
