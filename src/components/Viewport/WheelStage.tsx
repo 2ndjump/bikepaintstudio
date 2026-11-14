@@ -10,12 +10,11 @@ import { Wheel } from './Wheel';
 /** Where the preview wheel stands (x) and how far the camera sits from it. */
 const STAGE_X = 0.09;
 const CAMERA_DIST = 1.7;
-/** Auto-spin speed (rad/s): one turn in ~16 s, slow enough to read decals. */
-const SPIN_SPEED = 0.4;
 
 /**
  * Wheel designer preview: the selected wheel alone, standing face-on in the
- * studio and slowly rolling. Dragging on the canvas turns it about its axle
+ * studio and rolling at the riding speed set in the pill (WheelSpinControls,
+ * km/h → rad/s via the tyre radius). Dragging on the canvas turns it about its axle
  * (grab-and-turn around the hub). The camera is moved to face the wheel while
  * the stage is mounted and put back afterwards. Same Wheel component and zone
  * material as on the bike, so both always show the same paint.
@@ -23,6 +22,8 @@ const SPIN_SPEED = 0.4;
 export function WheelStage({ zone, model }: { zone: RimZone; model: BikeModel }) {
   const spin = useRef<THREE.Group>(null);
   const dragging = useRef(false);
+  /** Current speed, easing towards the chosen one so a change never jerks. */
+  const speed = useRef(0);
   const playing = useUIStore((s) => s.wheelSpin);
   const get = useThree((s) => s.get);
   const hubY = FLOOR_Y + model.wheelRadius;
@@ -93,8 +94,16 @@ export function WheelStage({ zone, model }: { zone: RimZone; model: BikeModel })
 
   useFrame((_, dt) => {
     // Clockwise seen from the camera = rolling forward (towards +x).
-    const hold = dragging.current || useUIStore.getState().spinHold;
-    if (playing && !hold && spin.current) spin.current.rotation.z -= dt * SPIN_SPEED;
+    const { spinHold, wheelKmh } = useUIStore.getState();
+    const hold = dragging.current || spinHold;
+    if (!playing || hold || !spin.current) {
+      speed.current = 0; // stop at once (a held wheel must not drift)
+      return;
+    }
+    // Rolling without slip: ω = v / r, r = outer tyre radius of this model.
+    const target = wheelKmh / 3.6 / model.wheelRadius;
+    speed.current += (target - speed.current) * Math.min(1, dt * 3);
+    spin.current.rotation.z -= dt * speed.current;
   });
 
   return (

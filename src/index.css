@@ -600,6 +600,29 @@ select.m3-field { cursor: pointer; }
 /* Lift the wheel mode's pause/speed pill above the strip. */
 .gallery-open .viewport-dock { bottom: calc(var(--glass-gap) * 2 + var(--gallery-h)); }
 
+/* Anchor ticks + values under a slider track (ui/Slider `marks`); positions
+   follow the 16px thumb's centre. */
+.m3-marks { position: relative; display: block; height: 1.05rem; margin-top: -0.2rem; }
+.m3-marks > span {
+  position: absolute;
+  top: 0;
+  left: calc(8px + (100% - 16px) * var(--f));
+  transform: translateX(-50%);
+  padding-top: 5px;
+  font-size: 0.625rem;
+  line-height: 1;
+  color: var(--md-on-surface-variant);
+  font-variant-numeric: tabular-nums;
+}
+.m3-marks > span::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 1px;
+  height: 4px;
+  background: var(--md-outline);
+}
 
 /* Compact numeric value field next to a slider label (see ui/Slider). */
 .m3-num {

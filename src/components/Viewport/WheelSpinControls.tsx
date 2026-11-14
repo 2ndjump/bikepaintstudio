@@ -1,15 +1,22 @@
 import { useUIStore } from '../../state/uiStore';
 import { useT } from '../../i18n/useT';
+import { Slider } from '../ui/Slider';
 
-/** Pause/play for the wheel designer's spinning preview, under the wheel. */
+/** Anchor riding speeds (km/h): walking pace up to a fast road-bike sprint.
+ *  1 km/h (the default) still leaves rim decals readable. */
+const KMH_MARKS = [1, 5, 15, 25, 35, 45];
+
+/** Pause/play and speed for the wheel designer's spinning preview, under the wheel. */
 export function WheelSpinControls() {
   const spin = useUIStore((s) => s.wheelSpin);
   const setSpin = useUIStore((s) => s.setWheelSpin);
+  const kmh = useUIStore((s) => s.wheelKmh);
+  const setKmh = useUIStore((s) => s.setWheelKmh);
   const t = useT();
 
   return (
     <div className="viewport-dock">
-      <div className="glass flex items-center gap-3 pl-1.5 pr-4 py-1.5 rounded-full">
+      <div className="glass flex items-center gap-4 pl-1.5 pr-5 py-1.5 rounded-full" title={t('dragToTurn')}>
         <button
           type="button"
           onClick={() => setSpin(!spin)}
@@ -28,7 +35,19 @@ export function WheelSpinControls() {
           )}
           {t(spin ? 'spinPause' : 'spinPlay')}
         </button>
-        <span className="m3-label">{t('dragToTurn')}</span>
+        <div className="w-60">
+          <Slider
+            label={t('spinSpeed')}
+            unit="km/h"
+            min={0}
+            max={60}
+            step={0.1}
+            curve={2} // most of the useful inspection range is below 5 km/h
+            marks={KMH_MARKS}
+            value={kmh}
+            onChange={setKmh}
+          />
+        </div>
       </div>
     </div>
   );
