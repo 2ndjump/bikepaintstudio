@@ -140,13 +140,13 @@ def sweep(name, zone, ctrl, r_keys, wy_keys=((0, 1.0),), wz_keys=((0, 1.0),), ex
     """Closed swept tube. r = base radius, wy = lateral scale, wz = in-plane scale.
     kamm_keys > 0 turns the section into a Kamm-tail airfoil with its nose towards `lead`.
     taper_keys > 0 narrows the section laterally towards its -nrm side (egg shape).
-    flat_bottom (straight ctrl only) shifts each section along nrm so its -nrm edge
-    runs straight from end to end: depth changes only grow the +nrm side."""
+    flat_bottom = (b0, b1) (straight ctrl only) shifts each section along nrm so its
+    -nrm edge runs straight from b0 below the first to b1 below the last control
+    point: depth changes only grow the +nrm side."""
     pts = catmull([Vector(p) for p in ctrl], n)
     bm = bmesh.new()
     rings = []
     samples = []
-    b_ends = [lerp_key(r_keys, e) * lerp_key(wz_keys, e) for e in (0, 1)]
     for i, p in enumerate(pts):
         u = i / (n - 1)
         tng = (pts[min(i + 1, n - 1)] - pts[max(i - 1, 0)]).normalized()
@@ -160,7 +160,7 @@ def sweep(name, zone, ctrl, r_keys, wy_keys=((0, 1.0),), wz_keys=((0, 1.0),), ex
         k = lerp_key(kamm_keys, u)
         tp = lerp_key(taper_keys, u)
         if flat_bottom:
-            p = p + nrm * (b - (b_ends[0] + (b_ends[1] - b_ends[0]) * u))
+            p = p + nrm * (b - (flat_bottom[0] + (flat_bottom[1] - flat_bottom[0]) * u))
         vs = []
         for j in range(ring):
             x, y = superellipse(2 * math.pi * j / ring, a, b, expo)
@@ -236,20 +236,22 @@ def frame_parts():
                        wy_keys=S(((0, 1.0), (0.8, 1.02), (1, 1.2)), ((0, 0.85), (0.8, 0.9), (1, 1.15))),
                        wz_keys=S(((0, 1.12), (1, 1.05)), ((0, 1.4), (1, 1.3))),
                        expo=S(2.2, 2.4)))
-    # Down tube: straight underside in the side view; extra depth grows into the main
-    # triangle only. The section is widest towards the triangle and narrows downwards,
-    # flaring wide and flat into the BB. Aero: deeper, narrower, stronger taper.
+    # Down tube: straight-sided in the side view. The underside runs straight from just
+    # inside the BB shell to the head tube; the depth is constant, so the upper edge is
+    # a parallel straight line that meets the seat tube well above the shell (the last
+    # 5% only thins inside the seat tube so the end stays hidden). The section is
+    # widest towards the triangle and narrows downwards, flaring wide into the BB.
+    # Aero: deeper, narrower, stronger taper.
     dt_front = ht_at(DT_TOP)
     parts.append(sweep("downTube", "downTube",
                        [BB + Vector((0.0, 0, -0.002)), dt_front],
-                       ((0, 0.0265), (0.3, 0.0270), (1, 0.0265)),
+                       ((0, 0.0265),),
                        wy_keys=S(((0, 1.55), (0.18, 1.25), (0.4, 0.98), (1, 0.98)),
                                  ((0, 1.55), (0.18, 1.1), (0.4, 0.82), (1, 0.85))),
-                       wz_keys=S(((0, 0.92), (0.45, 1.18), (0.85, 1.15), (1, 1.15)),
-                                 ((0, 0.92), (0.45, 1.5), (0.75, 1.46), (1, 1.2))),
+                       wz_keys=S(((0, 1.0), (0.05, 1.15)), ((0, 1.15), (0.05, 1.3))),
                        taper_keys=S(((0, 0.0), (0.25, 0.15), (0.85, 0.15), (1, 0.05)),
                                     ((0, 0.0), (0.25, 0.4), (0.85, 0.4), (1, 0.15))),
-                       flat_bottom=True, expo=2.3, n=80, ring=64))
+                       flat_bottom=(0.0265 * 0.92, 0.0265 * S(1.15, 1.2)), expo=2.3, n=80, ring=64))
     # Seat tube: round up top (31.6 post), widens laterally at the BB. Aero: airfoil
     # whose tail is cut out around the rear wheel, rising past the top tube as a mast.
     # Short stays push the tube forward where the tire would come too close.
