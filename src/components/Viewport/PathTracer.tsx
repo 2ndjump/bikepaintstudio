@@ -18,7 +18,7 @@ const PT_EXPOSURE = 1.35;
 const PT_BACKGROUND = new THREE.Color(0.008, 0.008, 0.009);
 
 /** Why path tracing can't run on this renderer, or null. */
-export function pathTraceUnsupported(gl: THREE.WebGLRenderer): string | null {
+function pathTraceUnsupported(gl: THREE.WebGLRenderer): string | null {
   if (!gl.capabilities.isWebGL2) return 'WebGL 2';
   if (!gl.extensions.has('EXT_color_buffer_float')) return 'EXT_color_buffer_float';
   return null;
@@ -217,9 +217,10 @@ export function PathTracer() {
       });
     });
 
+    const v = view.current;
     return () => {
       cancelled = true;
-      view.current.sum = 0;
+      v.sum = 0;
       cancelAnimationFrame(raf);
       restore.reverse().forEach((r) => r());
     };
@@ -229,7 +230,7 @@ export function PathTracer() {
 
   // While on: draw the traced image instead of the composer (priority > 0
   // takes the render over from R3F).
-  useFrame(() => {
+  useFrame(({ gl }) => {
     const t = tracer.current;
     if (!on || !t || view.current.sum === 0) return; // off, or not built yet
     if (viewSum(camera) !== view.current.sum) {

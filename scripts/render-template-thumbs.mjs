@@ -73,7 +73,7 @@ try {
   await evaluate(`(async () => {
     const url = (f) => performance.getEntriesByType('resource').map((e) => e.name).find((n) => n.includes(f));
     window.__store = await import(url('/src/state/designStore.ts'));
-    window.__studio = await import(url('/src/components/Viewport/StudioEnvironment.tsx'));
+    window.__floorShadow = (await import(url('/src/components/Viewport/floorShadowState.ts'))).floorShadow;
     // Only the bike: no panels, guides or highlights. The template strip is
     // closed (not just hidden) so the framing doesn't make room for it; the
     // still wheel faces the camera the same way in every shot.
@@ -89,7 +89,7 @@ try {
   // The soft floor shadow accumulates over a couple of seconds after any
   // change: wait until it has settled (max. 15 s) so no thumbnail is noisy.
   const settle = async () => {
-    for (let i = 0; i < 60 && !(await evaluate('window.__studio.shadowSettled()')); i++) await sleep(250);
+    for (let i = 0; i < 60 && !(await evaluate('window.__floorShadow.settled')); i++) await sleep(250);
   };
 
   const capture = async (clip) => {

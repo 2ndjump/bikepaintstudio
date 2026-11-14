@@ -3,6 +3,7 @@ import { useFrame, useThree } from '@react-three/fiber';
 import { AccumulativeShadows, RandomizedLight } from '@react-three/drei';
 import * as THREE from 'three';
 import { useUIStore } from '../../state/uiStore';
+import { floorShadow } from './floorShadowState';
 import { RectAreaLightUniformsLib } from 'three/examples/jsm/lights/RectAreaLightUniformsLib.js';
 import { HDRLoader } from 'three/examples/jsm/loaders/HDRLoader.js';
 
@@ -70,13 +71,6 @@ vec4 bilinear(sampler2D m, vec2 uv) {
   return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);
 }
 `;
-
-/** Whether the floor shadow is still converging (read by the thumbnail
- *  script so it never captures a half-accumulated shadow). */
-let shadowAccumulating = true;
-export function shadowSettled(): boolean {
-  return !shadowAccumulating;
-}
 
 type ShadowApi = {
   blend: number;
@@ -151,7 +145,7 @@ function FloorShadow() {
       api.count = 0; // (re)start accumulating
     }
     api.blend = s.moving > 0 ? SHADOW_BLEND_MOVING : Math.max(SHADOW_BLEND_MOVING, api.count + 1);
-    shadowAccumulating = s.moving > 0 || api.count < SHADOW_BLEND_STILL;
+    floorShadow.settled = s.moving === 0 && api.count >= SHADOW_BLEND_STILL;
   });
 
   const origin = new THREE.Vector3(CENTER.x, FLOOR_Y + 0.002, 0);
