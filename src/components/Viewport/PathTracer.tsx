@@ -6,7 +6,6 @@ import { useDesignStore } from '../../state/designStore';
 import { useUIStore } from '../../state/uiStore';
 import { createDividerBakeMaterial } from '../../rendering/dividers';
 import { DEFAULT_CHAMELEON_COLORS, type ZoneId } from '../../state/types';
-import { pathTraceEnvironment } from './StudioEnvironment';
 
 /** Samples after which the image counts as converged and tracing stops. */
 const MAX_SAMPLES = 1000;
@@ -88,8 +87,9 @@ function bakeZone(gl: THREE.WebGLRenderer, mesh: THREE.Mesh, map: THREE.Texture,
  * whose map is the zone's paint baked with its dividers (see bakeZone), the
  * chameleon flip becomes its mid colour plus a sheen in the grazing colour,
  * the floor shadow plane and the key's raster-only directional light are off
- * (StudioEnvironment) and the environment is the one pathTraceEnvironment()
- * gives (none while the procedural studio is in use).
+ * (StudioEnvironment) and there is no environment map: the tracer lights
+ * the scene with the cyclorama and softbox lights the studio HDRI was baked
+ * from.
  */
 export function PathTracer() {
   const on = useUIStore((s) => s.pathTrace);
@@ -191,7 +191,7 @@ export function PathTracer() {
           // Swapped until the build has read them (nothing else draws meanwhile).
           const env = scene.environment;
           const bg = scene.background;
-          scene.environment = pathTraceEnvironment();
+          scene.environment = null; // see STUDIO_HDRI: the tracer uses the real lights
           scene.background = PT_BACKGROUND;
           restore.push(() => {
             scene.environment = env;

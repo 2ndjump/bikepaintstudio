@@ -208,26 +208,18 @@ function FloorShadow() {
 /** Backdrop self-glow in the path-traced still (see the cyclorama below). */
 const PT_BACKDROP_GLOW = 0.12;
 
-/** Reflection environment resolution (PMREM cube face size). */
-const ENV_SIZE = 512;
-
 /**
- * The reflection environment's source — the one switch: the white studio
- * baked in Blender from the bike's position (equirect Radiance HDR), or null
- * for the procedural copy of the studio built below.
+ * The reflection environment: the white studio (cyclorama + the five softbox
+ * panels) baked in Blender from the bike's centre as an equirect Radiance HDR
+ * (blender/bake_studio_hdri.py; three's equirect orientation, so no turn).
+ * The path tracer doesn't use it: it traces the real cyclorama and softbox
+ * lights the HDRI was baked from (using both would count them twice).
  */
-const STUDIO_HDRI: string | null = null;
-/** Turn (about +y) and strength of the baked HDRI in the scene. */
+const STUDIO_HDRI = 'assets/hdri/studio_2k.hdr';
+/** Turn (about +y) and strength of the HDRI: 0.3 puts the softbox panels near
+ *  the RectAreaLights' radiance and keeps black paint black. */
 const HDRI_ROTATION = 0;
-const HDRI_INTENSITY = 1;
-
-/** Equirect environment for the path tracer (it can't use a PMREM); null
- *  while the studio is the procedural one — the tracer then lights the scene
- *  with the real cyclorama and softbox lights alone. */
-let tracerEnvironment: THREE.Texture | null = null;
-export function pathTraceEnvironment(): THREE.Texture | null {
-  return tracerEnvironment;
-}
+const HDRI_INTENSITY = 0.3;
 
 /** Cyclorama: flat floor sweeping up into the back wall (Blender profile). */
 function cycloramaGeometry(): THREE.BufferGeometry {
@@ -258,10 +250,9 @@ function cycloramaGeometry(): THREE.BufferGeometry {
  * cyclorama, the five softboxes as RectAreaLights (no shadows), one
  * shadow-casting directional light along the key for the bike's self-shadow
  * and the accumulated soft floor shadow (FloorShadow).
- * A copy of the studio (backdrop + glowing softbox panels, open front kept
- * darker for contrast) is rendered through PMREM into scene.environment so
- * glossy/metallic paint reflects the softboxes. Everything here is fixed in
- * world space; only the bike turns (see Turntable).
+ * The baked studio HDRI (STUDIO_HDRI) goes through PMREM into
+ * scene.environment so glossy/metallic paint reflects the softboxes.
+ * Everything here is fixed in world space; only the bike turns (see Turntable).
  */
 export function StudioEnvironment() {
   const gl = useThree((s) => s.gl);
@@ -273,63 +264,27 @@ export function StudioEnvironment() {
   useEffect(() => () => cyclo.dispose(), [cyclo]);
 
   useEffect(() => {
-    if (STUDIO_HDRI) {
-      let rt: THREE.WebGLRenderTarget | null = null;
-      let hdr: THREE.Texture | null = null;
-      let disposed = false;
-      new HDRLoader().load(`${import.meta.env.BASE_URL}${STUDIO_HDRI}`, (tex) => {
-        if (disposed) return tex.dispose();
-        tex.mapping = THREE.EquirectangularReflectionMapping;
-        const pmrem = new THREE.PMREMGenerator(gl);
-        rt = pmrem.fromEquirectangular(tex);
-        pmrem.dispose();
-        hdr = tex;
-        scene.environment = rt.texture;
-        scene.environmentRotation.set(0, HDRI_ROTATION, 0);
-        scene.environmentIntensity = HDRI_INTENSITY;
-        tracerEnvironment = tex;
-      });
-      return () => {
-        disposed = true;
-        scene.environment = null;
-        tracerEnvironment = null;
-        rt?.dispose();
-        hdr?.dispose();
-      };
-    }
-
-    const env = new THREE.Scene();
-    // Dim backdrop + darker open front keep reflections contrasty (black
-    // paint stays black); the softbox panels glow at their light's radiance.
-    env.background = new THREE.Color(0.018, 0.018, 0.02);
-    const backdropMat = new THREE.MeshBasicMaterial({ color: BACKDROP_COLOR, side: THREE.DoubleSide });
-    backdropMat.color.multiplyScalar(0.22);
-    env.add(new THREE.Mesh(cyclo, backdropMat));
-    const panelGeo = new THREE.PlaneGeometry(1, 1);
-    const panelMats = SOFTBOXES.map((b) => {
-      const m = new THREE.MeshBasicMaterial({ side: THREE.DoubleSide });
-      m.color.setScalar(b.radiance);
-      const panel = new THREE.Mesh(panelGeo, m);
-      panel.position.copy(b.pos);
-      panel.scale.set(b.w, b.h, 1);
-      panel.lookAt(CENTER);
-      env.add(panel);
-      return m;
+    let rt: THREE.WebGLRenderTarget | null = null;
+    let hdr: THREE.Texture | null = null;
+    let disposed = false;
+    new HDRLoader().load(`${import.meta.env.BASE_URL}${STUDIO_HDRI}`, (tex) => {
+      if (disposed) return tex.dispose();
+      tex.mapping = THREE.EquirectangularReflectionMapping;
+      const pmrem = new THREE.PMREMGenerator(gl);
+      rt = pmrem.fromEquirectangular(tex); // 512 px cube faces from the 2k map
+      pmrem.dispose();
+      hdr = tex;
+      scene.environment = rt.texture;
+      scene.environmentRotation.set(0, HDRI_ROTATION, 0);
+      scene.environmentIntensity = HDRI_INTENSITY;
     });
-
-    const pmrem = new THREE.PMREMGenerator(gl);
-    const rt = pmrem.fromScene(env, 0, 0.05, 50, { position: CENTER, size: ENV_SIZE });
-    scene.environment = rt.texture;
-    pmrem.dispose();
-    backdropMat.dispose();
-    panelGeo.dispose();
-    panelMats.forEach((m) => m.dispose());
-
     return () => {
+      disposed = true;
       scene.environment = null;
-      rt.dispose();
+      rt?.dispose();
+      hdr?.dispose();
     };
-  }, [gl, scene, cyclo]);
+  }, [gl, scene]);
 
   const key = SOFTBOXES[0].pos;
 

@@ -1,5 +1,5 @@
 import { Canvas, useThree } from '@react-three/fiber';
-import { OrbitControls, useGLTF } from '@react-three/drei';
+import { OrbitControls } from '@react-three/drei';
 import { Bloom, EffectComposer, N8AO, ToneMapping } from '@react-three/postprocessing';
 import { ToneMappingMode } from 'postprocessing';
 import * as THREE from 'three';
@@ -15,7 +15,7 @@ import { WheelStage } from './WheelStage';
 import { PathTracer } from './PathTracer';
 import { useUIStore } from '../../state/uiStore';
 import { isRimZone } from '../../state/types';
-import { ALL_VARIANTS, useBikeModel, variantUrl } from '../../geometry/bikeModel';
+import { useBikeModel } from '../../geometry/bikeModel';
 import { Suspense, useDeferredValue, useEffect } from 'react';
 import { useDesignStore } from '../../state/designStore';
 import { syncDividerUniforms, syncDividerPatterns } from '../../rendering/dividers';
@@ -114,8 +114,9 @@ function PostEffects() {
  * wheels at its hubs, standing on the studio floor. Suspends while the GLB loads.
  */
 function Bike() {
-  // Deferred: while another variant's GLB loads, the current bike stays up
-  // (no Suspense fallback, the turntable keeps its angle) and swaps when ready.
+  // Deferred: while another variant's GLB (~4.7 MB, fetched only when picked)
+  // loads, the current bike stays up (no Suspense fallback, the turntable
+  // keeps its angle) and swaps when ready.
   const variant = useDeferredValue(useDesignStore((s) => s.variant));
   const activeZone = useDesignStore((s) => s.activeZone);
   const model = useBikeModel(variant);
@@ -123,13 +124,6 @@ function Bike() {
   // selected wheel is shown alone.
   const wheelMode = isRimZone(activeZone);
   const { frontHub, rearHub } = model;
-
-  // Fetch the other variants once the first bike is up (after its first
-  // frames and textures), so switching is instant.
-  useEffect(() => {
-    const t = setTimeout(() => ALL_VARIANTS.forEach((v) => useGLTF.preload(variantUrl(v))), 1500);
-    return () => clearTimeout(t);
-  }, []);
 
   return (
     <>
