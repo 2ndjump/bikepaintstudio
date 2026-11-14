@@ -68,7 +68,9 @@ export function ZoneSelector({ columns = 1 }: Props) {
 
   return (
     <div className="space-y-2">
-      <div className="m3-section-title">{t('zones')}</div>
+      <div className="m3-section-title" title={t('zoneClickHint')}>
+        {t('zones')}
+      </div>
       <div className={gridClass}>{frameZones.map(renderZone)}</div>
     </div>
   );

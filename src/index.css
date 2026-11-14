@@ -2,9 +2,12 @@
 
 /* ============================================================
    Light "liquid glass" scheme (Material 3 token names kept).
-   The UI floats over the bright white studio as frosted cards: a mostly
-   opaque white tint (so dark text stays legible even when a dark or
-   saturated bike passes behind) + blur/saturation of what's behind.
+   The UI floats over the bright white studio as translucent glass: a thin,
+   faintly cool fill over a strongly blurred + saturated backdrop, a bright
+   rim top-left and a darker one bottom-right, layered soft shadows. The fill
+   never drops below ~50 % white so dark text stays AA-legible even with a
+   black bike right behind. Controls inside are a second, denser tier of
+   plain translucent fills (no extra backdrop-filters).
    ============================================================ */
 :root {
   /* Primary */
@@ -14,30 +17,56 @@
   --md-on-primary-container: #0b2a6b;
 
   /* Tonal / selected states */
-  --md-secondary-container: #e1e8f7;
+  --md-secondary-container: rgba(214, 226, 250, 0.78);
   --md-on-secondary-container: #102446;
 
-  /* Surfaces — page, then increasingly "solid" fills inside the glass */
+  /* Surfaces — page, then increasingly "solid" fills inside the glass
+     (the second glass tier: controls, cards, fields). */
   --md-surface: #f2f3f5;
-  --md-surface-container-low: rgba(255, 255, 255, 0.55);
-  --md-surface-container: rgba(255, 255, 255, 0.72);
-  --md-surface-container-high: #ffffff;
-  --md-surface-container-highest: rgba(15, 23, 42, 0.12);
+  --md-surface-container-low: rgba(255, 255, 255, 0.5);
+  --md-surface-container: rgba(255, 255, 255, 0.68);
+  --md-surface-container-high: rgba(255, 255, 255, 0.88);
+  --md-surface-container-highest: rgba(15, 23, 42, 0.14);
 
   /* Content */
   --md-on-surface: #14171c;
-  --md-on-surface-variant: #4a515e;
-  --md-outline: #8a909c;
+  --md-on-surface-variant: #333a47;
+  --md-outline: #7d8492;
   --md-outline-variant: rgba(15, 23, 42, 0.12);
 
   --md-error: #c62828;
 
-  /* Glass panels */
-  --glass-bg: rgba(248, 249, 252, 0.76);
-  --glass-border: rgba(255, 255, 255, 0.75);
-  --glass-shadow: 0 10px 34px rgba(18, 28, 48, 0.14), 0 1px 3px rgba(18, 28, 48, 0.08);
+  /* Glass panels (first tier): diagonal sheen from a brighter top-left to a
+     thinner, faintly blue bottom-right. */
+  --glass-bg: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.66) 0%,
+    rgba(246, 249, 255, 0.55) 45%,
+    rgba(232, 239, 252, 0.54) 100%
+  );
+  /* contrast < 1 lifts the darkest backdrop (a black tyre) before the fill
+     goes on top, so the fill can stay thin; saturate keeps colours vivid. */
+  --glass-filter: blur(26px) contrast(0.72) brightness(1.14) saturate(220%);
+  --glass-border: rgba(255, 255, 255, 0.55);
+  --glass-radius: 28px;
+  /* Rims (bright top-left, darker bottom-right, faint outer hairline so the
+     edge reads on the white studio) + layered soft depth. */
+  --glass-shadow:
+    inset 1.5px 1.5px 0 rgba(255, 255, 255, 0.95),
+    inset 0 0 18px rgba(255, 255, 255, 0.35),
+    inset -1px -1px 0 rgba(28, 40, 72, 0.12),
+    0 0 0 1px rgba(28, 40, 72, 0.07),
+    0 2px 4px rgba(18, 28, 48, 0.06),
+    0 10px 24px rgba(18, 28, 48, 0.1),
+    0 28px 64px rgba(18, 28, 48, 0.12);
+  /* Second tier (controls / cards inside a panel). */
+  --glass-control-border: rgba(255, 255, 255, 0.75);
+  --glass-control-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85), 0 0 0 1px rgba(28, 40, 72, 0.06),
+    0 1px 3px rgba(18, 28, 48, 0.08);
   --glass-gap: 12px;
   --toolbar-h: 3.25rem;
+  /* Template strip at the bottom edge (Toolbar/TemplateGallery). */
+  --gallery-h: 9.25rem;
 
   /* Shape */
   --md-radius-xs: 4px;
@@ -100,11 +129,11 @@ canvas {
 /* Floating frosted-glass panel (toolbar, side panels, viewport overlays). */
 .glass {
   background: var(--glass-bg);
-  -webkit-backdrop-filter: blur(22px) saturate(170%);
-  backdrop-filter: blur(22px) saturate(170%);
+  -webkit-backdrop-filter: var(--glass-filter);
+  backdrop-filter: var(--glass-filter);
   border: 1px solid var(--glass-border);
-  border-radius: 20px;
-  box-shadow: var(--glass-shadow), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  border-radius: var(--glass-radius);
+  box-shadow: var(--glass-shadow);
   color: var(--md-on-surface);
 }
 
@@ -212,23 +241,48 @@ canvas {
   color: var(--md-on-secondary-container);
   font-size: 0.6875rem;
   font-weight: 500;
-  border: none;
+  border: 1px solid var(--glass-control-border);
+  box-shadow: var(--glass-control-shadow);
   cursor: pointer;
   transition: filter 0.15s;
 }
 .layer-add-btn:hover { filter: brightness(0.94); }
-.layer-row {
+
+/* A list entry in a panel (layers, dividers): its own sheet of second-tier
+   glass. `--row-rail` adds the accent rail of a clipping group. */
+.list-row {
+  --row-rail: 0 0 #0000;
   border-radius: var(--md-radius-md);
-  border: 1px solid transparent;
-  padding: 0 0.15rem;
-  margin: 0.25rem 0;
-  transition: background-color 0.15s, border-color 0.15s;
+  border: 1px solid var(--glass-control-border);
+  background: var(--md-surface-container-low);
+  box-shadow: var(--row-rail), var(--glass-control-shadow);
+  transition: background-color 0.15s, border-color 0.15s, box-shadow 0.15s;
 }
-.layer-row:hover { background: var(--md-surface-container-low); }
-.layer-row-selected, .layer-row-selected:hover {
+.list-row:hover {
   background: var(--md-surface-container);
-  border-color: var(--md-primary);
+  box-shadow: var(--row-rail), var(--glass-control-shadow), 0 4px 12px rgba(18, 28, 48, 0.08);
 }
+.list-row-selected, .list-row-selected:hover {
+  background: var(--md-surface-container-high);
+  border-color: var(--md-primary);
+  box-shadow: var(--row-rail), 0 0 0 3px color-mix(in srgb, var(--md-primary) 18%, transparent),
+    0 4px 14px rgba(18, 28, 48, 0.12);
+}
+.list-row-rail { --row-rail: inset 3px 0 0 var(--md-primary); }
+.layer-row { padding: 0 0.15rem 0 0.35rem; margin: 0.375rem 0; }
+/* Type icon on the layer's colour (or a thumbnail of its image). */
+.layer-chip {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 1.625rem;
+  height: 1.625rem;
+  border-radius: var(--md-radius-sm);
+  overflow: hidden;
+  box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.16);
+}
+.layer-chip img { width: 100%; height: 100%; object-fit: cover; }
 
 /* Sections inside a panel, separated by hairlines instead of nested cards. */
 .m3-section { padding: 0.875rem 0; }
@@ -272,7 +326,12 @@ canvas {
 .m3-btn-filled { background: var(--md-primary); color: var(--md-on-primary); }
 .m3-btn-filled:hover { box-shadow: 0 1px 3px rgba(0,0,0,0.25); filter: brightness(1.08); }
 
-.m3-btn-tonal { background: var(--md-secondary-container); color: var(--md-on-secondary-container); }
+.m3-btn-tonal {
+  background: var(--md-secondary-container);
+  color: var(--md-on-secondary-container);
+  border-color: var(--glass-control-border);
+  box-shadow: var(--glass-control-shadow);
+}
 .m3-btn-tonal:hover { filter: brightness(0.95); }
 
 .m3-btn-outlined { background: transparent; color: var(--md-primary); border-color: var(--md-outline); }
@@ -339,8 +398,9 @@ canvas {
    ============================================================ */
 .m3-segmented {
   display: inline-flex;
-  border: 1px solid var(--md-outline-variant);
-  background: var(--md-surface-container);
+  border: 1px solid var(--glass-control-border);
+  background: var(--md-surface-container-low);
+  box-shadow: var(--glass-control-shadow);
   border-radius: var(--md-radius-full);
   overflow: hidden;
   height: 2rem;
@@ -373,19 +433,21 @@ canvas {
   align-items: center;
   gap: 0.5rem;
   padding: 0.4rem 0.75rem;
-  border-radius: var(--md-radius-sm);
-  border: 1px solid var(--md-outline-variant);
-  background: transparent;
-  color: var(--md-on-surface-variant);
+  border-radius: var(--md-radius-md);
+  border: 1px solid var(--glass-control-border);
+  background: var(--md-surface-container-low);
+  box-shadow: var(--glass-control-shadow);
+  color: var(--md-on-surface);
   font-size: 0.8125rem;
   cursor: pointer;
-  transition: background-color 0.15s, color 0.15s, border-color 0.15s;
+  transition: background-color 0.15s, color 0.15s, border-color 0.15s, box-shadow 0.15s;
 }
-.m3-chip:hover { background: color-mix(in srgb, var(--md-on-surface) 6%, transparent); }
-.m3-chip-active {
+.m3-chip:hover { background: var(--md-surface-container); box-shadow: var(--glass-control-shadow), 0 4px 12px rgba(18, 28, 48, 0.08); }
+.m3-chip-active, .m3-chip-active:hover {
   background: var(--md-primary-container);
   color: var(--md-on-primary-container);
   border-color: var(--md-primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--md-primary) 18%, transparent), 0 4px 14px rgba(18, 28, 48, 0.12);
 }
 
 /* ============================================================
@@ -396,6 +458,7 @@ canvas {
   background: var(--md-surface-container-high);
   color: var(--md-on-surface);
   border: 1px solid var(--md-outline-variant);
+  box-shadow: inset 0 1px 2px rgba(18, 28, 48, 0.05);
   border-radius: var(--md-radius-sm);
   padding: 0.45rem 0.6rem;
   font-size: 0.8125rem;

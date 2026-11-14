@@ -102,6 +102,25 @@ const TYPE_ICON: Record<Layer['type'], () => React.ReactElement> = {
   solid: PatternIcon,
 };
 
+/** The layer's type icon on its colour, or a thumbnail of its image. */
+function LayerChip({ layer, icon: Icon }: { layer: Layer; icon: () => React.ReactElement }) {
+  if (layer.type === 'image') {
+    return (
+      <span className="layer-chip">
+        <img src={layer.src} alt="" />
+      </span>
+    );
+  }
+  // Dark or light icon, whichever reads on the colour (rough sRGB luma).
+  const n = parseInt(layer.color.slice(1, 7), 16);
+  const luma = 0.299 * (n >> 16) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255);
+  return (
+    <span className="layer-chip" style={{ background: layer.color, color: luma > 150 ? '#14171c' : '#fff' }}>
+      <Icon />
+    </span>
+  );
+}
+
 const BLEND_MODES: BlendMode[] = [
   'normal',
   'multiply',
@@ -278,13 +297,6 @@ export function LayerStack() {
         ))}
       </div>
 
-      {layers.length === 0 && (
-        <div className="m3-label space-y-1">
-          <p>{t('layersEmpty')}</p>
-          {!isRimZone(activeZone) && <p>{t('zoneClickHint')}</p>}
-        </div>
-      )}
-
       <div>
         {[...layers].reverse().map((layer, ri, rev) => {
           // A layer can clip to the one below it unless it's the bottom layer.
@@ -298,21 +310,21 @@ export function LayerStack() {
           return (
             <Fragment key={layer.id}>
               <div
-                className={`layer-row ${selected ? 'layer-row-selected' : ''}`}
-                style={inClipGroup ? { boxShadow: 'inset 3px 0 0 var(--md-primary)' } : undefined}
+                className={`list-row layer-row ${selected ? 'list-row-selected' : ''} ${
+                  inClipGroup ? 'list-row-rail' : ''
+                }`}
               >
                 <div className="flex items-center gap-0.5">
                   <button
                     type="button"
                     onClick={() => select(selected ? null : layer.id)}
                     aria-expanded={selected}
-                    className={`flex-1 min-w-0 flex items-center gap-2 text-left text-sm py-1.5 pl-1 ${
-                      layer.visible ? '' : 'opacity-45'
-                    }`}
+                    title={layer.type !== 'pattern' ? t('layerEditHint') : undefined}
+                    className={`flex-1 min-w-0 flex items-center gap-2.5 text-left text-sm py-2 ${
+                      selected ? 'font-medium' : ''
+                    } ${layer.visible ? '' : 'opacity-45'}`}
                   >
-                    <span className="flex-none text-[var(--md-on-surface-variant)]">
-                      <Icon />
-                    </span>
+                    <LayerChip layer={layer} icon={Icon} />
                     <span className="truncate">{layer.name}</span>
                   </button>
                   <button
@@ -365,7 +377,6 @@ export function LayerStack() {
 
                 {selected && (
                   <div className="space-y-3 px-1 pt-2 pb-1">
-                    {layer.type !== 'pattern' && <div className="m3-label">{t('layerEditHint')}</div>}
                     <label className="m3-label flex flex-col gap-1">
                       {t('layerName')}
                       <input

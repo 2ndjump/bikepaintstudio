@@ -75,7 +75,7 @@ export function DividerPanel() {
           return (
             <div
               key={d.id}
-              className={`rounded-md px-1 py-0.5 ${active ? 'ring-1 ring-[var(--md-primary)]' : ''}`}
+              className={`list-row px-1.5 py-1 ${active ? 'list-row-selected' : ''}`}
             >
               <div className="flex items-center gap-2">
                 <ColorPicker
@@ -87,13 +87,12 @@ export function DividerPanel() {
                 <button
                   type="button"
                   onClick={() => setActiveId(active ? null : d.id)}
-                  title={t('dividerEdit')}
+                  title={t(active ? 'dividerEditing' : 'dividerEdit')}
                   className={`flex-1 min-w-0 text-left text-xs truncate bg-transparent ${
                     active ? 'text-[var(--md-primary)] font-medium' : 'text-[var(--md-on-surface)]'
                   }`}
                 >
                   {t(isShape ? 'dividerShapeLabel' : 'dividerLabel')} {i + 1}
-                  {active && <span className="text-[var(--md-on-surface-variant)] font-normal"> · {t('dividerEditing')}</span>}
                 </button>
                 <button
                   type="button"

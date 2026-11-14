@@ -9,9 +9,8 @@ export function RimPanel() {
 
   return (
     <div className="space-y-2.5">
-      <div>
-        <div className="m3-section-title">{t('rimGeometry')}</div>
-        <div className="m3-label">{t('rimGeometryBoth')}</div>
+      <div className="m3-section-title" title={t('rimGeometryBoth')}>
+        {t('rimGeometry')}
       </div>
       <Slider
         label={t('depth')}

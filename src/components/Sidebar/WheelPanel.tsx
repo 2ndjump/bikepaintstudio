@@ -9,8 +9,8 @@ function paintKey(z: ZoneState): string {
 }
 
 /**
- * Wheel designer header: which wheel is being edited, whether front and rear
- * currently match, and a one-click copy of this wheel's paint to the other.
+ * Wheel designer header: which wheel is being edited and a one-click copy of
+ * this wheel's paint to the other (disabled while both already match).
  */
 export function WheelPanel() {
   const activeZone = useDesignStore((s) => s.activeZone);
@@ -37,13 +37,7 @@ export function WheelPanel() {
           </button>
         ))}
       </div>
-      <div className="flex items-center gap-2 m3-label">
-        <span
-          className="flex-none rounded-full"
-          style={{ width: 8, height: 8, background: same ? '#2e7d32' : 'var(--md-outline)' }}
-        />
-        {t(same ? 'wheelsSame' : 'wheelsDiffer')}
-      </div>
+      {/* Disabled while both wheels already match. */}
       <button
         type="button"
         className="m3-btn m3-btn-tonal m3-btn-sm w-full"
