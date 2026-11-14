@@ -65,6 +65,9 @@ reordering, and duplicate (with horizontal/vertical mirror):
 - A session colour palette of favourites, shown in every colour picker.
 - **Save / load** the whole design as JSON (choose the filename), including the
   palette.
+- **Templates:** eight ready-made designs (`src/templates/`, same JSON format)
+  to load and modify. Thumbnails: `node scripts/render-template-thumbs.mjs`
+  with the dev server running.
 - Undo / redo, and German / English UI.
 
 ## Getting started

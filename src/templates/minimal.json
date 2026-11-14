@@ -1,0 +1,375 @@
+{
+  "activeZone": "topTube",
+  "zones": {
+    "headTube": {
+      "finish": "glossy",
+      "baseColor": "#f4f4f1",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": [
+        {
+          "id": "shape-tpl3s",
+          "name": "Accent",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "shape",
+          "shape": "rectangle",
+          "color": "#7a9a7e",
+          "x": 0.5,
+          "y": 0.5,
+          "width": 1,
+          "height": 0.05,
+          "rotation": 0
+        }
+      ]
+    },
+    "topTube": {
+      "finish": "glossy",
+      "baseColor": "#f4f4f1",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": []
+    },
+    "downTube": {
+      "finish": "glossy",
+      "baseColor": "#f4f4f1",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": [
+        {
+          "letterSpacing": 16,
+          "glyphRotation": 0,
+          "id": "decal-tpl3p",
+          "name": "Wordmark",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "ALBA",
+          "font": "Montserrat",
+          "size": 24,
+          "color": "#1a1a1a",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.25,
+          "y": 0.78,
+          "rotation": 0,
+          "bold": false,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        },
+        {
+          "letterSpacing": 16,
+          "glyphRotation": 0,
+          "id": "decal-tpl3q",
+          "name": "Wordmark (L)",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "ALBA",
+          "font": "Montserrat",
+          "size": 24,
+          "color": "#1a1a1a",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.75,
+          "y": 0.78,
+          "rotation": 180,
+          "bold": false,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        }
+      ]
+    },
+    "seatTube": {
+      "finish": "glossy",
+      "baseColor": "#f4f4f1",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": [
+        {
+          "id": "shape-tpl3r",
+          "name": "Fine line",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "shape",
+          "shape": "rectangle",
+          "color": "#1a1a1a",
+          "x": 0.5,
+          "y": 0.1,
+          "width": 1,
+          "height": 0.008,
+          "rotation": 0
+        }
+      ]
+    },
+    "seatStays": {
+      "finish": "glossy",
+      "baseColor": "#f4f4f1",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": []
+    },
+    "chainStays": {
+      "finish": "glossy",
+      "baseColor": "#f4f4f1",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": []
+    },
+    "fork": {
+      "finish": "glossy",
+      "baseColor": "#f4f4f1",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": []
+    },
+    "frontRim": {
+      "finish": "matte",
+      "baseColor": "#161616",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": [
+        {
+          "letterSpacing": 14,
+          "glyphRotation": 0,
+          "id": "decal-tpl3x",
+          "name": "Rim 1",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "ALBA",
+          "font": "Montserrat",
+          "size": 30,
+          "color": "#f4f4f1",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.125,
+          "y": 0.5,
+          "rotation": 0,
+          "bold": false,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        },
+        {
+          "letterSpacing": 14,
+          "glyphRotation": 0,
+          "id": "decal-tpl3y",
+          "name": "Rim 2",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "ALBA",
+          "font": "Montserrat",
+          "size": 30,
+          "color": "#f4f4f1",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.375,
+          "y": 0.5,
+          "rotation": 0,
+          "bold": false,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        },
+        {
+          "letterSpacing": 14,
+          "glyphRotation": 0,
+          "id": "decal-tpl3z",
+          "name": "Rim 3",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "ALBA",
+          "font": "Montserrat",
+          "size": 30,
+          "color": "#f4f4f1",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.625,
+          "y": 0.5,
+          "rotation": 0,
+          "bold": false,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        },
+        {
+          "letterSpacing": 14,
+          "glyphRotation": 0,
+          "id": "decal-tpl40",
+          "name": "Rim 4",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "ALBA",
+          "font": "Montserrat",
+          "size": 30,
+          "color": "#f4f4f1",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.875,
+          "y": 0.5,
+          "rotation": 0,
+          "bold": false,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        }
+      ]
+    },
+    "rearRim": {
+      "finish": "matte",
+      "baseColor": "#161616",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": [
+        {
+          "letterSpacing": 14,
+          "glyphRotation": 0,
+          "id": "decal-tpl41",
+          "name": "Rim 1",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "ALBA",
+          "font": "Montserrat",
+          "size": 30,
+          "color": "#f4f4f1",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.125,
+          "y": 0.5,
+          "rotation": 0,
+          "bold": false,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        },
+        {
+          "letterSpacing": 14,
+          "glyphRotation": 0,
+          "id": "decal-tpl42",
+          "name": "Rim 2",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "ALBA",
+          "font": "Montserrat",
+          "size": 30,
+          "color": "#f4f4f1",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.375,
+          "y": 0.5,
+          "rotation": 0,
+          "bold": false,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        },
+        {
+          "letterSpacing": 14,
+          "glyphRotation": 0,
+          "id": "decal-tpl43",
+          "name": "Rim 3",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "ALBA",
+          "font": "Montserrat",
+          "size": 30,
+          "color": "#f4f4f1",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.625,
+          "y": 0.5,
+          "rotation": 0,
+          "bold": false,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        },
+        {
+          "letterSpacing": 14,
+          "glyphRotation": 0,
+          "id": "decal-tpl44",
+          "name": "Rim 4",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "ALBA",
+          "font": "Montserrat",
+          "size": 30,
+          "color": "#f4f4f1",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.875,
+          "y": 0.5,
+          "rotation": 0,
+          "bold": false,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        }
+      ]
+    }
+  },
+  "rim": {
+    "depth": 35,
+    "width": 25,
+    "spokeCount": 20
+  },
+  "dividers": [],
+  "variant": {
+    "discipline": "gravel",
+    "style": "classic"
+  },
+  "palette": [
+    "#f4f4f1",
+    "#1a1a1a",
+    "#7a9a7e"
+  ]
+}

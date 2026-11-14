@@ -159,7 +159,17 @@ export type I18nKey =
   | 'dupMirrorH'
   | 'dupMirrorV'
   | 'layerName'
-  | 'zoneClickHint';
+  | 'zoneClickHint'
+  | 'templates'
+  | 'templatesHint'
+  | 'tplDiagonal'
+  | 'tplRace'
+  | 'tplFade'
+  | 'tplStealth'
+  | 'tplRetro'
+  | 'tplPop'
+  | 'tplChameleon'
+  | 'tplMinimal';
 
 const STRINGS: Record<I18nKey, Record<Lang, string>> = {
   active: { de: 'Aktiv', en: 'Active' },
@@ -321,6 +331,16 @@ const STRINGS: Record<I18nKey, Record<Lang, string>> = {
   layerName: { de: 'Name', en: 'Name' },
   zoneClickHint: { de: 'Tipp: Klicke ein Rahmenteil im Bild an, um es auszuwählen.', en: 'Tip: click a part of the frame to select it.' },
   handleRotate: { de: 'Drehen (Shift: 15°-Schritte)', en: 'Rotate (Shift: 15° steps)' },
+  templates: { de: 'Vorlagen', en: 'Templates' },
+  templatesHint: { de: 'Ersetzt das aktuelle Design (Strg+Z macht es rückgängig).', en: 'Replaces the current design (Ctrl+Z undoes it).' },
+  tplDiagonal: { de: 'Diagonale', en: 'Diagonal Split' },
+  tplRace: { de: 'Rennteam', en: 'Race Team' },
+  tplFade: { de: 'Sonnenuntergang', en: 'Sunset Fade' },
+  tplStealth: { de: 'Stealth', en: 'Stealth' },
+  tplRetro: { de: 'Stahl-Klassiker', en: 'Heritage Steel' },
+  tplPop: { de: 'Pop-Art', en: 'Pop Art' },
+  tplChameleon: { de: 'Chamäleon', en: 'Chameleon' },
+  tplMinimal: { de: 'Reinweiß', en: 'Pure White' },
 };
 
 export function translate(key: I18nKey, lang: Lang): string {

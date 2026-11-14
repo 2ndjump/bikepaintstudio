@@ -1,0 +1,344 @@
+{
+  "activeZone": "topTube",
+  "zones": {
+    "headTube": {
+      "finish": "chameleon",
+      "baseColor": "#d0d0d0",
+      "chameleonColors": [
+        "#00b3a4",
+        "#6a1fd1",
+        "#e8a317"
+      ],
+      "layers": []
+    },
+    "topTube": {
+      "finish": "chameleon",
+      "baseColor": "#d0d0d0",
+      "chameleonColors": [
+        "#00b3a4",
+        "#6a1fd1",
+        "#e8a317"
+      ],
+      "layers": []
+    },
+    "downTube": {
+      "finish": "chameleon",
+      "baseColor": "#d0d0d0",
+      "chameleonColors": [
+        "#00b3a4",
+        "#6a1fd1",
+        "#e8a317"
+      ],
+      "layers": [
+        {
+          "letterSpacing": 12,
+          "glyphRotation": 0,
+          "id": "decal-tpl3b",
+          "name": "Wordmark",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "PRISMA",
+          "font": "Orbitron",
+          "size": 38,
+          "color": "#111111",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.25,
+          "y": 0.55,
+          "rotation": 0,
+          "bold": true,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        },
+        {
+          "letterSpacing": 12,
+          "glyphRotation": 0,
+          "id": "decal-tpl3c",
+          "name": "Wordmark (L)",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "PRISMA",
+          "font": "Orbitron",
+          "size": 38,
+          "color": "#111111",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.75,
+          "y": 0.55,
+          "rotation": 180,
+          "bold": true,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        }
+      ]
+    },
+    "seatTube": {
+      "finish": "chameleon",
+      "baseColor": "#d0d0d0",
+      "chameleonColors": [
+        "#00b3a4",
+        "#6a1fd1",
+        "#e8a317"
+      ],
+      "layers": []
+    },
+    "seatStays": {
+      "finish": "chameleon",
+      "baseColor": "#d0d0d0",
+      "chameleonColors": [
+        "#00b3a4",
+        "#6a1fd1",
+        "#e8a317"
+      ],
+      "layers": []
+    },
+    "chainStays": {
+      "finish": "chameleon",
+      "baseColor": "#d0d0d0",
+      "chameleonColors": [
+        "#00b3a4",
+        "#6a1fd1",
+        "#e8a317"
+      ],
+      "layers": []
+    },
+    "fork": {
+      "finish": "chameleon",
+      "baseColor": "#d0d0d0",
+      "chameleonColors": [
+        "#00b3a4",
+        "#6a1fd1",
+        "#e8a317"
+      ],
+      "layers": []
+    },
+    "frontRim": {
+      "finish": "chameleon",
+      "baseColor": "#d0d0d0",
+      "chameleonColors": [
+        "#00b3a4",
+        "#6a1fd1",
+        "#e8a317"
+      ],
+      "layers": [
+        {
+          "letterSpacing": 10,
+          "glyphRotation": 0,
+          "id": "decal-tpl3h",
+          "name": "Rim 1",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "PRISMA",
+          "font": "Orbitron",
+          "size": 40,
+          "color": "#111111",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.125,
+          "y": 0.5,
+          "rotation": 0,
+          "bold": true,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        },
+        {
+          "letterSpacing": 10,
+          "glyphRotation": 0,
+          "id": "decal-tpl3i",
+          "name": "Rim 2",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "PRISMA",
+          "font": "Orbitron",
+          "size": 40,
+          "color": "#111111",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.375,
+          "y": 0.5,
+          "rotation": 0,
+          "bold": true,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        },
+        {
+          "letterSpacing": 10,
+          "glyphRotation": 0,
+          "id": "decal-tpl3j",
+          "name": "Rim 3",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "PRISMA",
+          "font": "Orbitron",
+          "size": 40,
+          "color": "#111111",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.625,
+          "y": 0.5,
+          "rotation": 0,
+          "bold": true,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        },
+        {
+          "letterSpacing": 10,
+          "glyphRotation": 0,
+          "id": "decal-tpl3k",
+          "name": "Rim 4",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "PRISMA",
+          "font": "Orbitron",
+          "size": 40,
+          "color": "#111111",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.875,
+          "y": 0.5,
+          "rotation": 0,
+          "bold": true,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        }
+      ]
+    },
+    "rearRim": {
+      "finish": "chameleon",
+      "baseColor": "#d0d0d0",
+      "chameleonColors": [
+        "#00b3a4",
+        "#6a1fd1",
+        "#e8a317"
+      ],
+      "layers": [
+        {
+          "letterSpacing": 10,
+          "glyphRotation": 0,
+          "id": "decal-tpl3l",
+          "name": "Rim 1",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "PRISMA",
+          "font": "Orbitron",
+          "size": 40,
+          "color": "#111111",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.125,
+          "y": 0.5,
+          "rotation": 0,
+          "bold": true,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        },
+        {
+          "letterSpacing": 10,
+          "glyphRotation": 0,
+          "id": "decal-tpl3m",
+          "name": "Rim 2",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "PRISMA",
+          "font": "Orbitron",
+          "size": 40,
+          "color": "#111111",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.375,
+          "y": 0.5,
+          "rotation": 0,
+          "bold": true,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        },
+        {
+          "letterSpacing": 10,
+          "glyphRotation": 0,
+          "id": "decal-tpl3n",
+          "name": "Rim 3",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "PRISMA",
+          "font": "Orbitron",
+          "size": 40,
+          "color": "#111111",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.625,
+          "y": 0.5,
+          "rotation": 0,
+          "bold": true,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        },
+        {
+          "letterSpacing": 10,
+          "glyphRotation": 0,
+          "id": "decal-tpl3o",
+          "name": "Rim 4",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "PRISMA",
+          "font": "Orbitron",
+          "size": 40,
+          "color": "#111111",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.875,
+          "y": 0.5,
+          "rotation": 0,
+          "bold": true,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        }
+      ]
+    }
+  },
+  "rim": {
+    "depth": 65,
+    "width": 25,
+    "spokeCount": 20
+  },
+  "dividers": [],
+  "variant": {
+    "discipline": "road",
+    "style": "aero"
+  },
+  "palette": [
+    "#00b3a4",
+    "#6a1fd1",
+    "#e8a317",
+    "#111111"
+  ]
+}

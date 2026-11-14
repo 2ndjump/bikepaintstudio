@@ -18,6 +18,7 @@ import {
   pushHistory,
   snapshotDesign,
 } from './history';
+import { useUIStore } from './uiStore';
 
 // Defaults fill in fields that legacy persisted layers may lack; the spread
 // then overrides them with whatever the stored layer actually has. `layer` is
@@ -478,6 +479,15 @@ export const useDesignStore = create<Store>((set, get) => {
     canRedo: () => get().history.future.length > 0,
   };
 });
+
+/** A saved design file (Save/Load JSON and the bundled templates). */
+export type DesignFile = DesignState & { palette?: string[] };
+
+/** Load a design file: replaces the design (undoable) and takes its palette. */
+export function loadDesignFile(data: DesignFile): void {
+  useDesignStore.getState().loadDesign(data);
+  if (Array.isArray(data.palette)) useUIStore.getState().setPalette(data.palette);
+}
 
 export function newLayerId(prefix: string): string {
   return `${prefix}-${Math.random().toString(36).slice(2, 10)}`;

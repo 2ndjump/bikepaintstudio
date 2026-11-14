@@ -1,8 +1,9 @@
-import { useDesignStore } from '../../state/designStore';
+import { loadDesignFile, useDesignStore, type DesignFile } from '../../state/designStore';
 import type { DesignState } from '../../state/types';
 import { useUIStore, type Lang } from '../../state/uiStore';
 import { useT } from '../../i18n/useT';
 import { ModeTabs } from './ModeTabs';
+import { TemplateGallery } from './TemplateGallery';
 
 /** Minimal shape of the File System Access API's save picker (not in lib.dom). */
 type ShowSaveFilePicker = (opts: {
@@ -80,11 +81,7 @@ export function Toolbar({ floating = false }: { floating?: boolean }) {
       const reader = new FileReader();
       reader.onload = () => {
         try {
-          const data = JSON.parse(reader.result as string) as DesignState & {
-            palette?: string[];
-          };
-          useDesignStore.getState().loadDesign(data);
-          if (Array.isArray(data.palette)) useUIStore.getState().setPalette(data.palette);
+          loadDesignFile(JSON.parse(reader.result as string) as DesignFile);
         } catch (e) {
           console.error('Invalid design JSON', e);
         }
@@ -144,6 +141,7 @@ export function Toolbar({ floating = false }: { floating?: boolean }) {
         </button>
       </div>
 
+      <TemplateGallery />
       <button className="m3-btn m3-btn-tonal m3-btn-sm" onClick={exportPNG}>
         {t('pngExport')}
       </button>

@@ -1,0 +1,450 @@
+{
+  "activeZone": "topTube",
+  "zones": {
+    "headTube": {
+      "finish": "glossy",
+      "baseColor": "#f1e6c8",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": [
+        {
+          "id": "shape-tpl2k",
+          "name": "Badge",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "shape",
+          "shape": "star",
+          "color": "#c9a227",
+          "x": 0.5,
+          "y": 0.45,
+          "width": 0.14,
+          "height": 0.22,
+          "rotation": 0
+        },
+        {
+          "id": "shape-tpl2l",
+          "name": "Pinstripe top",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "shape",
+          "shape": "rectangle",
+          "color": "#c9a227",
+          "x": 0.5,
+          "y": 0.2,
+          "width": 1,
+          "height": 0.02,
+          "rotation": 0
+        },
+        {
+          "id": "shape-tpl2m",
+          "name": "Pinstripe bottom",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "shape",
+          "shape": "rectangle",
+          "color": "#c9a227",
+          "x": 0.5,
+          "y": 0.8,
+          "width": 1,
+          "height": 0.02,
+          "rotation": 0
+        }
+      ]
+    },
+    "topTube": {
+      "finish": "glossy",
+      "baseColor": "#0f5c4d",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": [
+        {
+          "id": "shape-tpl2f",
+          "name": "Lug",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "shape",
+          "shape": "rectangle",
+          "color": "#f1e6c8",
+          "x": 0.5,
+          "y": 0.96,
+          "width": 1,
+          "height": 0.08,
+          "rotation": 0
+        },
+        {
+          "id": "shape-tpl2g",
+          "name": "Lug pinstripe",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "shape",
+          "shape": "rectangle",
+          "color": "#c9a227",
+          "x": 0.5,
+          "y": 0.914,
+          "width": 1,
+          "height": 0.012,
+          "rotation": 0
+        }
+      ]
+    },
+    "downTube": {
+      "finish": "glossy",
+      "baseColor": "#0f5c4d",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": [
+        {
+          "id": "shape-tpl28",
+          "name": "Panel",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "shape",
+          "shape": "rectangle",
+          "color": "#f1e6c8",
+          "x": 0.5,
+          "y": 0.5,
+          "width": 1,
+          "height": 0.46,
+          "rotation": 0
+        },
+        {
+          "id": "shape-tpl29",
+          "name": "Pinstripe low",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "shape",
+          "shape": "rectangle",
+          "color": "#c9a227",
+          "x": 0.5,
+          "y": 0.265,
+          "width": 1,
+          "height": 0.012,
+          "rotation": 0
+        },
+        {
+          "id": "shape-tpl2a",
+          "name": "Pinstripe high",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "shape",
+          "shape": "rectangle",
+          "color": "#c9a227",
+          "x": 0.5,
+          "y": 0.735,
+          "width": 1,
+          "height": 0.012,
+          "rotation": 0
+        },
+        {
+          "id": "shape-tpl2b",
+          "name": "Lug",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "shape",
+          "shape": "rectangle",
+          "color": "#f1e6c8",
+          "x": 0.5,
+          "y": 0.96,
+          "width": 1,
+          "height": 0.08,
+          "rotation": 0
+        },
+        {
+          "id": "shape-tpl2c",
+          "name": "Lug pinstripe",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "shape",
+          "shape": "rectangle",
+          "color": "#c9a227",
+          "x": 0.5,
+          "y": 0.914,
+          "width": 1,
+          "height": 0.012,
+          "rotation": 0
+        },
+        {
+          "letterSpacing": 2,
+          "glyphRotation": 0,
+          "id": "decal-tpl2d",
+          "name": "Wordmark",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "Arvenne",
+          "font": "Playfair Display",
+          "size": 28,
+          "color": "#0f5c4d",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.25,
+          "y": 0.5,
+          "rotation": 0,
+          "bold": true,
+          "italic": true,
+          "underline": false,
+          "strikethrough": false
+        },
+        {
+          "letterSpacing": 2,
+          "glyphRotation": 0,
+          "id": "decal-tpl2e",
+          "name": "Wordmark (L)",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "Arvenne",
+          "font": "Playfair Display",
+          "size": 28,
+          "color": "#0f5c4d",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.75,
+          "y": 0.5,
+          "rotation": 180,
+          "bold": true,
+          "italic": true,
+          "underline": false,
+          "strikethrough": false
+        }
+      ]
+    },
+    "seatTube": {
+      "finish": "glossy",
+      "baseColor": "#0f5c4d",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": [
+        {
+          "id": "shape-tpl2h",
+          "name": "Panel",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "shape",
+          "shape": "rectangle",
+          "color": "#f1e6c8",
+          "x": 0.5,
+          "y": 0.3,
+          "width": 1,
+          "height": 0.2,
+          "rotation": 0
+        },
+        {
+          "id": "shape-tpl2i",
+          "name": "Pinstripe top",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "shape",
+          "shape": "rectangle",
+          "color": "#c9a227",
+          "x": 0.5,
+          "y": 0.198,
+          "width": 1,
+          "height": 0.012,
+          "rotation": 0
+        },
+        {
+          "id": "shape-tpl2j",
+          "name": "Pinstripe bottom",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "shape",
+          "shape": "rectangle",
+          "color": "#c9a227",
+          "x": 0.5,
+          "y": 0.402,
+          "width": 1,
+          "height": 0.012,
+          "rotation": 0
+        }
+      ]
+    },
+    "seatStays": {
+      "finish": "glossy",
+      "baseColor": "#0f5c4d",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": []
+    },
+    "chainStays": {
+      "finish": "glossy",
+      "baseColor": "#0f5c4d",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": []
+    },
+    "fork": {
+      "finish": "metallic",
+      "baseColor": "#cfd2d6",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": []
+    },
+    "frontRim": {
+      "finish": "metallic",
+      "baseColor": "#c4c7cc",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": [
+        {
+          "letterSpacing": 8,
+          "glyphRotation": 0,
+          "id": "decal-tpl2p",
+          "name": "Rim 1",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "ARVENNE",
+          "font": "Playfair Display",
+          "size": 46,
+          "color": "#0f5c4d",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.25,
+          "y": 0.5,
+          "rotation": 0,
+          "bold": true,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        },
+        {
+          "letterSpacing": 8,
+          "glyphRotation": 0,
+          "id": "decal-tpl2q",
+          "name": "Rim 2",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "ARVENNE",
+          "font": "Playfair Display",
+          "size": 46,
+          "color": "#0f5c4d",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.75,
+          "y": 0.5,
+          "rotation": 0,
+          "bold": true,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        }
+      ]
+    },
+    "rearRim": {
+      "finish": "metallic",
+      "baseColor": "#c4c7cc",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": [
+        {
+          "letterSpacing": 8,
+          "glyphRotation": 0,
+          "id": "decal-tpl2r",
+          "name": "Rim 1",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "ARVENNE",
+          "font": "Playfair Display",
+          "size": 46,
+          "color": "#0f5c4d",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.25,
+          "y": 0.5,
+          "rotation": 0,
+          "bold": true,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        },
+        {
+          "letterSpacing": 8,
+          "glyphRotation": 0,
+          "id": "decal-tpl2s",
+          "name": "Rim 2",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "ARVENNE",
+          "font": "Playfair Display",
+          "size": 46,
+          "color": "#0f5c4d",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.75,
+          "y": 0.5,
+          "rotation": 0,
+          "bold": true,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        }
+      ]
+    }
+  },
+  "rim": {
+    "depth": 30,
+    "width": 25,
+    "spokeCount": 20
+  },
+  "dividers": [],
+  "variant": {
+    "discipline": "road",
+    "style": "classic"
+  },
+  "palette": [
+    "#0f5c4d",
+    "#f1e6c8",
+    "#c9a227",
+    "#cfd2d6"
+  ]
+}

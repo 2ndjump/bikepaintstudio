@@ -1,0 +1,408 @@
+{
+  "activeZone": "topTube",
+  "zones": {
+    "headTube": {
+      "finish": "metallic",
+      "baseColor": "#3a3d42",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": []
+    },
+    "topTube": {
+      "finish": "matte",
+      "baseColor": "#141414",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": [
+        {
+          "rotationX": 0,
+          "rotationY": 0,
+          "scaleX": 1,
+          "scaleY": 1,
+          "id": "pattern-tpl1s",
+          "name": "Forged",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "pattern",
+          "pattern": "forged",
+          "color": "#2e2e2e",
+          "scale": 14,
+          "rotation": 0,
+          "intensity": 1
+        }
+      ]
+    },
+    "downTube": {
+      "finish": "matte",
+      "baseColor": "#141414",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": [
+        {
+          "letterSpacing": 10,
+          "glyphRotation": 0,
+          "id": "decal-tpl1p",
+          "name": "Wordmark",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "NOCTURNE",
+          "font": "Orbitron",
+          "size": 36,
+          "color": "#333333",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.25,
+          "y": 0.52,
+          "rotation": 0,
+          "bold": true,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        },
+        {
+          "letterSpacing": 10,
+          "glyphRotation": 0,
+          "id": "decal-tpl1q",
+          "name": "Wordmark (L)",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "NOCTURNE",
+          "font": "Orbitron",
+          "size": 36,
+          "color": "#333333",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.75,
+          "y": 0.52,
+          "rotation": 180,
+          "bold": true,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        }
+      ]
+    },
+    "seatTube": {
+      "finish": "matte",
+      "baseColor": "#141414",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": [
+        {
+          "id": "shape-tpl1r",
+          "name": "Accent",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "shape",
+          "shape": "rectangle",
+          "color": "#ff5a1f",
+          "x": 0.5,
+          "y": 0.08,
+          "width": 1,
+          "height": 0.012,
+          "rotation": 0
+        }
+      ]
+    },
+    "seatStays": {
+      "finish": "matte",
+      "baseColor": "#141414",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": []
+    },
+    "chainStays": {
+      "finish": "matte",
+      "baseColor": "#141414",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": []
+    },
+    "fork": {
+      "finish": "glossy",
+      "baseColor": "#141414",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": []
+    },
+    "frontRim": {
+      "finish": "metallic",
+      "baseColor": "#4a4e55",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": [
+        {
+          "id": "shape-tpl1y",
+          "name": "Accent",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "shape",
+          "shape": "rectangle",
+          "color": "#ff5a1f",
+          "x": 0.5,
+          "y": 0.86,
+          "width": 1,
+          "height": 0.035,
+          "rotation": 0
+        },
+        {
+          "letterSpacing": 10,
+          "glyphRotation": 0,
+          "id": "decal-tpl1z",
+          "name": "Rim 1",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "NOCTURNE",
+          "font": "Orbitron",
+          "size": 40,
+          "color": "#141414",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.125,
+          "y": 0.5,
+          "rotation": 0,
+          "bold": true,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        },
+        {
+          "letterSpacing": 10,
+          "glyphRotation": 0,
+          "id": "decal-tpl20",
+          "name": "Rim 2",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "NOCTURNE",
+          "font": "Orbitron",
+          "size": 40,
+          "color": "#141414",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.375,
+          "y": 0.5,
+          "rotation": 0,
+          "bold": true,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        },
+        {
+          "letterSpacing": 10,
+          "glyphRotation": 0,
+          "id": "decal-tpl21",
+          "name": "Rim 3",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "NOCTURNE",
+          "font": "Orbitron",
+          "size": 40,
+          "color": "#141414",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.625,
+          "y": 0.5,
+          "rotation": 0,
+          "bold": true,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        },
+        {
+          "letterSpacing": 10,
+          "glyphRotation": 0,
+          "id": "decal-tpl22",
+          "name": "Rim 4",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "NOCTURNE",
+          "font": "Orbitron",
+          "size": 40,
+          "color": "#141414",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.875,
+          "y": 0.5,
+          "rotation": 0,
+          "bold": true,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        }
+      ]
+    },
+    "rearRim": {
+      "finish": "metallic",
+      "baseColor": "#4a4e55",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": [
+        {
+          "id": "shape-tpl23",
+          "name": "Accent",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "shape",
+          "shape": "rectangle",
+          "color": "#ff5a1f",
+          "x": 0.5,
+          "y": 0.86,
+          "width": 1,
+          "height": 0.035,
+          "rotation": 0
+        },
+        {
+          "letterSpacing": 10,
+          "glyphRotation": 0,
+          "id": "decal-tpl24",
+          "name": "Rim 1",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "NOCTURNE",
+          "font": "Orbitron",
+          "size": 40,
+          "color": "#141414",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.125,
+          "y": 0.5,
+          "rotation": 0,
+          "bold": true,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        },
+        {
+          "letterSpacing": 10,
+          "glyphRotation": 0,
+          "id": "decal-tpl25",
+          "name": "Rim 2",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "NOCTURNE",
+          "font": "Orbitron",
+          "size": 40,
+          "color": "#141414",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.375,
+          "y": 0.5,
+          "rotation": 0,
+          "bold": true,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        },
+        {
+          "letterSpacing": 10,
+          "glyphRotation": 0,
+          "id": "decal-tpl26",
+          "name": "Rim 3",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "NOCTURNE",
+          "font": "Orbitron",
+          "size": 40,
+          "color": "#141414",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.625,
+          "y": 0.5,
+          "rotation": 0,
+          "bold": true,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        },
+        {
+          "letterSpacing": 10,
+          "glyphRotation": 0,
+          "id": "decal-tpl27",
+          "name": "Rim 4",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "NOCTURNE",
+          "font": "Orbitron",
+          "size": 40,
+          "color": "#141414",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.875,
+          "y": 0.5,
+          "rotation": 0,
+          "bold": true,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        }
+      ]
+    }
+  },
+  "rim": {
+    "depth": 60,
+    "width": 25,
+    "spokeCount": 20
+  },
+  "dividers": [],
+  "variant": {
+    "discipline": "gravel",
+    "style": "aero"
+  },
+  "palette": [
+    "#141414",
+    "#2c2c2c",
+    "#3a3d42",
+    "#ff5a1f"
+  ]
+}

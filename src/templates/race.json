@@ -1,0 +1,505 @@
+{
+  "activeZone": "topTube",
+  "zones": {
+    "headTube": {
+      "finish": "glossy",
+      "baseColor": "#c8102e",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": [
+        {
+          "id": "shape-tplr",
+          "name": "Cap white",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "shape",
+          "shape": "rectangle",
+          "color": "#ffffff",
+          "x": 0.5,
+          "y": 0.05,
+          "width": 1,
+          "height": 0.1,
+          "rotation": 0
+        },
+        {
+          "id": "shape-tpls",
+          "name": "Cap blue",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "shape",
+          "shape": "rectangle",
+          "color": "#1d3b8f",
+          "x": 0.5,
+          "y": 0.12,
+          "width": 1,
+          "height": 0.04,
+          "rotation": 0
+        }
+      ]
+    },
+    "topTube": {
+      "finish": "glossy",
+      "baseColor": "#c8102e",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": [
+        {
+          "letterSpacing": 6,
+          "glyphRotation": 0,
+          "id": "decal-tplm",
+          "name": "Model",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "SQUADRA",
+          "font": "Barlow Condensed",
+          "size": 36,
+          "color": "#ffffff",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.25,
+          "y": 0.3,
+          "rotation": 0,
+          "bold": true,
+          "italic": true,
+          "underline": false,
+          "strikethrough": false
+        },
+        {
+          "letterSpacing": 6,
+          "glyphRotation": 0,
+          "id": "decal-tpln",
+          "name": "Model (L)",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "SQUADRA",
+          "font": "Barlow Condensed",
+          "size": 36,
+          "color": "#ffffff",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.75,
+          "y": 0.3,
+          "rotation": 180,
+          "bold": true,
+          "italic": true,
+          "underline": false,
+          "strikethrough": false
+        }
+      ]
+    },
+    "downTube": {
+      "finish": "glossy",
+      "baseColor": "#c8102e",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": [
+        {
+          "letterSpacing": 3,
+          "glyphRotation": 0,
+          "id": "decal-tplk",
+          "name": "Wordmark",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "ATTACCO",
+          "font": "Barlow Condensed",
+          "size": 44,
+          "color": "#ffffff",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.25,
+          "y": 0.6,
+          "rotation": 0,
+          "bold": true,
+          "italic": true,
+          "underline": false,
+          "strikethrough": false
+        },
+        {
+          "letterSpacing": 3,
+          "glyphRotation": 0,
+          "id": "decal-tpll",
+          "name": "Wordmark (L)",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "ATTACCO",
+          "font": "Barlow Condensed",
+          "size": 44,
+          "color": "#ffffff",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.75,
+          "y": 0.6,
+          "rotation": 180,
+          "bold": true,
+          "italic": true,
+          "underline": false,
+          "strikethrough": false
+        }
+      ]
+    },
+    "seatTube": {
+      "finish": "glossy",
+      "baseColor": "#c8102e",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": [
+        {
+          "id": "shape-tplo",
+          "name": "Band white",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "shape",
+          "shape": "rectangle",
+          "color": "#ffffff",
+          "x": 0.5,
+          "y": 0.16,
+          "width": 1,
+          "height": 0.05,
+          "rotation": 0
+        },
+        {
+          "id": "shape-tplp",
+          "name": "Band blue",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "shape",
+          "shape": "rectangle",
+          "color": "#1d3b8f",
+          "x": 0.5,
+          "y": 0.21,
+          "width": 1,
+          "height": 0.035,
+          "rotation": 0
+        },
+        {
+          "id": "shape-tplq",
+          "name": "Band white 2",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "shape",
+          "shape": "rectangle",
+          "color": "#ffffff",
+          "x": 0.5,
+          "y": 0.255,
+          "width": 1,
+          "height": 0.05,
+          "rotation": 0
+        }
+      ]
+    },
+    "seatStays": {
+      "finish": "glossy",
+      "baseColor": "#c8102e",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": []
+    },
+    "chainStays": {
+      "finish": "glossy",
+      "baseColor": "#c8102e",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": []
+    },
+    "fork": {
+      "finish": "glossy",
+      "baseColor": "#c8102e",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": []
+    },
+    "frontRim": {
+      "finish": "glossy",
+      "baseColor": "#121212",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": [
+        {
+          "letterSpacing": 3,
+          "glyphRotation": 0,
+          "id": "decal-tpl11",
+          "name": "Rim 1",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "ATTACCO",
+          "font": "Barlow Condensed",
+          "size": 64,
+          "color": "#ffffff",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.125,
+          "y": 0.5,
+          "rotation": 0,
+          "bold": true,
+          "italic": true,
+          "underline": false,
+          "strikethrough": false
+        },
+        {
+          "letterSpacing": 3,
+          "glyphRotation": 0,
+          "id": "decal-tpl12",
+          "name": "Rim 2",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "ATTACCO",
+          "font": "Barlow Condensed",
+          "size": 64,
+          "color": "#ffffff",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.375,
+          "y": 0.5,
+          "rotation": 0,
+          "bold": true,
+          "italic": true,
+          "underline": false,
+          "strikethrough": false
+        },
+        {
+          "letterSpacing": 3,
+          "glyphRotation": 0,
+          "id": "decal-tpl13",
+          "name": "Rim 3",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "ATTACCO",
+          "font": "Barlow Condensed",
+          "size": 64,
+          "color": "#ffffff",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.625,
+          "y": 0.5,
+          "rotation": 0,
+          "bold": true,
+          "italic": true,
+          "underline": false,
+          "strikethrough": false
+        },
+        {
+          "letterSpacing": 3,
+          "glyphRotation": 0,
+          "id": "decal-tpl14",
+          "name": "Rim 4",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "ATTACCO",
+          "font": "Barlow Condensed",
+          "size": 64,
+          "color": "#ffffff",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.875,
+          "y": 0.5,
+          "rotation": 0,
+          "bold": true,
+          "italic": true,
+          "underline": false,
+          "strikethrough": false
+        }
+      ]
+    },
+    "rearRim": {
+      "finish": "glossy",
+      "baseColor": "#121212",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": [
+        {
+          "letterSpacing": 3,
+          "glyphRotation": 0,
+          "id": "decal-tpl15",
+          "name": "Rim 1",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "ATTACCO",
+          "font": "Barlow Condensed",
+          "size": 64,
+          "color": "#ffffff",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.125,
+          "y": 0.5,
+          "rotation": 0,
+          "bold": true,
+          "italic": true,
+          "underline": false,
+          "strikethrough": false
+        },
+        {
+          "letterSpacing": 3,
+          "glyphRotation": 0,
+          "id": "decal-tpl16",
+          "name": "Rim 2",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "ATTACCO",
+          "font": "Barlow Condensed",
+          "size": 64,
+          "color": "#ffffff",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.375,
+          "y": 0.5,
+          "rotation": 0,
+          "bold": true,
+          "italic": true,
+          "underline": false,
+          "strikethrough": false
+        },
+        {
+          "letterSpacing": 3,
+          "glyphRotation": 0,
+          "id": "decal-tpl17",
+          "name": "Rim 3",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "ATTACCO",
+          "font": "Barlow Condensed",
+          "size": 64,
+          "color": "#ffffff",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.625,
+          "y": 0.5,
+          "rotation": 0,
+          "bold": true,
+          "italic": true,
+          "underline": false,
+          "strikethrough": false
+        },
+        {
+          "letterSpacing": 3,
+          "glyphRotation": 0,
+          "id": "decal-tpl18",
+          "name": "Rim 4",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "ATTACCO",
+          "font": "Barlow Condensed",
+          "size": 64,
+          "color": "#ffffff",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.875,
+          "y": 0.5,
+          "rotation": 0,
+          "bold": true,
+          "italic": true,
+          "underline": false,
+          "strikethrough": false
+        }
+      ]
+    }
+  },
+  "rim": {
+    "depth": 50,
+    "width": 25,
+    "spokeCount": 20
+  },
+  "dividers": [
+    {
+      "id": "div-tplt",
+      "color": "#1d3b8f",
+      "ax": -0.6,
+      "ay": 0.2,
+      "bx": 0.8,
+      "by": 0.09,
+      "softness": 0
+    },
+    {
+      "id": "div-tplu",
+      "color": "#ffffff",
+      "ax": -0.6,
+      "ay": 0.19,
+      "bx": 0.8,
+      "by": 0.08,
+      "softness": 0
+    },
+    {
+      "id": "div-tplv",
+      "color": "#1d3b8f",
+      "ax": -0.6,
+      "ay": 0.145,
+      "bx": 0.8,
+      "by": 0.035,
+      "softness": 0
+    },
+    {
+      "id": "div-tplw",
+      "color": "#c8102e",
+      "ax": -0.6,
+      "ay": 0.135,
+      "bx": 0.8,
+      "by": 0.025,
+      "softness": 0
+    }
+  ],
+  "variant": {
+    "discipline": "road",
+    "style": "classic"
+  },
+  "palette": [
+    "#c8102e",
+    "#ffffff",
+    "#1d3b8f",
+    "#121212"
+  ]
+}

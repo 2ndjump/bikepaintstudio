@@ -1,0 +1,367 @@
+{
+  "activeZone": "topTube",
+  "zones": {
+    "headTube": {
+      "finish": "glossy",
+      "baseColor": "#2b1055",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": []
+    },
+    "topTube": {
+      "finish": "glossy",
+      "baseColor": "#2b1055",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": [
+        {
+          "letterSpacing": 12,
+          "glyphRotation": 0,
+          "id": "decal-tpl19",
+          "name": "Wordmark",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "HORIZON",
+          "font": "Josefin Sans",
+          "size": 34,
+          "color": "#ffffff",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.25,
+          "y": 0.5,
+          "rotation": 0,
+          "bold": true,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        },
+        {
+          "letterSpacing": 12,
+          "glyphRotation": 0,
+          "id": "decal-tpl1a",
+          "name": "Wordmark (L)",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "HORIZON",
+          "font": "Josefin Sans",
+          "size": 34,
+          "color": "#ffffff",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.75,
+          "y": 0.5,
+          "rotation": 180,
+          "bold": true,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        }
+      ]
+    },
+    "downTube": {
+      "finish": "glossy",
+      "baseColor": "#2b1055",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": []
+    },
+    "seatTube": {
+      "finish": "glossy",
+      "baseColor": "#2b1055",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": []
+    },
+    "seatStays": {
+      "finish": "glossy",
+      "baseColor": "#2b1055",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": []
+    },
+    "chainStays": {
+      "finish": "glossy",
+      "baseColor": "#2b1055",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": []
+    },
+    "fork": {
+      "finish": "glossy",
+      "baseColor": "#2b1055",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": []
+    },
+    "frontRim": {
+      "finish": "satin",
+      "baseColor": "#1a1a1a",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": [
+        {
+          "letterSpacing": 10,
+          "glyphRotation": 0,
+          "id": "decal-tpl1h",
+          "name": "Rim 1",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "HORIZON",
+          "font": "Josefin Sans",
+          "size": 40,
+          "color": "#ff8a00",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.125,
+          "y": 0.5,
+          "rotation": 0,
+          "bold": true,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        },
+        {
+          "letterSpacing": 10,
+          "glyphRotation": 0,
+          "id": "decal-tpl1i",
+          "name": "Rim 2",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "HORIZON",
+          "font": "Josefin Sans",
+          "size": 40,
+          "color": "#ff8a00",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.375,
+          "y": 0.5,
+          "rotation": 0,
+          "bold": true,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        },
+        {
+          "letterSpacing": 10,
+          "glyphRotation": 0,
+          "id": "decal-tpl1j",
+          "name": "Rim 3",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "HORIZON",
+          "font": "Josefin Sans",
+          "size": 40,
+          "color": "#ff8a00",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.625,
+          "y": 0.5,
+          "rotation": 0,
+          "bold": true,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        },
+        {
+          "letterSpacing": 10,
+          "glyphRotation": 0,
+          "id": "decal-tpl1k",
+          "name": "Rim 4",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "HORIZON",
+          "font": "Josefin Sans",
+          "size": 40,
+          "color": "#ff8a00",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.875,
+          "y": 0.5,
+          "rotation": 0,
+          "bold": true,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        }
+      ]
+    },
+    "rearRim": {
+      "finish": "satin",
+      "baseColor": "#1a1a1a",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": [
+        {
+          "letterSpacing": 10,
+          "glyphRotation": 0,
+          "id": "decal-tpl1l",
+          "name": "Rim 1",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "HORIZON",
+          "font": "Josefin Sans",
+          "size": 40,
+          "color": "#ff8a00",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.125,
+          "y": 0.5,
+          "rotation": 0,
+          "bold": true,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        },
+        {
+          "letterSpacing": 10,
+          "glyphRotation": 0,
+          "id": "decal-tpl1m",
+          "name": "Rim 2",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "HORIZON",
+          "font": "Josefin Sans",
+          "size": 40,
+          "color": "#ff8a00",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.375,
+          "y": 0.5,
+          "rotation": 0,
+          "bold": true,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        },
+        {
+          "letterSpacing": 10,
+          "glyphRotation": 0,
+          "id": "decal-tpl1n",
+          "name": "Rim 3",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "HORIZON",
+          "font": "Josefin Sans",
+          "size": 40,
+          "color": "#ff8a00",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.625,
+          "y": 0.5,
+          "rotation": 0,
+          "bold": true,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        },
+        {
+          "letterSpacing": 10,
+          "glyphRotation": 0,
+          "id": "decal-tpl1o",
+          "name": "Rim 4",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "HORIZON",
+          "font": "Josefin Sans",
+          "size": 40,
+          "color": "#ff8a00",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.875,
+          "y": 0.5,
+          "rotation": 0,
+          "bold": true,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        }
+      ]
+    }
+  },
+  "rim": {
+    "depth": 40,
+    "width": 25,
+    "spokeCount": 20
+  },
+  "dividers": [
+    {
+      "id": "div-tpl1b",
+      "color": "#d7267b",
+      "ax": -0.6,
+      "ay": 0.44,
+      "bx": 0.8,
+      "by": 0.34,
+      "softness": 1
+    },
+    {
+      "id": "div-tpl1c",
+      "color": "#ff8a00",
+      "ax": -0.6,
+      "ay": 0.2,
+      "bx": 0.8,
+      "by": 0.1,
+      "softness": 1,
+      "pattern": "topo",
+      "patternColor": "#ffb347",
+      "patternScale": 10
+    }
+  ],
+  "variant": {
+    "discipline": "gravel",
+    "style": "aero"
+  },
+  "palette": [
+    "#2b1055",
+    "#d7267b",
+    "#ff8a00",
+    "#ffb347",
+    "#1a1a1a"
+  ]
+}
