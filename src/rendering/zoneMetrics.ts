@@ -52,7 +52,8 @@ export function measureUVScale(geo: THREE.BufferGeometry): { su: number; sv: num
     const du2 = uvA.getX(c) - u0;
     const dv2 = uvA.getY(c) - v0;
     const det = du1 * dv2 - du2 * dv1;
-    if (Math.abs(det) < 1e-12) continue;
+    // Near-degenerate uv triangles (slivers at junctions) would dominate the mean.
+    if (Math.abs(det) < 1e-6) continue;
     // Invert the triangle's linear uv→world map for ∂world/∂u and ∂world/∂v.
     ju.copy(e1).multiplyScalar(dv2).addScaledVector(e2, -dv1).divideScalar(det);
     jv.copy(e2).multiplyScalar(du1).addScaledVector(e1, -du2).divideScalar(det);
