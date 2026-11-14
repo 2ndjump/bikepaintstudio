@@ -1,5 +1,7 @@
 import { Canvas, useThree } from '@react-three/fiber';
 import { OrbitControls, useGLTF } from '@react-three/drei';
+import { Bloom, EffectComposer, N8AO, ToneMapping } from '@react-three/postprocessing';
+import { ToneMappingMode } from 'postprocessing';
 import * as THREE from 'three';
 import { BikeFrame } from './BikeFrame';
 import { BACKDROP_COLOR, FLOOR_Y, StudioEnvironment } from './StudioEnvironment';
@@ -12,7 +14,7 @@ import { Wheel } from './Wheel';
 import { WheelStage } from './WheelStage';
 import { isRimZone } from '../../state/types';
 import { ALL_VARIANTS, useBikeModel, variantUrl } from '../../geometry/bikeModel';
-import { Suspense, useEffect } from 'react';
+import { Suspense, useDeferredValue, useEffect } from 'react';
 import { useDesignStore } from '../../state/designStore';
 import { syncDividerUniforms, syncDividerPatterns } from '../../rendering/dividers';
 
@@ -89,11 +91,28 @@ function DividerSync() {
 }
 
 /**
+ * Post-processing on an 8× multisampled buffer (clean spokes): N8AO ambient
+ * occlusion (tube junctions, tyres on the floor, between the spokes), a faint
+ * bloom on specular highlights only, and AgX tone mapping like Blender.
+ */
+function PostEffects() {
+  return (
+    <EffectComposer multisampling={8}>
+      <N8AO aoRadius={0.15} distanceFalloff={1} intensity={3.5} quality="medium" />
+      <Bloom luminanceThreshold={1.2} luminanceSmoothing={0.2} intensity={0.25} mipmapBlur />
+      <ToneMapping mode={ToneMappingMode.NEUTRAL} />
+    </EffectComposer>
+  );
+}
+
+/**
  * The selected variant's bike on the turntable: Blender frameset + procedural
  * wheels at its hubs, standing on the studio floor. Suspends while the GLB loads.
  */
 function Bike() {
-  const variant = useDesignStore((s) => s.variant);
+  // Deferred: while another variant's GLB loads, the current bike stays up
+  // (no Suspense fallback, the turntable keeps its angle) and swaps when ready.
+  const variant = useDeferredValue(useDesignStore((s) => s.variant));
   const activeZone = useDesignStore((s) => s.activeZone);
   const model = useBikeModel(variant);
   // Wheel designer: the bike is hidden (keeping its turntable angle) and the
@@ -101,9 +120,11 @@ function Bike() {
   const wheelMode = isRimZone(activeZone);
   const { frontHub, rearHub } = model;
 
-  // Fetch the other variants once the first bike is up, so switching is instant.
+  // Fetch the other variants once the first bike is up (after its first
+  // frames and textures), so switching is instant.
   useEffect(() => {
-    ALL_VARIANTS.forEach((v) => useGLTF.preload(variantUrl(v)));
+    const t = setTimeout(() => ALL_VARIANTS.forEach((v) => useGLTF.preload(variantUrl(v))), 1500);
+    return () => clearTimeout(t);
   }, []);
 
   return (
@@ -142,7 +163,7 @@ export function Viewport() {
   return (
     <div className="relative w-full h-full">
       <Canvas
-        shadows="soft"
+        shadows
         // Straight at the back wall; the bike's start angle gives the 3/4 view.
         camera={{ position: [0.09, 0.75, 2.48], fov: 33 }}
         gl={{
@@ -168,6 +189,7 @@ export function Viewport() {
         <Suspense fallback={null}>
           <Bike />
         </Suspense>
+        <PostEffects />
 
         {/* The studio stays put: the camera only zooms, pans and tilts within
             limits (azimuth locked straight at the back wall); horizontal

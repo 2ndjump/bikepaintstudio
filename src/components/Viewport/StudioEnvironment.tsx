@@ -1,5 +1,6 @@
-import { useEffect, useMemo } from 'react';
-import { useThree } from '@react-three/fiber';
+import { useEffect, useMemo, useRef } from 'react';
+import { useFrame, useThree } from '@react-three/fiber';
+import { AccumulativeShadows, RandomizedLight } from '@react-three/drei';
 import * as THREE from 'three';
 import { RectAreaLightUniformsLib } from 'three/examples/jsm/lights/RectAreaLightUniformsLib.js';
 
@@ -35,6 +36,163 @@ const SOFTBOXES = [
   { w: 0.35, h: 2.2, pos: fromBlender(-2.6, 1.6, 1.4), energy: 160 }, // rim, back-left
   { w: 0.35, h: 2.2, pos: fromBlender(2.8, 1.6, 1.4), energy: 160 }, // rim, back-right
 ].map((b) => ({ ...b, radiance: (LIGHT_SCALE * b.energy) / (b.w * b.h) }));
+
+/** Accumulated floor shadow: blend window (frames) while something moves —
+ *  short, so the shadow follows — and once everything is still (long, smooth). */
+const SHADOW_BLEND_MOVING = 8;
+const SHADOW_BLEND_STILL = 150;
+/** Frames the short window is kept after the last change. */
+const SHADOW_MOVING_FRAMES = 12;
+/** Share of the floor's light from the open sky dome (contact darkening);
+ *  the rest comes from the softboxes by energy. */
+const SHADOW_SKY = 0.12;
+/** What an unoccluded floor point actually sums to per channel (measured;
+ *  a bit under 1 since the lights aim at the origin, not at each point). */
+const SHADOW_OPEN = 0.86;
+/** Darkening per occluded share (the thin bike blocks only part of the
+ *  softboxes, so the plain share reads too faint next to Blender's). */
+const SHADOW_GAIN = 2;
+
+const BILINEAR = /* glsl */ `
+vec4 bilinear(sampler2D m, vec2 uv) {
+  ivec2 n = textureSize(m, 0) - 1;
+  vec2 p = uv * vec2(textureSize(m, 0)) - 0.5;
+  vec2 f = fract(p);
+  ivec2 i = ivec2(floor(p));
+  vec4 a = texelFetch(m, clamp(i, ivec2(0), n), 0);
+  vec4 b = texelFetch(m, clamp(i + ivec2(1, 0), ivec2(0), n), 0);
+  vec4 c = texelFetch(m, clamp(i + ivec2(0, 1), ivec2(0), n), 0);
+  vec4 d = texelFetch(m, clamp(i + ivec2(1, 1), ivec2(0), n), 0);
+  return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);
+}
+`;
+
+type ShadowApi = {
+  blend: number;
+  count: number;
+  reset(): void;
+  update(frames?: number): void;
+  getMesh(): THREE.Mesh<THREE.BufferGeometry, THREE.ShaderMaterial>;
+};
+
+/**
+ * Soft studio shadow on the floor, fixed in the studio: drei's
+ * AccumulativeShadows averages many shadow maps of randomised directional
+ * lights spread over each softbox (weighted by its energy) and over the sky
+ * dome (contact darkening) into a lightmap on a floor plane. Each light is
+ * scaled by its Lambert term so an unoccluded floor point sums to about 1
+ * per channel; with alphaTest = 3 × that the plane's alpha is the occluded share.
+ * The accumulation restarts whenever a shadow caster moves (turntable, spinning
+ * wheel) or the casters change (variant, wheel designer, rim geometry).
+ */
+function FloorShadow() {
+  const ref = useRef<ShadowApi>(null);
+  const scene = useThree((s) => s.scene);
+  const last = useRef({ structure: 0, pose: 0, moving: 0 });
+  const patched = useRef<ShadowApi | null>(null);
+
+  useFrame(() => {
+    const api = ref.current;
+    if (!api) return;
+    if (patched.current !== api) {
+      // The lightmap's Lambert pass would also pick up scene.environment as
+      // unshadowed ambient light, which the alpha mapping can't tell apart.
+      const update = api.update;
+      api.update = (frames) => {
+        const env = scene.environment;
+        scene.environment = null;
+        update(frames);
+        scene.environment = env;
+      };
+      // Alpha = gain × occluded share, capped at 1 (opacity carries the gain);
+      // the lightmap (nearest-filtered) is read bilinearly so it isn't blocky.
+      const mat = api.getMesh().material;
+      mat.onBeforeCompile = (sh) => {
+        sh.fragmentShader = sh.fragmentShader
+          .replace('void main', BILINEAR + 'void main')
+          .replace('texture2D(map, vUv)', 'bilinear(map, vUv)')
+          .replace('* opacity);', '* opacity);\n gl_FragColor.a = min(gl_FragColor.a, 1.0);');
+      };
+      mat.needsUpdate = true;
+      patched.current = api;
+    }
+    let structure = 0;
+    let pose = 0;
+    scene.traverseVisible((o) => {
+      const m = o as THREE.Mesh;
+      if (!m.isMesh || !m.castShadow) return;
+      structure += m.id * 7919 + m.geometry.id;
+      const e = m.matrixWorld.elements;
+      for (let i = 0; i < 16; i++) pose += e[i] * (i + 1);
+    });
+    const s = last.current;
+    if (structure !== s.structure) {
+      // Other casters: the lightmap pass must re-collect the scene's meshes.
+      api.reset();
+      s.moving = SHADOW_MOVING_FRAMES;
+    } else if (pose !== s.pose) {
+      s.moving = SHADOW_MOVING_FRAMES;
+    }
+    s.structure = structure;
+    s.pose = pose;
+    if (s.moving > 0) {
+      s.moving--;
+      api.blend = s.moving > 0 ? SHADOW_BLEND_MOVING : SHADOW_BLEND_STILL;
+      api.count = 0; // (re)start accumulating
+    }
+  });
+
+  const origin = new THREE.Vector3(CENTER.x, FLOOR_Y + 0.002, 0);
+  const total = SOFTBOXES.reduce((a, b) => a + b.energy, 0);
+  return (
+    <AccumulativeShadows
+      ref={ref as never}
+      temporal
+      frames={SHADOW_BLEND_STILL}
+      position={origin}
+      scale={3.6}
+      resolution={2048}
+      alphaTest={3 * SHADOW_OPEN}
+      opacity={SHADOW_GAIN}
+      color="#000000"
+    >
+      {SOFTBOXES.map((b, i) => {
+        const p = b.pos.clone().sub(origin);
+        // Lambert term on the floor (a directional light aims at the world origin).
+        const cos = b.pos.y / b.pos.length();
+        return (
+          <RandomizedLight
+            key={i}
+            position={[p.x, p.y, p.z]}
+            // One light per softbox: each shadow map is a texture unit in
+            // every material compiled while they're on.
+            amount={1}
+            radius={Math.max(b.w, b.h) * 0.6}
+            intensity={(Math.PI * (1 - SHADOW_SKY) * b.energy) / total / cos}
+            ambient={0}
+            size={1.4}
+            near={0.5}
+            far={8}
+            mapSize={1024}
+            bias={0.0005}
+          />
+        );
+      })}
+      {/* Sky dome: random directions over the hemisphere (mean Lambert ≈ ½). */}
+      <RandomizedLight
+        position={[0, 3, 0]}
+        amount={1}
+        ambient={1}
+        intensity={Math.PI * SHADOW_SKY * 2}
+        size={1.4}
+        near={0.5}
+        far={8}
+        mapSize={1024}
+        bias={0.0005}
+      />
+    </AccumulativeShadows>
+  );
+}
 
 /** Cyclorama: flat floor sweeping up into the back wall (Blender profile). */
 function cycloramaGeometry(): THREE.BufferGeometry {
@@ -116,7 +274,7 @@ export function StudioEnvironment() {
     <>
       {/* A touch of emissive lifts the backdrop to clean white without
           brightening the bike, while the key shadow still reads on it. */}
-      <mesh geometry={cyclo} receiveShadow>
+      <mesh geometry={cyclo}>
         <meshStandardMaterial
           color={BACKDROP_COLOR}
           emissive={BACKDROP_COLOR}
@@ -137,13 +295,17 @@ export function StudioEnvironment() {
         />
       ))}
 
-      {/* The only shadow map: along the key, aimed at the bike centre. */}
+      <FloorShadow />
+
+      {/* The bike's self-shadow (tube on tube): along the key, aimed at the
+          bike centre, PCF-softened. The floor takes FloorShadow instead. */}
       <directionalLight
         intensity={2.0}
         position={[key.x - CENTER.x, key.y - CENTER.y, key.z - CENTER.z]}
         castShadow
         shadow-mapSize-width={2048}
         shadow-mapSize-height={2048}
+        shadow-radius={6}
         shadow-bias={-0.0004}
         shadow-camera-near={0.1}
         shadow-camera-far={8}
