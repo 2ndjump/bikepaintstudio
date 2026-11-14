@@ -4,7 +4,7 @@ import * as THREE from 'three';
 import type { BikeModel } from '../../geometry/bikeModel';
 import type { RimZone } from '../../state/types';
 import { useUIStore } from '../../state/uiStore';
-import { FLOOR_Y } from './StudioEnvironment';
+import { FLOOR_Y, FloorShadow } from './StudioEnvironment';
 import { Wheel } from './Wheel';
 
 /** Where the preview wheel stands (x) and how far the camera sits from it. */
@@ -109,6 +109,9 @@ export function WheelStage({ zone, model }: { zone: RimZone; model: BikeModel })
 
   return (
     <group position={[STAGE_X, hubY, 0]}>
+      <group position={[0, -model.wheelRadius, 0]}>
+        <FloorShadow x={0} length={2 * model.wheelRadius + 0.2} width={0.3} />
+      </group>
       <group ref={spin}>
         <Wheel
           position={[0, 0, 0]}

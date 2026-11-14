@@ -4,7 +4,7 @@ import { Bloom, EffectComposer, N8AO, ToneMapping } from '@react-three/postproce
 import { ToneMappingMode } from 'postprocessing';
 import * as THREE from 'three';
 import { BikeFrame } from './BikeFrame';
-import { BACKDROP_COLOR, FLOOR_Y, StudioEnvironment } from './StudioEnvironment';
+import { BACKDROP_COLOR, FLOOR_Y, FloorShadow, StudioEnvironment } from './StudioEnvironment';
 import { DividerHandles } from './DividerHandles';
 import { EditControls } from './EditControls';
 import { LayerGizmo } from './LayerGizmo';
@@ -102,7 +102,7 @@ function PostEffects() {
   const tracing = useUIStore((s) => s.pathTrace);
   return (
     <EffectComposer multisampling={8} enabled={!tracing}>
-      <N8AO aoRadius={0.15} distanceFalloff={1} intensity={3.5} quality="medium" />
+      <N8AO aoRadius={0.12} distanceFalloff={1} intensity={1.5} quality="low" halfRes />
       <Bloom luminanceThreshold={1.2} luminanceSmoothing={0.2} intensity={0.25} mipmapBlur />
       <ToneMapping mode={ToneMappingMode.NEUTRAL} />
     </EffectComposer>
@@ -131,6 +131,11 @@ function Bike() {
         <Turntable axisX={(frontHub.x + rearHub.x) / 2} enabled={!wheelMode}>
           <DividerHandles />
           <group position={[0, FLOOR_Y, 0]}>
+            <FloorShadow
+              x={(frontHub.x + rearHub.x) / 2}
+              length={frontHub.x - rearHub.x + 2 * model.wheelRadius + 0.25}
+              width={0.42}
+            />
             <BikeFrame model={model} />
             <ZoneHighlight model={model} />
             <Wheel
