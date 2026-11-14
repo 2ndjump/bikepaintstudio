@@ -73,6 +73,7 @@ try {
   await evaluate(`(async () => {
     const url = (f) => performance.getEntriesByType('resource').map((e) => e.name).find((n) => n.includes(f));
     window.__store = await import(url('/src/state/designStore.ts'));
+    window.__studio = await import(url('/src/components/Viewport/StudioEnvironment.tsx'));
     // Only the bike: no panels, guides or highlights. The template strip is
     // closed (not just hidden) so the framing doesn't make room for it; the
     // still wheel faces the camera the same way in every shot.
@@ -84,6 +85,12 @@ try {
     style.textContent = '[data-overlay], .viewport-dock { visibility: hidden; }';
     document.head.append(style);
   })()`);
+
+  // The soft floor shadow accumulates over a couple of seconds after any
+  // change: wait until it has settled (max. 15 s) so no thumbnail is noisy.
+  const settle = async () => {
+    for (let i = 0; i < 60 && !(await evaluate('window.__studio.shadowSettled()')); i++) await sleep(250);
+  };
 
   const capture = async (clip) => {
     const { data } = await send('Page.captureScreenshot', {
@@ -101,10 +108,12 @@ try {
     const name = file.replace('.json', '.webp');
     await evaluate(`window.__store.loadDesignFile(${design})`);
     await sleep(6000); // GLB, fonts and layer textures
+    await settle();
     shots.push([name, await capture(CLIP)]);
     // Entering the wheel designer remounts the (unturned) preview wheel.
     await evaluate(`window.__store.useDesignStore.getState().setActiveZone('frontRim')`);
     await sleep(3000);
+    await settle();
     shots.push([`wheels/${name}`, await capture(CLIP_WHEEL)]);
   }
   fs.mkdirSync(path.join(DIR, 'thumbs', 'wheels'), { recursive: true });

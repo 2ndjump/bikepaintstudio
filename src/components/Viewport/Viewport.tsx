@@ -12,6 +12,8 @@ import { ZoneHighlight } from './ZoneHighlight';
 import { Turntable } from './Turntable';
 import { Wheel } from './Wheel';
 import { WheelStage } from './WheelStage';
+import { PathTracer } from './PathTracer';
+import { useUIStore } from '../../state/uiStore';
 import { isRimZone } from '../../state/types';
 import { ALL_VARIANTS, useBikeModel, variantUrl } from '../../geometry/bikeModel';
 import { Suspense, useDeferredValue, useEffect } from 'react';
@@ -96,8 +98,10 @@ function DividerSync() {
  * bloom on specular highlights only, and AgX tone mapping like Blender.
  */
 function PostEffects() {
+  // Off while the path tracer draws the canvas.
+  const tracing = useUIStore((s) => s.pathTrace);
   return (
-    <EffectComposer multisampling={8}>
+    <EffectComposer multisampling={8} enabled={!tracing}>
       <N8AO aoRadius={0.15} distanceFalloff={1} intensity={3.5} quality="medium" />
       <Bloom luminanceThreshold={1.2} luminanceSmoothing={0.2} intensity={0.25} mipmapBlur />
       <ToneMapping mode={ToneMappingMode.NEUTRAL} />
@@ -190,6 +194,7 @@ export function Viewport() {
           <Bike />
         </Suspense>
         <PostEffects />
+        <PathTracer />
 
         {/* The studio stays put: the camera only zooms, pans and tilts within
             limits (azimuth locked straight at the back wall); horizontal

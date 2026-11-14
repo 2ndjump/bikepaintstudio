@@ -152,6 +152,7 @@ export function Toolbar({ floating = false }: { floating?: boolean }) {
         </SegmentedControl>
 
         <TemplateGalleryToggle />
+        <RenderButton />
         <button className="m3-btn m3-btn-tonal m3-btn-sm" onClick={exportPNG}>
           {t('pngExport')}
         </button>
@@ -163,6 +164,38 @@ export function Toolbar({ floating = false }: { floating?: boolean }) {
         </button>
       </div>
     </header>
+  );
+}
+
+/**
+ * Path-traced still of the current view (PathTracer); while it converges the
+ * button shows the sample count, a second click (or any change) ends it.
+ */
+function RenderButton() {
+  const t = useT();
+  const on = useUIStore((s) => s.pathTrace);
+  const samples = useUIStore((s) => s.pathTraceSamples);
+  const error = useUIStore((s) => s.pathTraceError);
+  const setOn = useUIStore((s) => s.setPathTrace);
+  const tip = error ? `${t('renderUnavailable')} (${error})` : on ? t('renderStopTip') : t('renderTip');
+  // The wrapper carries the tooltip too: a disabled button gets no hover.
+  return (
+    <span title={tip} className="inline-flex">
+    <button
+      className={`m3-btn m3-btn-sm ${on ? 'm3-btn-filled' : 'm3-btn-tonal'}`}
+      aria-pressed={on}
+      disabled={!!error}
+      title={tip}
+      aria-label={tip}
+      onClick={() => setOn(!on)}
+    >
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="9" />
+        <path d="M12 3a9 9 0 0 1 7.8 13.5M21 12a9 9 0 0 1-13.5 7.8M12 21a9 9 0 0 1-7.8-13.5M3 12a9 9 0 0 1 13.5-7.8" />
+      </svg>
+      <span className="tabular-nums">{on && samples > 0 ? `${t('render')} · ${samples}` : t('render')}</span>
+    </button>
+    </span>
   );
 }
 

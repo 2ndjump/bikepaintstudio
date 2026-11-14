@@ -2,7 +2,9 @@ import { useEffect, useMemo, useRef } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import { AccumulativeShadows, RandomizedLight } from '@react-three/drei';
 import * as THREE from 'three';
+import { useUIStore } from '../../state/uiStore';
 import { RectAreaLightUniformsLib } from 'three/examples/jsm/lights/RectAreaLightUniformsLib.js';
+import { HDRLoader } from 'three/examples/jsm/loaders/HDRLoader.js';
 
 RectAreaLightUniformsLib.init();
 
@@ -45,7 +47,7 @@ const SHADOW_BLEND_STILL = 150;
 const SHADOW_MOVING_FRAMES = 12;
 /** Share of the floor's light from the open sky dome (contact darkening);
  *  the rest comes from the softboxes by energy. */
-const SHADOW_SKY = 0.12;
+const SHADOW_SKY = 0.25;
 /** What an unoccluded floor point actually sums to per channel (measured;
  *  a bit under 1 since the lights aim at the origin, not at each point). */
 const SHADOW_OPEN = 0.86;
@@ -67,6 +69,13 @@ vec4 bilinear(sampler2D m, vec2 uv) {
 }
 `;
 
+/** Whether the floor shadow is still converging (read by the thumbnail
+ *  script so it never captures a half-accumulated shadow). */
+let shadowAccumulating = true;
+export function shadowSettled(): boolean {
+  return !shadowAccumulating;
+}
+
 type ShadowApi = {
   blend: number;
   count: number;
@@ -78,8 +87,8 @@ type ShadowApi = {
 /**
  * Soft studio shadow on the floor, fixed in the studio: drei's
  * AccumulativeShadows averages many shadow maps of randomised directional
- * lights spread over each softbox (weighted by its energy) and over the sky
- * dome (contact darkening) into a lightmap on a floor plane. Each light is
+ * lights spread over each softbox (weighted by its energy) and over a wide
+ * patch of sky overhead (contact darkening) into a lightmap on a floor plane. Each light is
  * scaled by its Lambert term so an unoccluded floor point sums to about 1
  * per channel; with alphaTest = 3 × that the plane's alpha is the occluded share.
  * The accumulation restarts whenever a shadow caster moves (turntable, spinning
@@ -140,6 +149,7 @@ function FloorShadow() {
       api.blend = s.moving > 0 ? SHADOW_BLEND_MOVING : SHADOW_BLEND_STILL;
       api.count = 0; // (re)start accumulating
     }
+    shadowAccumulating = s.moving > 0 || api.count < SHADOW_BLEND_STILL;
   });
 
   const origin = new THREE.Vector3(CENTER.x, FLOOR_Y + 0.002, 0);
@@ -178,12 +188,13 @@ function FloorShadow() {
           />
         );
       })}
-      {/* Sky dome: random directions over the hemisphere (mean Lambert ≈ ½). */}
+      {/* Sky: a wide patch overhead (no grazing samples — they streak). */}
       <RandomizedLight
         position={[0, 3, 0]}
         amount={1}
-        ambient={1}
-        intensity={Math.PI * SHADOW_SKY * 2}
+        radius={4}
+        ambient={0}
+        intensity={(Math.PI * SHADOW_SKY) / 0.9}
         size={1.4}
         near={0.5}
         far={8}
@@ -192,6 +203,30 @@ function FloorShadow() {
       />
     </AccumulativeShadows>
   );
+}
+
+/** Backdrop self-glow in the path-traced still (see the cyclorama below). */
+const PT_BACKDROP_GLOW = 0.12;
+
+/** Reflection environment resolution (PMREM cube face size). */
+const ENV_SIZE = 512;
+
+/**
+ * The reflection environment's source — the one switch: the white studio
+ * baked in Blender from the bike's position (equirect Radiance HDR), or null
+ * for the procedural copy of the studio built below.
+ */
+const STUDIO_HDRI: string | null = null;
+/** Turn (about +y) and strength of the baked HDRI in the scene. */
+const HDRI_ROTATION = 0;
+const HDRI_INTENSITY = 1;
+
+/** Equirect environment for the path tracer (it can't use a PMREM); null
+ *  while the studio is the procedural one — the tracer then lights the scene
+ *  with the real cyclorama and softbox lights alone. */
+let tracerEnvironment: THREE.Texture | null = null;
+export function pathTraceEnvironment(): THREE.Texture | null {
+  return tracerEnvironment;
 }
 
 /** Cyclorama: flat floor sweeping up into the back wall (Blender profile). */
@@ -220,8 +255,9 @@ function cycloramaGeometry(): THREE.BufferGeometry {
 
 /**
  * Bright white product studio, a web port of the Blender studio: a visible
- * cyclorama, the five softboxes as RectAreaLights (no shadows), and one
- * shadow-casting directional light along the key for the contact shadow.
+ * cyclorama, the five softboxes as RectAreaLights (no shadows), one
+ * shadow-casting directional light along the key for the bike's self-shadow
+ * and the accumulated soft floor shadow (FloorShadow).
  * A copy of the studio (backdrop + glowing softbox panels, open front kept
  * darker for contrast) is rendered through PMREM into scene.environment so
  * glossy/metallic paint reflects the softboxes. Everything here is fixed in
@@ -231,10 +267,37 @@ export function StudioEnvironment() {
   const gl = useThree((s) => s.gl);
   const scene = useThree((s) => s.scene);
   const cyclo = useMemo(() => cycloramaGeometry(), []);
+  // Path-traced still: real area light only (no raster helpers).
+  const tracing = useUIStore((s) => s.pathTrace);
 
   useEffect(() => () => cyclo.dispose(), [cyclo]);
 
   useEffect(() => {
+    if (STUDIO_HDRI) {
+      let rt: THREE.WebGLRenderTarget | null = null;
+      let hdr: THREE.Texture | null = null;
+      let disposed = false;
+      new HDRLoader().load(`${import.meta.env.BASE_URL}${STUDIO_HDRI}`, (tex) => {
+        if (disposed) return tex.dispose();
+        tex.mapping = THREE.EquirectangularReflectionMapping;
+        const pmrem = new THREE.PMREMGenerator(gl);
+        rt = pmrem.fromEquirectangular(tex);
+        pmrem.dispose();
+        hdr = tex;
+        scene.environment = rt.texture;
+        scene.environmentRotation.set(0, HDRI_ROTATION, 0);
+        scene.environmentIntensity = HDRI_INTENSITY;
+        tracerEnvironment = tex;
+      });
+      return () => {
+        disposed = true;
+        scene.environment = null;
+        tracerEnvironment = null;
+        rt?.dispose();
+        hdr?.dispose();
+      };
+    }
+
     const env = new THREE.Scene();
     // Dim backdrop + darker open front keep reflections contrasty (black
     // paint stays black); the softbox panels glow at their light's radiance.
@@ -255,7 +318,7 @@ export function StudioEnvironment() {
     });
 
     const pmrem = new THREE.PMREMGenerator(gl);
-    const rt = pmrem.fromScene(env, 0, 0.05, 50, { position: CENTER });
+    const rt = pmrem.fromScene(env, 0, 0.05, 50, { position: CENTER, size: ENV_SIZE });
     scene.environment = rt.texture;
     pmrem.dispose();
     backdropMat.dispose();
@@ -273,12 +336,13 @@ export function StudioEnvironment() {
   return (
     <>
       {/* A touch of emissive lifts the backdrop to clean white without
-          brightening the bike, while the key shadow still reads on it. */}
+          brightening the bike, while the key shadow still reads on it. The
+          path tracer has no environment light on it, so it gets more. */}
       <mesh geometry={cyclo}>
         <meshStandardMaterial
           color={BACKDROP_COLOR}
           emissive={BACKDROP_COLOR}
-          emissiveIntensity={0.06}
+          emissiveIntensity={tracing ? PT_BACKDROP_GLOW : 0.06}
           roughness={0.9}
           metalness={0}
         />
@@ -290,16 +354,17 @@ export function StudioEnvironment() {
           position={b.pos}
           width={b.w}
           height={b.h}
-          intensity={i === 0 ? b.radiance * KEY_AREA_SHARE : b.radiance}
+          intensity={i === 0 && !tracing ? b.radiance * KEY_AREA_SHARE : b.radiance}
           onUpdate={(l) => l.lookAt(CENTER)}
         />
       ))}
 
-      <FloorShadow />
+      {!tracing && <FloorShadow />}
 
       {/* The bike's self-shadow (tube on tube): along the key, aimed at the
           bike centre, PCF-softened. The floor takes FloorShadow instead. */}
       <directionalLight
+        visible={!tracing}
         intensity={2.0}
         position={[key.x - CENTER.x, key.y - CENTER.y, key.z - CENTER.z]}
         castShadow

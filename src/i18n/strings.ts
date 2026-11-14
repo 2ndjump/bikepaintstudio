@@ -5,6 +5,10 @@ export type I18nKey =
   | 'save'
   | 'load'
   | 'pngExport'
+  | 'render'
+  | 'renderTip'
+  | 'renderStopTip'
+  | 'renderUnavailable'
   | 'zones'
   | 'rims'
   | 'hasLayers'
@@ -196,6 +200,16 @@ const STRINGS: Record<I18nKey, Record<Lang, string>> = {
   save: { de: 'Speichern', en: 'Save' },
   load: { de: 'Laden', en: 'Load' },
   pngExport: { de: 'PNG Export', en: 'Export PNG' },
+  render: { de: 'Rendern', en: 'Render' },
+  renderTip: {
+    de: 'Fotorealistisches Standbild dieser Ansicht (Pathtracing) – jede Änderung kehrt zur Live-Ansicht zurück',
+    en: 'Photoreal still of this view (path tracing) – any change returns to the live view',
+  },
+  renderStopTip: { de: 'Zurück zur Live-Ansicht', en: 'Back to the live view' },
+  renderUnavailable: {
+    de: 'Pathtracing wird von diesem Browser bzw. Grafikchip nicht unterstützt',
+    en: 'Path tracing isn’t supported by this browser or GPU',
+  },
   zones: { de: 'Zonen', en: 'Zones' },
   rims: { de: 'Felgen', en: 'Rims' },
   dividers: { de: 'Divider', en: 'Dividers' },

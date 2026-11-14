@@ -226,3 +226,56 @@ export function applyDividerShaderMapped(this: THREE.Material, shader: CompileSh
     .replace('#include <common>', '#include <common>' + FRAG_HEAD_MAPPED)
     .replace('#include <map_fragment>', '#include <map_fragment>' + FRAG_BODY_MAPPED);
 }
+
+/**
+ * For the path tracer, which can't run the onBeforeCompile injection above:
+ * a material that bakes a frame zone's final base colour (layer map with the
+ * dividers under the layers, exactly as FRAG_BODY_MAPPED) into a texture.
+ * Drawn with the zone mesh, it rasterises the surface in UV space: the UV
+ * rectangle `uvRect` (min u, min v, size u, size v) fills the render target,
+ * so tube ends past v 0…1 (mirrored in the live material) get texels of
+ * their own. `uOffset` (clip space) shifts the draw for edge dilation.
+ */
+export function createDividerBakeMaterial(
+  map: THREE.Texture,
+  coverage: THREE.Texture,
+  uvRect: THREE.Vector4,
+): THREE.ShaderMaterial {
+  const shader: CompileShader = {
+    uniforms: {
+      map: { value: map },
+      uDivCoverage: { value: coverage },
+      uUvRect: { value: uvRect },
+      uOffset: { value: new THREE.Vector2() },
+    },
+    vertexShader: /* glsl */ `
+      uniform mat4 uDivBikeInv;
+      uniform vec4 uUvRect;
+      uniform vec2 uOffset;
+      varying vec2 vMapUv;
+      varying vec3 vWorldPosDiv;
+      void main() {
+        vMapUv = uv;
+        vWorldPosDiv = (uDivBikeInv * modelMatrix * vec4(position, 1.0)).xyz;
+        gl_Position = vec4((uv - uUvRect.xy) / uUvRect.zw * 2.0 - 1.0 + uOffset, 0.0, 1.0);
+      }`,
+    fragmentShader: /* glsl */ `
+      uniform sampler2D map;
+      varying vec2 vMapUv;
+      ${FRAG_HEAD_MAPPED}
+      void main() {
+        vec4 diffuseColor = texture2D(map, vMapUv);
+        ${FRAG_BODY_MAPPED}
+        gl_FragColor = vec4(diffuseColor.rgb, 1.0);
+      }`,
+  };
+  wireUniforms(shader);
+  return new THREE.ShaderMaterial({
+    uniforms: shader.uniforms,
+    vertexShader: shader.vertexShader,
+    fragmentShader: shader.fragmentShader,
+    side: THREE.DoubleSide,
+    depthTest: false,
+    depthWrite: false,
+  });
+}
