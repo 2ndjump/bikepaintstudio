@@ -168,7 +168,28 @@ export type I18nKey =
   | 'tplRetro'
   | 'tplPop'
   | 'tplChameleon'
-  | 'tplMinimal';
+  | 'tplMinimal'
+  | 'catRacy'
+  | 'catAggressive'
+  | 'catArtistic'
+  | 'catHeritage'
+  | 'catClean'
+  | 'catAll'
+  | 'tplTeamblock'
+  | 'tplTricolore'
+  | 'tplNumber'
+  | 'tplNeontt'
+  | 'tplHazard'
+  | 'tplShards'
+  | 'tplClaws'
+  | 'tplGlitch'
+  | 'tplSplatter'
+  | 'tplMarble'
+  | 'tplBordeaux'
+  | 'tplCeleste'
+  | 'tplBarber'
+  | 'tplAccentline'
+  | 'tplPastel';
 
 const STRINGS: Record<I18nKey, Record<Lang, string>> = {
   active: { de: 'Aktiv', en: 'Active' },
@@ -339,6 +360,27 @@ const STRINGS: Record<I18nKey, Record<Lang, string>> = {
   tplPop: { de: 'Pop-Art', en: 'Pop Art' },
   tplChameleon: { de: 'Chamäleon', en: 'Chameleon' },
   tplMinimal: { de: 'Reinweiß', en: 'Pure White' },
+  catRacy: { de: 'Racy', en: 'Racy' },
+  catAggressive: { de: 'Aggressiv', en: 'Aggressive' },
+  catArtistic: { de: 'Künstlerisch', en: 'Artistic' },
+  catHeritage: { de: 'Klassisch', en: 'Heritage' },
+  catClean: { de: 'Clean', en: 'Clean' },
+  catAll: { de: 'Alle', en: 'All' },
+  tplTeamblock: { de: 'Profiteam', en: 'Pro Team' },
+  tplTricolore: { de: 'Trikolore', en: 'Tricolour' },
+  tplNumber: { de: 'Startnummer', en: 'Race Number' },
+  tplNeontt: { de: 'Neon-Zeitfahren', en: 'Neon Time Trial' },
+  tplHazard: { de: 'Warnstreifen', en: 'Hazard' },
+  tplShards: { de: 'Scherben', en: 'Shattered' },
+  tplClaws: { de: 'Krallen', en: 'Claw Marks' },
+  tplGlitch: { de: 'Glitch', en: 'Glitch' },
+  tplSplatter: { de: 'Farbspritzer', en: 'Paint Splatter' },
+  tplMarble: { de: 'Marmor', en: 'Marble' },
+  tplBordeaux: { de: 'Bordeaux', en: 'Bordeaux' },
+  tplCeleste: { de: 'Mint & Marine', en: 'Mint & Navy' },
+  tplBarber: { de: 'Barber Pole', en: 'Barber Pole' },
+  tplAccentline: { de: 'Akzentlinie', en: 'Accent Line' },
+  tplPastel: { de: 'Pastell', en: 'Pastel' },
 };
 
 export function translate(key: I18nKey, lang: Lang): string {

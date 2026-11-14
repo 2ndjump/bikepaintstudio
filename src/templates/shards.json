@@ -1,0 +1,419 @@
+{
+  "activeZone": "topTube",
+  "zones": {
+    "headTube": {
+      "finish": "glossy",
+      "baseColor": "#0b0b0b",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": []
+    },
+    "topTube": {
+      "finish": "glossy",
+      "baseColor": "#0b0b0b",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": []
+    },
+    "downTube": {
+      "finish": "glossy",
+      "baseColor": "#0b0b0b",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": [
+        {
+          "letterSpacing": 8,
+          "glyphRotation": 0,
+          "id": "decal-t22r",
+          "name": "Wordmark",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "OBSIDIA",
+          "font": "Chakra Petch",
+          "size": 40,
+          "color": "#ffffff",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.25,
+          "y": 0.62,
+          "rotation": 0,
+          "bold": true,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        },
+        {
+          "letterSpacing": 8,
+          "glyphRotation": 0,
+          "id": "decal-t22s",
+          "name": "Wordmark (L)",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "OBSIDIA",
+          "font": "Chakra Petch",
+          "size": 40,
+          "color": "#ffffff",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.75,
+          "y": 0.62,
+          "rotation": 180,
+          "bold": true,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        }
+      ]
+    },
+    "seatTube": {
+      "finish": "glossy",
+      "baseColor": "#0b0b0b",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": []
+    },
+    "seatStays": {
+      "finish": "glossy",
+      "baseColor": "#0b0b0b",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": []
+    },
+    "chainStays": {
+      "finish": "glossy",
+      "baseColor": "#0b0b0b",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": []
+    },
+    "fork": {
+      "finish": "glossy",
+      "baseColor": "#0b0b0b",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": []
+    },
+    "frontRim": {
+      "finish": "glossy",
+      "baseColor": "#0b0b0b",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": [
+        {
+          "id": "shape-t233",
+          "name": "Shard 1",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "shape",
+          "shape": "triangle",
+          "color": "#c1121f",
+          "x": 0,
+          "y": 0.5,
+          "width": 0.05,
+          "height": 0.9,
+          "rotation": 90
+        },
+        {
+          "letterSpacing": 8,
+          "glyphRotation": 0,
+          "id": "decal-t234",
+          "name": "Rim 1",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "OBSIDIA",
+          "font": "Chakra Petch",
+          "size": 46,
+          "color": "#c1121f",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.1667,
+          "y": 0.5,
+          "rotation": 0,
+          "bold": true,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        },
+        {
+          "letterSpacing": 8,
+          "glyphRotation": 0,
+          "id": "decal-t235",
+          "name": "Rim 2",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "OBSIDIA",
+          "font": "Chakra Petch",
+          "size": 46,
+          "color": "#c1121f",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.5,
+          "y": 0.5,
+          "rotation": 0,
+          "bold": true,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        },
+        {
+          "letterSpacing": 8,
+          "glyphRotation": 0,
+          "id": "decal-t236",
+          "name": "Rim 3",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "OBSIDIA",
+          "font": "Chakra Petch",
+          "size": 46,
+          "color": "#c1121f",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.8333,
+          "y": 0.5,
+          "rotation": 0,
+          "bold": true,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        }
+      ]
+    },
+    "rearRim": {
+      "finish": "glossy",
+      "baseColor": "#0b0b0b",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": [
+        {
+          "id": "shape-t237",
+          "name": "Shard 1",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "shape",
+          "shape": "triangle",
+          "color": "#c1121f",
+          "x": 0,
+          "y": 0.5,
+          "width": 0.05,
+          "height": 0.9,
+          "rotation": 90
+        },
+        {
+          "letterSpacing": 8,
+          "glyphRotation": 0,
+          "id": "decal-t238",
+          "name": "Rim 1",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "OBSIDIA",
+          "font": "Chakra Petch",
+          "size": 46,
+          "color": "#c1121f",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.1667,
+          "y": 0.5,
+          "rotation": 0,
+          "bold": true,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        },
+        {
+          "letterSpacing": 8,
+          "glyphRotation": 0,
+          "id": "decal-t239",
+          "name": "Rim 2",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "OBSIDIA",
+          "font": "Chakra Petch",
+          "size": 46,
+          "color": "#c1121f",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.5,
+          "y": 0.5,
+          "rotation": 0,
+          "bold": true,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        },
+        {
+          "letterSpacing": 8,
+          "glyphRotation": 0,
+          "id": "decal-t23a",
+          "name": "Rim 3",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "OBSIDIA",
+          "font": "Chakra Petch",
+          "size": 46,
+          "color": "#c1121f",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.8333,
+          "y": 0.5,
+          "rotation": 0,
+          "bold": true,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        }
+      ]
+    }
+  },
+  "rim": {
+    "depth": 65,
+    "width": 25,
+    "spokeCount": 20
+  },
+  "dividers": [
+    {
+      "id": "div-t22t",
+      "kind": "shape",
+      "color": "#c1121f",
+      "ax": 0,
+      "ay": 0,
+      "bx": 0,
+      "by": 0,
+      "shape": "triangle",
+      "cx": 0.24,
+      "cy": 0.24,
+      "w": 0.3,
+      "h": 0.5,
+      "rotation": 30
+    },
+    {
+      "id": "div-t22u",
+      "kind": "shape",
+      "color": "#c1121f",
+      "ax": 0,
+      "ay": 0,
+      "bx": 0,
+      "by": 0,
+      "shape": "triangle",
+      "cx": -0.12,
+      "cy": 0.44,
+      "w": 0.3,
+      "h": 0.42,
+      "rotation": 200
+    },
+    {
+      "id": "div-t22v",
+      "kind": "shape",
+      "color": "#c1121f",
+      "ax": 0,
+      "ay": 0,
+      "bx": 0,
+      "by": 0,
+      "shape": "triangle",
+      "cx": 0.52,
+      "cy": 0.22,
+      "w": 0.24,
+      "h": 0.42,
+      "rotation": -60
+    },
+    {
+      "id": "div-t22w",
+      "kind": "shape",
+      "color": "#c1121f",
+      "ax": 0,
+      "ay": 0,
+      "bx": 0,
+      "by": 0,
+      "shape": "triangle",
+      "cx": -0.3,
+      "cy": 0.12,
+      "w": 0.3,
+      "h": 0.34,
+      "rotation": 100
+    },
+    {
+      "id": "div-t22x",
+      "kind": "shape",
+      "color": "#6e0a12",
+      "ax": 0,
+      "ay": 0,
+      "bx": 0,
+      "by": 0,
+      "shape": "triangle",
+      "cx": 0.04,
+      "cy": 0.1,
+      "w": 0.2,
+      "h": 0.3,
+      "rotation": 160
+    },
+    {
+      "id": "div-t22y",
+      "kind": "shape",
+      "color": "#6e0a12",
+      "ax": 0,
+      "ay": 0,
+      "bx": 0,
+      "by": 0,
+      "shape": "triangle",
+      "cx": 0.36,
+      "cy": 0.5,
+      "w": 0.16,
+      "h": 0.24,
+      "rotation": -20
+    }
+  ],
+  "variant": {
+    "discipline": "road",
+    "style": "aero"
+  },
+  "palette": [
+    "#c1121f",
+    "#0b0b0b",
+    "#5c0a10",
+    "#ffffff"
+  ]
+}

@@ -2,7 +2,7 @@ import { loadDesignFile, useDesignStore } from '../../state/designStore';
 import { isRimZone } from '../../state/types';
 import { useUIStore } from '../../state/uiStore';
 import { useT } from '../../i18n/useT';
-import { TEMPLATES } from '../../templates/templates';
+import { CATEGORIES, TEMPLATES } from '../../templates/templates';
 
 /** Toolbar button showing/hiding the template strip. */
 export function TemplateGalleryToggle() {
@@ -32,6 +32,10 @@ export function TemplateGallery({ floating = false }: { floating?: boolean }) {
   const open = useUIStore((s) => s.galleryOpen);
   // Wheel designer: show the templates' wheels and take only their rims.
   const wheelMode = useDesignStore((s) => isRimZone(s.activeZone));
+  const stored = useUIStore((s) => s.galleryCategory);
+  const setCategory = useUIStore((s) => s.setGalleryCategory);
+  const category = CATEGORIES.some((c) => c.id === stored) ? stored : 'all';
+  const shown = category === 'all' ? TEMPLATES : TEMPLATES.filter((tpl) => tpl.category === category);
 
   async function choose(tpl: (typeof TEMPLATES)[number]) {
     const design = await tpl.load();
@@ -46,9 +50,22 @@ export function TemplateGallery({ floating = false }: { floating?: boolean }) {
       aria-label={t('templates')}
       className={`glass template-strip ${floating ? 'template-strip-floating' : ''} ${open ? '' : 'hidden'}`}
     >
-      <div className="template-strip-head m3-section-title">{t('templates')}</div>
-      <div className="template-row">
-        {TEMPLATES.map((tpl) => (
+      <div className="template-cats" role="radiogroup" aria-label={t('templates')}>
+        {[{ id: 'all', nameKey: 'catAll' as const }, ...CATEGORIES].map((c) => (
+          <button
+            key={c.id}
+            type="button"
+            role="radio"
+            aria-checked={category === c.id}
+            className={`m3-chip ${category === c.id ? 'm3-chip-active' : ''}`}
+            onClick={() => setCategory(c.id)}
+          >
+            {t(c.nameKey)}
+          </button>
+        ))}
+      </div>
+      <div className="template-row" key={category}>
+        {shown.map((tpl) => (
           <button
             key={tpl.id}
             type="button"

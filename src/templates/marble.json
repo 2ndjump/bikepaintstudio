@@ -1,0 +1,453 @@
+{
+  "activeZone": "topTube",
+  "zones": {
+    "headTube": {
+      "finish": "glossy",
+      "baseColor": "#f1eee8",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": [
+        {
+          "rotationX": 0,
+          "rotationY": 0,
+          "scaleX": 1,
+          "scaleY": 1,
+          "id": "pattern-t24u",
+          "name": "Veins",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "pattern",
+          "pattern": "marble",
+          "color": "#2b2b2b",
+          "scale": 60,
+          "rotation": 0,
+          "intensity": 0.6
+        }
+      ]
+    },
+    "topTube": {
+      "finish": "glossy",
+      "baseColor": "#f1eee8",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": [
+        {
+          "rotationX": 0,
+          "rotationY": 0,
+          "scaleX": 1,
+          "scaleY": 1,
+          "id": "pattern-t24v",
+          "name": "Veins",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "pattern",
+          "pattern": "marble",
+          "color": "#2b2b2b",
+          "scale": 60,
+          "rotation": 0,
+          "intensity": 0.6
+        },
+        {
+          "letterSpacing": 12,
+          "glyphRotation": 0,
+          "id": "decal-t24w",
+          "name": "Wordmark",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "MARMORA",
+          "font": "Cormorant Garamond",
+          "size": 36,
+          "color": "#b08d3c",
+          "outlineColor": "#1a1a1a",
+          "outlineWidth": 2,
+          "x": 0.25,
+          "y": 0.5,
+          "rotation": 0,
+          "bold": true,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        },
+        {
+          "letterSpacing": 12,
+          "glyphRotation": 0,
+          "id": "decal-t24x",
+          "name": "Wordmark (L)",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "MARMORA",
+          "font": "Cormorant Garamond",
+          "size": 36,
+          "color": "#b08d3c",
+          "outlineColor": "#1a1a1a",
+          "outlineWidth": 2,
+          "x": 0.75,
+          "y": 0.5,
+          "rotation": 180,
+          "bold": true,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        }
+      ]
+    },
+    "downTube": {
+      "finish": "glossy",
+      "baseColor": "#f1eee8",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": [
+        {
+          "rotationX": 0,
+          "rotationY": 0,
+          "scaleX": 1,
+          "scaleY": 1,
+          "id": "pattern-t24u",
+          "name": "Veins",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "pattern",
+          "pattern": "marble",
+          "color": "#2b2b2b",
+          "scale": 60,
+          "rotation": 0,
+          "intensity": 0.6
+        }
+      ]
+    },
+    "seatTube": {
+      "finish": "glossy",
+      "baseColor": "#f1eee8",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": [
+        {
+          "rotationX": 0,
+          "rotationY": 0,
+          "scaleX": 1,
+          "scaleY": 1,
+          "id": "pattern-t24u",
+          "name": "Veins",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "pattern",
+          "pattern": "marble",
+          "color": "#2b2b2b",
+          "scale": 60,
+          "rotation": 0,
+          "intensity": 0.6
+        }
+      ]
+    },
+    "seatStays": {
+      "finish": "glossy",
+      "baseColor": "#f1eee8",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": [
+        {
+          "rotationX": 0,
+          "rotationY": 0,
+          "scaleX": 1,
+          "scaleY": 1,
+          "id": "pattern-t24u",
+          "name": "Veins",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "pattern",
+          "pattern": "marble",
+          "color": "#2b2b2b",
+          "scale": 60,
+          "rotation": 0,
+          "intensity": 0.6
+        }
+      ]
+    },
+    "chainStays": {
+      "finish": "glossy",
+      "baseColor": "#f1eee8",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": [
+        {
+          "rotationX": 0,
+          "rotationY": 0,
+          "scaleX": 1,
+          "scaleY": 1,
+          "id": "pattern-t24u",
+          "name": "Veins",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "pattern",
+          "pattern": "marble",
+          "color": "#2b2b2b",
+          "scale": 60,
+          "rotation": 0,
+          "intensity": 0.6
+        }
+      ]
+    },
+    "fork": {
+      "finish": "glossy",
+      "baseColor": "#f1eee8",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": [
+        {
+          "rotationX": 0,
+          "rotationY": 0,
+          "scaleX": 1,
+          "scaleY": 1,
+          "id": "pattern-t24u",
+          "name": "Veins",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "pattern",
+          "pattern": "marble",
+          "color": "#2b2b2b",
+          "scale": 60,
+          "rotation": 0,
+          "intensity": 0.6
+        }
+      ]
+    },
+    "frontRim": {
+      "finish": "glossy",
+      "baseColor": "#141414",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": [
+        {
+          "id": "shape-t252",
+          "name": "Gold line",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "shape",
+          "shape": "rectangle",
+          "color": "#b08d3c",
+          "x": 0.5,
+          "y": 0.84,
+          "width": 1,
+          "height": 0.03,
+          "rotation": 0
+        },
+        {
+          "letterSpacing": 10,
+          "glyphRotation": 0,
+          "id": "decal-t253",
+          "name": "Rim 1",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "MARMORA",
+          "font": "Cormorant Garamond",
+          "size": 48,
+          "color": "#b08d3c",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.1667,
+          "y": 0.5,
+          "rotation": 0,
+          "bold": true,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        },
+        {
+          "letterSpacing": 10,
+          "glyphRotation": 0,
+          "id": "decal-t254",
+          "name": "Rim 2",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "MARMORA",
+          "font": "Cormorant Garamond",
+          "size": 48,
+          "color": "#b08d3c",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.5,
+          "y": 0.5,
+          "rotation": 0,
+          "bold": true,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        },
+        {
+          "letterSpacing": 10,
+          "glyphRotation": 0,
+          "id": "decal-t255",
+          "name": "Rim 3",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "MARMORA",
+          "font": "Cormorant Garamond",
+          "size": 48,
+          "color": "#b08d3c",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.8333,
+          "y": 0.5,
+          "rotation": 0,
+          "bold": true,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        }
+      ]
+    },
+    "rearRim": {
+      "finish": "glossy",
+      "baseColor": "#141414",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": [
+        {
+          "id": "shape-t256",
+          "name": "Gold line",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "shape",
+          "shape": "rectangle",
+          "color": "#b08d3c",
+          "x": 0.5,
+          "y": 0.84,
+          "width": 1,
+          "height": 0.03,
+          "rotation": 0
+        },
+        {
+          "letterSpacing": 10,
+          "glyphRotation": 0,
+          "id": "decal-t257",
+          "name": "Rim 1",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "MARMORA",
+          "font": "Cormorant Garamond",
+          "size": 48,
+          "color": "#b08d3c",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.1667,
+          "y": 0.5,
+          "rotation": 0,
+          "bold": true,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        },
+        {
+          "letterSpacing": 10,
+          "glyphRotation": 0,
+          "id": "decal-t258",
+          "name": "Rim 2",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "MARMORA",
+          "font": "Cormorant Garamond",
+          "size": 48,
+          "color": "#b08d3c",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.5,
+          "y": 0.5,
+          "rotation": 0,
+          "bold": true,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        },
+        {
+          "letterSpacing": 10,
+          "glyphRotation": 0,
+          "id": "decal-t259",
+          "name": "Rim 3",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "MARMORA",
+          "font": "Cormorant Garamond",
+          "size": 48,
+          "color": "#b08d3c",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.8333,
+          "y": 0.5,
+          "rotation": 0,
+          "bold": true,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        }
+      ]
+    }
+  },
+  "rim": {
+    "depth": 45,
+    "width": 25,
+    "spokeCount": 20
+  },
+  "dividers": [],
+  "variant": {
+    "discipline": "gravel",
+    "style": "aero"
+  },
+  "palette": [
+    "#f1eee8",
+    "#2b2b2b",
+    "#b08d3c",
+    "#141414"
+  ]
+}

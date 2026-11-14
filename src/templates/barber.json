@@ -1,0 +1,377 @@
+{
+  "activeZone": "topTube",
+  "zones": {
+    "headTube": {
+      "finish": "glossy",
+      "baseColor": "#f2ead8",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": [
+        {
+          "id": "shape-t26k",
+          "name": "Band",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "shape",
+          "shape": "rectangle",
+          "color": "#b3202a",
+          "x": 0.5,
+          "y": 0.5,
+          "width": 1,
+          "height": 0.08,
+          "rotation": 0
+        }
+      ]
+    },
+    "topTube": {
+      "finish": "glossy",
+      "baseColor": "#f2ead8",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": []
+    },
+    "downTube": {
+      "finish": "glossy",
+      "baseColor": "#f2ead8",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": [
+        {
+          "letterSpacing": 2,
+          "glyphRotation": 0,
+          "id": "decal-t26i",
+          "name": "Wordmark",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "Officina",
+          "font": "Kreon",
+          "size": 40,
+          "color": "#1d3557",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.25,
+          "y": 0.55,
+          "rotation": 0,
+          "bold": true,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        },
+        {
+          "letterSpacing": 2,
+          "glyphRotation": 0,
+          "id": "decal-t26j",
+          "name": "Wordmark (L)",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "Officina",
+          "font": "Kreon",
+          "size": 40,
+          "color": "#1d3557",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.75,
+          "y": 0.55,
+          "rotation": 180,
+          "bold": true,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        }
+      ]
+    },
+    "seatTube": {
+      "finish": "glossy",
+      "baseColor": "#f2ead8",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": [
+        {
+          "id": "shape-t26e",
+          "name": "Pole base",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "shape",
+          "shape": "rectangle",
+          "color": "#f2ead8",
+          "x": 0.5,
+          "y": 0.5,
+          "width": 1,
+          "height": 0.56,
+          "rotation": 0
+        },
+        {
+          "rotationX": 0,
+          "rotationY": 0,
+          "scaleX": 1,
+          "scaleY": 1,
+          "id": "pattern-t26f",
+          "name": "Pole stripes",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "pattern",
+          "pattern": "stripes",
+          "color": "#b3202a",
+          "scale": 8,
+          "rotation": 30,
+          "intensity": 1
+        },
+        {
+          "id": "shape-t26g",
+          "name": "Navy top",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "shape",
+          "shape": "rectangle",
+          "color": "#1d3557",
+          "x": 0.5,
+          "y": 0.2,
+          "width": 1,
+          "height": 0.03,
+          "rotation": 0
+        },
+        {
+          "id": "shape-t26h",
+          "name": "Navy bottom",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "shape",
+          "shape": "rectangle",
+          "color": "#1d3557",
+          "x": 0.5,
+          "y": 0.8,
+          "width": 1,
+          "height": 0.03,
+          "rotation": 0
+        }
+      ]
+    },
+    "seatStays": {
+      "finish": "glossy",
+      "baseColor": "#f2ead8",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": []
+    },
+    "chainStays": {
+      "finish": "glossy",
+      "baseColor": "#f2ead8",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": []
+    },
+    "fork": {
+      "finish": "glossy",
+      "baseColor": "#f2ead8",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": []
+    },
+    "frontRim": {
+      "finish": "satin",
+      "baseColor": "#1d1d1d",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": [
+        {
+          "letterSpacing": 6,
+          "glyphRotation": 0,
+          "id": "decal-t26o",
+          "name": "Rim 1",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "OFFICINA",
+          "font": "Kreon",
+          "size": 46,
+          "color": "#f2ead8",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.1667,
+          "y": 0.5,
+          "rotation": 0,
+          "bold": true,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        },
+        {
+          "letterSpacing": 6,
+          "glyphRotation": 0,
+          "id": "decal-t26p",
+          "name": "Rim 2",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "OFFICINA",
+          "font": "Kreon",
+          "size": 46,
+          "color": "#f2ead8",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.5,
+          "y": 0.5,
+          "rotation": 0,
+          "bold": true,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        },
+        {
+          "letterSpacing": 6,
+          "glyphRotation": 0,
+          "id": "decal-t26q",
+          "name": "Rim 3",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "OFFICINA",
+          "font": "Kreon",
+          "size": 46,
+          "color": "#f2ead8",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.8333,
+          "y": 0.5,
+          "rotation": 0,
+          "bold": true,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        }
+      ]
+    },
+    "rearRim": {
+      "finish": "satin",
+      "baseColor": "#1d1d1d",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": [
+        {
+          "letterSpacing": 6,
+          "glyphRotation": 0,
+          "id": "decal-t26r",
+          "name": "Rim 1",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "OFFICINA",
+          "font": "Kreon",
+          "size": 46,
+          "color": "#f2ead8",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.1667,
+          "y": 0.5,
+          "rotation": 0,
+          "bold": true,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        },
+        {
+          "letterSpacing": 6,
+          "glyphRotation": 0,
+          "id": "decal-t26s",
+          "name": "Rim 2",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "OFFICINA",
+          "font": "Kreon",
+          "size": 46,
+          "color": "#f2ead8",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.5,
+          "y": 0.5,
+          "rotation": 0,
+          "bold": true,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        },
+        {
+          "letterSpacing": 6,
+          "glyphRotation": 0,
+          "id": "decal-t26t",
+          "name": "Rim 3",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "OFFICINA",
+          "font": "Kreon",
+          "size": 46,
+          "color": "#f2ead8",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.8333,
+          "y": 0.5,
+          "rotation": 0,
+          "bold": true,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        }
+      ]
+    }
+  },
+  "rim": {
+    "depth": 30,
+    "width": 25,
+    "spokeCount": 20
+  },
+  "dividers": [],
+  "variant": {
+    "discipline": "gravel",
+    "style": "classic"
+  },
+  "palette": [
+    "#f2ead8",
+    "#b3202a",
+    "#1d3557",
+    "#1d1d1d"
+  ]
+}

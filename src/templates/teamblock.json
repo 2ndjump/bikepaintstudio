@@ -1,0 +1,409 @@
+{
+  "activeZone": "topTube",
+  "zones": {
+    "headTube": {
+      "finish": "glossy",
+      "baseColor": "#00a3e0",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": []
+    },
+    "topTube": {
+      "finish": "glossy",
+      "baseColor": "#00a3e0",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": [
+        {
+          "id": "shape-t23",
+          "name": "Sponsor panel",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "shape",
+          "shape": "rectangle",
+          "color": "#ffffff",
+          "x": 0.5,
+          "y": 0.32,
+          "width": 1,
+          "height": 0.34,
+          "rotation": 0
+        },
+        {
+          "letterSpacing": 2,
+          "glyphRotation": 0,
+          "id": "decal-t24",
+          "name": "Sponsor",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "NORDA·KAPITAL",
+          "font": "Barlow Condensed",
+          "size": 30,
+          "color": "#111111",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.25,
+          "y": 0.32,
+          "rotation": 0,
+          "bold": true,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        },
+        {
+          "letterSpacing": 2,
+          "glyphRotation": 0,
+          "id": "decal-t25",
+          "name": "Sponsor (L)",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "NORDA·KAPITAL",
+          "font": "Barlow Condensed",
+          "size": 30,
+          "color": "#111111",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.75,
+          "y": 0.32,
+          "rotation": 180,
+          "bold": true,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        }
+      ]
+    },
+    "downTube": {
+      "finish": "glossy",
+      "baseColor": "#00a3e0",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": [
+        {
+          "letterSpacing": 4,
+          "glyphRotation": 0,
+          "id": "decal-t21",
+          "name": "Wordmark",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "VELTRIX",
+          "font": "Exo 2",
+          "size": 40,
+          "color": "#ffffff",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.25,
+          "y": 0.7,
+          "rotation": 0,
+          "bold": true,
+          "italic": true,
+          "underline": false,
+          "strikethrough": false
+        },
+        {
+          "letterSpacing": 4,
+          "glyphRotation": 0,
+          "id": "decal-t22",
+          "name": "Wordmark (L)",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "VELTRIX",
+          "font": "Exo 2",
+          "size": 40,
+          "color": "#ffffff",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.75,
+          "y": 0.7,
+          "rotation": 180,
+          "bold": true,
+          "italic": true,
+          "underline": false,
+          "strikethrough": false
+        }
+      ]
+    },
+    "seatTube": {
+      "finish": "glossy",
+      "baseColor": "#00a3e0",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": []
+    },
+    "seatStays": {
+      "finish": "glossy",
+      "baseColor": "#00a3e0",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": []
+    },
+    "chainStays": {
+      "finish": "glossy",
+      "baseColor": "#00a3e0",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": []
+    },
+    "fork": {
+      "finish": "glossy",
+      "baseColor": "#00a3e0",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": []
+    },
+    "frontRim": {
+      "finish": "glossy",
+      "baseColor": "#111111",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": [
+        {
+          "id": "shape-t2c",
+          "name": "Stripe",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "shape",
+          "shape": "rectangle",
+          "color": "#ff2d87",
+          "x": 0.5,
+          "y": 0.85,
+          "width": 1,
+          "height": 0.05,
+          "rotation": 0
+        },
+        {
+          "letterSpacing": 4,
+          "glyphRotation": 0,
+          "id": "decal-t2d",
+          "name": "Rim 1",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "VELTRIX",
+          "font": "Exo 2",
+          "size": 50,
+          "color": "#00a3e0",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.1667,
+          "y": 0.5,
+          "rotation": 0,
+          "bold": true,
+          "italic": true,
+          "underline": false,
+          "strikethrough": false
+        },
+        {
+          "letterSpacing": 4,
+          "glyphRotation": 0,
+          "id": "decal-t2e",
+          "name": "Rim 2",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "VELTRIX",
+          "font": "Exo 2",
+          "size": 50,
+          "color": "#00a3e0",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.5,
+          "y": 0.5,
+          "rotation": 0,
+          "bold": true,
+          "italic": true,
+          "underline": false,
+          "strikethrough": false
+        },
+        {
+          "letterSpacing": 4,
+          "glyphRotation": 0,
+          "id": "decal-t2f",
+          "name": "Rim 3",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "VELTRIX",
+          "font": "Exo 2",
+          "size": 50,
+          "color": "#00a3e0",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.8333,
+          "y": 0.5,
+          "rotation": 0,
+          "bold": true,
+          "italic": true,
+          "underline": false,
+          "strikethrough": false
+        }
+      ]
+    },
+    "rearRim": {
+      "finish": "glossy",
+      "baseColor": "#111111",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": [
+        {
+          "id": "shape-t2g",
+          "name": "Stripe",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "shape",
+          "shape": "rectangle",
+          "color": "#ff2d87",
+          "x": 0.5,
+          "y": 0.85,
+          "width": 1,
+          "height": 0.05,
+          "rotation": 0
+        },
+        {
+          "letterSpacing": 4,
+          "glyphRotation": 0,
+          "id": "decal-t2h",
+          "name": "Rim 1",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "VELTRIX",
+          "font": "Exo 2",
+          "size": 50,
+          "color": "#00a3e0",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.1667,
+          "y": 0.5,
+          "rotation": 0,
+          "bold": true,
+          "italic": true,
+          "underline": false,
+          "strikethrough": false
+        },
+        {
+          "letterSpacing": 4,
+          "glyphRotation": 0,
+          "id": "decal-t2i",
+          "name": "Rim 2",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "VELTRIX",
+          "font": "Exo 2",
+          "size": 50,
+          "color": "#00a3e0",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.5,
+          "y": 0.5,
+          "rotation": 0,
+          "bold": true,
+          "italic": true,
+          "underline": false,
+          "strikethrough": false
+        },
+        {
+          "letterSpacing": 4,
+          "glyphRotation": 0,
+          "id": "decal-t2j",
+          "name": "Rim 3",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "VELTRIX",
+          "font": "Exo 2",
+          "size": 50,
+          "color": "#00a3e0",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.8333,
+          "y": 0.5,
+          "rotation": 0,
+          "bold": true,
+          "italic": true,
+          "underline": false,
+          "strikethrough": false
+        }
+      ]
+    }
+  },
+  "rim": {
+    "depth": 60,
+    "width": 25,
+    "spokeCount": 20
+  },
+  "dividers": [
+    {
+      "id": "div-t26",
+      "color": "#ff2d87",
+      "ax": -0.6,
+      "ay": 0.33,
+      "bx": 0.8,
+      "by": 0.2,
+      "softness": 0
+    },
+    {
+      "id": "div-t27",
+      "color": "#111111",
+      "ax": -0.6,
+      "ay": 0.312,
+      "bx": 0.8,
+      "by": 0.18200000000000002,
+      "softness": 0
+    }
+  ],
+  "variant": {
+    "discipline": "road",
+    "style": "aero"
+  },
+  "palette": [
+    "#00a3e0",
+    "#111111",
+    "#ff2d87",
+    "#ffffff"
+  ]
+}

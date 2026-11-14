@@ -1,0 +1,451 @@
+{
+  "activeZone": "topTube",
+  "zones": {
+    "headTube": {
+      "finish": "glossy",
+      "baseColor": "#8fd1c4",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": [
+        {
+          "id": "shape-t264",
+          "name": "Band",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "shape",
+          "shape": "rectangle",
+          "color": "#1b2a4a",
+          "x": 0.5,
+          "y": 0.5,
+          "width": 1,
+          "height": 0.06,
+          "rotation": 0
+        }
+      ]
+    },
+    "topTube": {
+      "finish": "glossy",
+      "baseColor": "#8fd1c4",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": [
+        {
+          "letterSpacing": 4,
+          "glyphRotation": 0,
+          "id": "decal-t262",
+          "name": "Model",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "LEGGERA",
+          "font": "Alfa Slab One",
+          "size": 24,
+          "color": "#1b2a4a",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.25,
+          "y": 0.5,
+          "rotation": 0,
+          "bold": false,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        },
+        {
+          "letterSpacing": 4,
+          "glyphRotation": 0,
+          "id": "decal-t263",
+          "name": "Model (L)",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "LEGGERA",
+          "font": "Alfa Slab One",
+          "size": 24,
+          "color": "#1b2a4a",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.75,
+          "y": 0.5,
+          "rotation": 180,
+          "bold": false,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        }
+      ]
+    },
+    "downTube": {
+      "finish": "glossy",
+      "baseColor": "#8fd1c4",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": [
+        {
+          "id": "shape-t25u",
+          "name": "Panel",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "shape",
+          "shape": "rectangle",
+          "color": "#1b2a4a",
+          "x": 0.5,
+          "y": 0.52,
+          "width": 1,
+          "height": 0.4,
+          "rotation": 0
+        },
+        {
+          "id": "shape-t25v",
+          "name": "Pinstripe low",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "shape",
+          "shape": "rectangle",
+          "color": "#ffffff",
+          "x": 0.5,
+          "y": 0.31,
+          "width": 1,
+          "height": 0.01,
+          "rotation": 0
+        },
+        {
+          "id": "shape-t25w",
+          "name": "Pinstripe high",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "shape",
+          "shape": "rectangle",
+          "color": "#ffffff",
+          "x": 0.5,
+          "y": 0.73,
+          "width": 1,
+          "height": 0.01,
+          "rotation": 0
+        },
+        {
+          "letterSpacing": 4,
+          "glyphRotation": 0,
+          "id": "decal-t25x",
+          "name": "Wordmark",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "LEGGERA",
+          "font": "Alfa Slab One",
+          "size": 30,
+          "color": "#8fd1c4",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.25,
+          "y": 0.52,
+          "rotation": 0,
+          "bold": false,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        },
+        {
+          "letterSpacing": 4,
+          "glyphRotation": 0,
+          "id": "decal-t25y",
+          "name": "Wordmark (L)",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "LEGGERA",
+          "font": "Alfa Slab One",
+          "size": 30,
+          "color": "#8fd1c4",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.75,
+          "y": 0.52,
+          "rotation": 180,
+          "bold": false,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        }
+      ]
+    },
+    "seatTube": {
+      "finish": "glossy",
+      "baseColor": "#8fd1c4",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": [
+        {
+          "id": "shape-t25z",
+          "name": "Panel",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "shape",
+          "shape": "rectangle",
+          "color": "#1b2a4a",
+          "x": 0.5,
+          "y": 0.28,
+          "width": 1,
+          "height": 0.18,
+          "rotation": 0
+        },
+        {
+          "id": "shape-t260",
+          "name": "Pinstripe top",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "shape",
+          "shape": "rectangle",
+          "color": "#ffffff",
+          "x": 0.5,
+          "y": 0.185,
+          "width": 1,
+          "height": 0.01,
+          "rotation": 0
+        },
+        {
+          "id": "shape-t261",
+          "name": "Pinstripe bottom",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "shape",
+          "shape": "rectangle",
+          "color": "#ffffff",
+          "x": 0.5,
+          "y": 0.375,
+          "width": 1,
+          "height": 0.01,
+          "rotation": 0
+        }
+      ]
+    },
+    "seatStays": {
+      "finish": "glossy",
+      "baseColor": "#8fd1c4",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": []
+    },
+    "chainStays": {
+      "finish": "glossy",
+      "baseColor": "#8fd1c4",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": []
+    },
+    "fork": {
+      "finish": "glossy",
+      "baseColor": "#8fd1c4",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": []
+    },
+    "frontRim": {
+      "finish": "glossy",
+      "baseColor": "#151a26",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": [
+        {
+          "letterSpacing": 4,
+          "glyphRotation": 0,
+          "id": "decal-t268",
+          "name": "Rim 1",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "LEGGERA",
+          "font": "Alfa Slab One",
+          "size": 46,
+          "color": "#8fd1c4",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.1667,
+          "y": 0.5,
+          "rotation": 0,
+          "bold": false,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        },
+        {
+          "letterSpacing": 4,
+          "glyphRotation": 0,
+          "id": "decal-t269",
+          "name": "Rim 2",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "LEGGERA",
+          "font": "Alfa Slab One",
+          "size": 46,
+          "color": "#8fd1c4",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.5,
+          "y": 0.5,
+          "rotation": 0,
+          "bold": false,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        },
+        {
+          "letterSpacing": 4,
+          "glyphRotation": 0,
+          "id": "decal-t26a",
+          "name": "Rim 3",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "LEGGERA",
+          "font": "Alfa Slab One",
+          "size": 46,
+          "color": "#8fd1c4",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.8333,
+          "y": 0.5,
+          "rotation": 0,
+          "bold": false,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        }
+      ]
+    },
+    "rearRim": {
+      "finish": "glossy",
+      "baseColor": "#151a26",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": [
+        {
+          "letterSpacing": 4,
+          "glyphRotation": 0,
+          "id": "decal-t26b",
+          "name": "Rim 1",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "LEGGERA",
+          "font": "Alfa Slab One",
+          "size": 46,
+          "color": "#8fd1c4",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.1667,
+          "y": 0.5,
+          "rotation": 0,
+          "bold": false,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        },
+        {
+          "letterSpacing": 4,
+          "glyphRotation": 0,
+          "id": "decal-t26c",
+          "name": "Rim 2",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "LEGGERA",
+          "font": "Alfa Slab One",
+          "size": 46,
+          "color": "#8fd1c4",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.5,
+          "y": 0.5,
+          "rotation": 0,
+          "bold": false,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        },
+        {
+          "letterSpacing": 4,
+          "glyphRotation": 0,
+          "id": "decal-t26d",
+          "name": "Rim 3",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "LEGGERA",
+          "font": "Alfa Slab One",
+          "size": 46,
+          "color": "#8fd1c4",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.8333,
+          "y": 0.5,
+          "rotation": 0,
+          "bold": false,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        }
+      ]
+    }
+  },
+  "rim": {
+    "depth": 35,
+    "width": 25,
+    "spokeCount": 20
+  },
+  "dividers": [],
+  "variant": {
+    "discipline": "road",
+    "style": "classic"
+  },
+  "palette": [
+    "#8fd1c4",
+    "#1b2a4a",
+    "#ffffff"
+  ]
+}

@@ -3,7 +3,9 @@
 // wheel alone in the wheel designer (src/templates/thumbs/wheels/<id>.webp).
 //
 //   npm run dev        (then, in a second terminal)
-//   node scripts/render-template-thumbs.mjs [dev-server-url]
+//   node scripts/render-template-thumbs.mjs [dev-server-url] [id,id,...]
+//
+// With a list of ids only those templates are rendered (default: all).
 //
 // Drives a headless Chromium (Edge by default; set BROWSER to another
 // Chromium-based executable) over the DevTools protocol. Needs Node 22+.
@@ -13,6 +15,7 @@ import os from 'node:os';
 import path from 'node:path';
 
 const URL = process.argv[2] ?? 'http://localhost:5173/';
+const ONLY = process.argv[3]?.split(',');
 const BROWSER = process.env.BROWSER ?? 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe';
 const DIR = path.resolve(import.meta.dirname, '../src/templates');
 const PORT = 9339;
@@ -93,7 +96,7 @@ try {
 
   // Collect first, write last: new files under src/ make Vite reload the page.
   const shots = [];
-  for (const file of fs.readdirSync(DIR).filter((f) => f.endsWith('.json'))) {
+  for (const file of fs.readdirSync(DIR).filter((f) => f.endsWith('.json') && (!ONLY || ONLY.includes(f.slice(0, -5))))) {
     const design = fs.readFileSync(path.join(DIR, file), 'utf8');
     const name = file.replace('.json', '.webp');
     await evaluate(`window.__store.loadDesignFile(${design})`);

@@ -1,0 +1,442 @@
+{
+  "activeZone": "topTube",
+  "zones": {
+    "headTube": {
+      "finish": "satin",
+      "baseColor": "#1f2421",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": []
+    },
+    "topTube": {
+      "finish": "satin",
+      "baseColor": "#1f2421",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": [
+        {
+          "rotationX": 0,
+          "rotationY": 0,
+          "scaleX": 1,
+          "scaleY": 1,
+          "id": "pattern-t23b",
+          "name": "Digital camo",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "pattern",
+          "pattern": "digicamo",
+          "color": "#2f3631",
+          "scale": 10,
+          "rotation": 0,
+          "intensity": 1
+        }
+      ]
+    },
+    "downTube": {
+      "finish": "satin",
+      "baseColor": "#1f2421",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": [
+        {
+          "letterSpacing": 6,
+          "glyphRotation": 0,
+          "id": "decal-t23e",
+          "name": "Wordmark",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "RAPTRA",
+          "font": "Russo One",
+          "size": 44,
+          "color": "#39ff14",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.25,
+          "y": 0.3,
+          "rotation": 0,
+          "bold": false,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        },
+        {
+          "letterSpacing": 6,
+          "glyphRotation": 0,
+          "id": "decal-t23f",
+          "name": "Wordmark (L)",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "RAPTRA",
+          "font": "Russo One",
+          "size": 44,
+          "color": "#39ff14",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.75,
+          "y": 0.3,
+          "rotation": 180,
+          "bold": false,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        }
+      ]
+    },
+    "seatTube": {
+      "finish": "satin",
+      "baseColor": "#1f2421",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": []
+    },
+    "seatStays": {
+      "finish": "satin",
+      "baseColor": "#1f2421",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": [
+        {
+          "rotationX": 0,
+          "rotationY": 0,
+          "scaleX": 1,
+          "scaleY": 1,
+          "id": "pattern-t23c",
+          "name": "Digital camo",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "pattern",
+          "pattern": "digicamo",
+          "color": "#2f3631",
+          "scale": 8,
+          "rotation": 0,
+          "intensity": 1
+        }
+      ]
+    },
+    "chainStays": {
+      "finish": "satin",
+      "baseColor": "#1f2421",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": [
+        {
+          "rotationX": 0,
+          "rotationY": 0,
+          "scaleX": 1,
+          "scaleY": 1,
+          "id": "pattern-t23d",
+          "name": "Digital camo",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "pattern",
+          "pattern": "digicamo",
+          "color": "#2f3631",
+          "scale": 8,
+          "rotation": 0,
+          "intensity": 1
+        }
+      ]
+    },
+    "fork": {
+      "finish": "satin",
+      "baseColor": "#1f2421",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": []
+    },
+    "frontRim": {
+      "finish": "satin",
+      "baseColor": "#141714",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": [
+        {
+          "letterSpacing": 6,
+          "glyphRotation": 0,
+          "id": "decal-t23p",
+          "name": "Rim 1",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "RAPTRA",
+          "font": "Russo One",
+          "size": 50,
+          "color": "#39ff14",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.1667,
+          "y": 0.5,
+          "rotation": 0,
+          "bold": false,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        },
+        {
+          "letterSpacing": 6,
+          "glyphRotation": 0,
+          "id": "decal-t23q",
+          "name": "Rim 2",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "RAPTRA",
+          "font": "Russo One",
+          "size": 50,
+          "color": "#39ff14",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.5,
+          "y": 0.5,
+          "rotation": 0,
+          "bold": false,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        },
+        {
+          "letterSpacing": 6,
+          "glyphRotation": 0,
+          "id": "decal-t23r",
+          "name": "Rim 3",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "RAPTRA",
+          "font": "Russo One",
+          "size": 50,
+          "color": "#39ff14",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.8333,
+          "y": 0.5,
+          "rotation": 0,
+          "bold": false,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        }
+      ]
+    },
+    "rearRim": {
+      "finish": "satin",
+      "baseColor": "#141714",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": [
+        {
+          "letterSpacing": 6,
+          "glyphRotation": 0,
+          "id": "decal-t23s",
+          "name": "Rim 1",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "RAPTRA",
+          "font": "Russo One",
+          "size": 50,
+          "color": "#39ff14",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.1667,
+          "y": 0.5,
+          "rotation": 0,
+          "bold": false,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        },
+        {
+          "letterSpacing": 6,
+          "glyphRotation": 0,
+          "id": "decal-t23t",
+          "name": "Rim 2",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "RAPTRA",
+          "font": "Russo One",
+          "size": 50,
+          "color": "#39ff14",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.5,
+          "y": 0.5,
+          "rotation": 0,
+          "bold": false,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        },
+        {
+          "letterSpacing": 6,
+          "glyphRotation": 0,
+          "id": "decal-t23u",
+          "name": "Rim 3",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "RAPTRA",
+          "font": "Russo One",
+          "size": 50,
+          "color": "#39ff14",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.8333,
+          "y": 0.5,
+          "rotation": 0,
+          "bold": false,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        }
+      ]
+    }
+  },
+  "rim": {
+    "depth": 40,
+    "width": 25,
+    "spokeCount": 20
+  },
+  "dividers": [
+    {
+      "id": "div-t23g",
+      "kind": "shape",
+      "color": "#39ff14",
+      "ax": 0,
+      "ay": 0,
+      "bx": 0,
+      "by": 0,
+      "shape": "diamond",
+      "cx": 0.27,
+      "cy": 0.3,
+      "w": 0.018,
+      "h": 0.34,
+      "rotation": 5
+    },
+    {
+      "id": "div-t23h",
+      "kind": "shape",
+      "color": "#39ff14",
+      "ax": 0,
+      "ay": 0,
+      "bx": 0,
+      "by": 0,
+      "shape": "diamond",
+      "cx": 0.315,
+      "cy": 0.35,
+      "w": 0.022,
+      "h": 0.4,
+      "rotation": 5
+    },
+    {
+      "id": "div-t23i",
+      "kind": "shape",
+      "color": "#39ff14",
+      "ax": 0,
+      "ay": 0,
+      "bx": 0,
+      "by": 0,
+      "shape": "diamond",
+      "cx": 0.36,
+      "cy": 0.4,
+      "w": 0.018,
+      "h": 0.34,
+      "rotation": 5
+    },
+    {
+      "id": "div-t23j",
+      "kind": "shape",
+      "color": "#39ff14",
+      "ax": 0,
+      "ay": 0,
+      "bx": 0,
+      "by": 0,
+      "shape": "diamond",
+      "cx": -0.3,
+      "cy": 0.27,
+      "w": 0.016,
+      "h": 0.3,
+      "rotation": -10
+    },
+    {
+      "id": "div-t23k",
+      "kind": "shape",
+      "color": "#39ff14",
+      "ax": 0,
+      "ay": 0,
+      "bx": 0,
+      "by": 0,
+      "shape": "diamond",
+      "cx": -0.26,
+      "cy": 0.29,
+      "w": 0.02,
+      "h": 0.36,
+      "rotation": -10
+    },
+    {
+      "id": "div-t23l",
+      "kind": "shape",
+      "color": "#39ff14",
+      "ax": 0,
+      "ay": 0,
+      "bx": 0,
+      "by": 0,
+      "shape": "diamond",
+      "cx": -0.22,
+      "cy": 0.31,
+      "w": 0.016,
+      "h": 0.3,
+      "rotation": -10
+    }
+  ],
+  "variant": {
+    "discipline": "gravel",
+    "style": "classic"
+  },
+  "palette": [
+    "#1f2421",
+    "#2f3631",
+    "#39ff14"
+  ]
+}

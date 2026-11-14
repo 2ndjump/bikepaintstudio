@@ -1,0 +1,436 @@
+{
+  "activeZone": "topTube",
+  "zones": {
+    "headTube": {
+      "finish": "glossy",
+      "baseColor": "#6d1a2a",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": [
+        {
+          "id": "shape-t25i",
+          "name": "Badge",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "shape",
+          "shape": "circle",
+          "color": "#efe4cc",
+          "x": 0.5,
+          "y": 0.5,
+          "width": 0.16,
+          "height": 0.2,
+          "rotation": 0
+        },
+        {
+          "id": "shape-t25j",
+          "name": "Badge ring",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "shape",
+          "shape": "ring",
+          "color": "#b08d57",
+          "x": 0.5,
+          "y": 0.5,
+          "width": 0.16,
+          "height": 0.2,
+          "rotation": 0
+        }
+      ]
+    },
+    "topTube": {
+      "finish": "glossy",
+      "baseColor": "#6d1a2a",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": []
+    },
+    "downTube": {
+      "finish": "glossy",
+      "baseColor": "#6d1a2a",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": [
+        {
+          "id": "shape-t25a",
+          "name": "Panel",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "shape",
+          "shape": "rectangle",
+          "color": "#efe4cc",
+          "x": 0.5,
+          "y": 0.5,
+          "width": 1,
+          "height": 0.42,
+          "rotation": 0
+        },
+        {
+          "id": "shape-t25b",
+          "name": "Pinstripe low",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "shape",
+          "shape": "rectangle",
+          "color": "#111111",
+          "x": 0.5,
+          "y": 0.285,
+          "width": 1,
+          "height": 0.01,
+          "rotation": 0
+        },
+        {
+          "id": "shape-t25c",
+          "name": "Pinstripe high",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "shape",
+          "shape": "rectangle",
+          "color": "#111111",
+          "x": 0.5,
+          "y": 0.715,
+          "width": 1,
+          "height": 0.01,
+          "rotation": 0
+        },
+        {
+          "letterSpacing": 6,
+          "glyphRotation": 0,
+          "id": "decal-t25d",
+          "name": "Wordmark",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "VALMONT",
+          "font": "Cinzel",
+          "size": 28,
+          "color": "#6d1a2a",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.25,
+          "y": 0.5,
+          "rotation": 0,
+          "bold": true,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        },
+        {
+          "letterSpacing": 6,
+          "glyphRotation": 0,
+          "id": "decal-t25e",
+          "name": "Wordmark (L)",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "VALMONT",
+          "font": "Cinzel",
+          "size": 28,
+          "color": "#6d1a2a",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.75,
+          "y": 0.5,
+          "rotation": 180,
+          "bold": true,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        }
+      ]
+    },
+    "seatTube": {
+      "finish": "glossy",
+      "baseColor": "#6d1a2a",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": [
+        {
+          "id": "shape-t25f",
+          "name": "Check 1",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "shape",
+          "shape": "rectangle",
+          "color": "#efe4cc",
+          "x": 0.5,
+          "y": 0.24,
+          "width": 1,
+          "height": 0.03,
+          "rotation": 0
+        },
+        {
+          "id": "shape-t25g",
+          "name": "Check 2",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "shape",
+          "shape": "rectangle",
+          "color": "#111111",
+          "x": 0.5,
+          "y": 0.28,
+          "width": 1,
+          "height": 0.03,
+          "rotation": 0
+        },
+        {
+          "id": "shape-t25h",
+          "name": "Check 3",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "shape",
+          "shape": "rectangle",
+          "color": "#efe4cc",
+          "x": 0.5,
+          "y": 0.32,
+          "width": 1,
+          "height": 0.03,
+          "rotation": 0
+        }
+      ]
+    },
+    "seatStays": {
+      "finish": "glossy",
+      "baseColor": "#6d1a2a",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": []
+    },
+    "chainStays": {
+      "finish": "glossy",
+      "baseColor": "#6d1a2a",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": []
+    },
+    "fork": {
+      "finish": "glossy",
+      "baseColor": "#6d1a2a",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": [
+        {
+          "id": "shape-t25k",
+          "name": "Fork band",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "shape",
+          "shape": "rectangle",
+          "color": "#efe4cc",
+          "x": 0.5,
+          "y": 0.55,
+          "width": 1,
+          "height": 0.04,
+          "rotation": 0
+        }
+      ]
+    },
+    "frontRim": {
+      "finish": "metallic",
+      "baseColor": "#c4c7cc",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": [
+        {
+          "letterSpacing": 8,
+          "glyphRotation": 0,
+          "id": "decal-t25o",
+          "name": "Rim 1",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "VALMONT",
+          "font": "Cinzel",
+          "size": 46,
+          "color": "#6d1a2a",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.1667,
+          "y": 0.5,
+          "rotation": 0,
+          "bold": true,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        },
+        {
+          "letterSpacing": 8,
+          "glyphRotation": 0,
+          "id": "decal-t25p",
+          "name": "Rim 2",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "VALMONT",
+          "font": "Cinzel",
+          "size": 46,
+          "color": "#6d1a2a",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.5,
+          "y": 0.5,
+          "rotation": 0,
+          "bold": true,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        },
+        {
+          "letterSpacing": 8,
+          "glyphRotation": 0,
+          "id": "decal-t25q",
+          "name": "Rim 3",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "VALMONT",
+          "font": "Cinzel",
+          "size": 46,
+          "color": "#6d1a2a",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.8333,
+          "y": 0.5,
+          "rotation": 0,
+          "bold": true,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        }
+      ]
+    },
+    "rearRim": {
+      "finish": "metallic",
+      "baseColor": "#c4c7cc",
+      "chameleonColors": [
+        "#3b82f6",
+        "#c026d3",
+        "#22d3ee"
+      ],
+      "layers": [
+        {
+          "letterSpacing": 8,
+          "glyphRotation": 0,
+          "id": "decal-t25r",
+          "name": "Rim 1",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "VALMONT",
+          "font": "Cinzel",
+          "size": 46,
+          "color": "#6d1a2a",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.1667,
+          "y": 0.5,
+          "rotation": 0,
+          "bold": true,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        },
+        {
+          "letterSpacing": 8,
+          "glyphRotation": 0,
+          "id": "decal-t25s",
+          "name": "Rim 2",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "VALMONT",
+          "font": "Cinzel",
+          "size": 46,
+          "color": "#6d1a2a",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.5,
+          "y": 0.5,
+          "rotation": 0,
+          "bold": true,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        },
+        {
+          "letterSpacing": 8,
+          "glyphRotation": 0,
+          "id": "decal-t25t",
+          "name": "Rim 3",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "decal",
+          "text": "VALMONT",
+          "font": "Cinzel",
+          "size": 46,
+          "color": "#6d1a2a",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "x": 0.8333,
+          "y": 0.5,
+          "rotation": 0,
+          "bold": true,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false
+        }
+      ]
+    }
+  },
+  "rim": {
+    "depth": 30,
+    "width": 25,
+    "spokeCount": 20
+  },
+  "dividers": [],
+  "variant": {
+    "discipline": "road",
+    "style": "classic"
+  },
+  "palette": [
+    "#6d1a2a",
+    "#efe4cc",
+    "#111111",
+    "#b08d57"
+  ]
+}

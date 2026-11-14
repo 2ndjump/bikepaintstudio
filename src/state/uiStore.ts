@@ -15,6 +15,16 @@ function readGalleryOpen(): boolean {
   }
 }
 
+/** The template strip's category filter ('all' or a category id), remembered too. */
+const GALLERY_CATEGORY_KEY = 'bps.galleryCategory';
+function readGalleryCategory(): string {
+  try {
+    return localStorage.getItem(GALLERY_CATEGORY_KEY) ?? 'all';
+  } catch {
+    return 'all';
+  }
+}
+
 interface UIState {
   lang: Lang;
   /** Session-scoped favourite colours, shown as quick-picks in every ColorPicker. */
@@ -30,6 +40,8 @@ interface UIState {
   wheelKmh: number;
   /** Template strip at the bottom edge shown. */
   galleryOpen: boolean;
+  /** Template strip filter: 'all' or a template category id. */
+  galleryCategory: string;
   /** Holds the wheel still while the pointer is on a layer handle or a layer
    *  is being dragged, so a moving target can be grabbed. */
   spinHold: boolean;
@@ -44,6 +56,7 @@ interface UIState {
   setWheelSpin(on: boolean): void;
   setWheelKmh(kmh: number): void;
   setGalleryOpen(open: boolean): void;
+  setGalleryCategory(category: string): void;
   setSpinHold(on: boolean): void;
   setCapturing(on: boolean): void;
 }
@@ -56,6 +69,7 @@ export const useUIStore = create<UIState>((set) => ({
   wheelSpin: true,
   wheelKmh: 1,
   galleryOpen: readGalleryOpen(),
+  galleryCategory: readGalleryCategory(),
   spinHold: false,
   capturing: false,
   setLang: (lang) => set({ lang }),
@@ -70,6 +84,14 @@ export const useUIStore = create<UIState>((set) => ({
       // storage blocked: the choice just isn't remembered
     }
     set({ galleryOpen });
+  },
+  setGalleryCategory: (galleryCategory) => {
+    try {
+      localStorage.setItem(GALLERY_CATEGORY_KEY, galleryCategory);
+    } catch {
+      // storage blocked: the choice just isn't remembered
+    }
+    set({ galleryCategory });
   },
   setSpinHold: (spinHold) => set({ spinHold }),
   setCapturing: (capturing) => set({ capturing }),
