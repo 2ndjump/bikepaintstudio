@@ -217,6 +217,31 @@ canvas {
 }
 .viewport-dock > * { pointer-events: auto; }
 
+/* Loading spinner pill at the top of the free viewport area. */
+.viewport-status {
+  position: absolute;
+  z-index: 5;
+  top: calc(var(--glass-gap) * 3 + var(--toolbar-h));
+  left: calc(var(--glass-gap) * 2 + 19rem);
+  right: var(--glass-gap);
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+}
+@media (min-width: 1024px) {
+  .viewport-status { right: calc(var(--glass-gap) * 2 + 19rem); }
+}
+.viewport-status-pill {
+  display: flex;
+  padding: 0.5rem;
+  border-radius: 999px;
+  color: var(--md-on-surface);
+  animation: status-in 0.2s ease-out;
+}
+@keyframes status-in { from { opacity: 0; transform: translateY(-4px); } }
+.spinner { animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
 /* How-to-turn hint: small, never in the way of a drag, gone once used. */
 .viewport-dock > .turn-hint {
   display: flex;
@@ -676,6 +701,18 @@ select.m3-field { cursor: pointer; }
   text-overflow: ellipsis;
   cursor: pointer;
   transition: border-color 0.15s, background-color 0.15s, box-shadow 0.15s;
+}
+/* Spinner over a tile while its template loads. */
+.template-tile { position: relative; }
+.template-tile-loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: inherit;
+  background: rgba(255, 255, 255, 0.55);
+  color: var(--md-on-surface);
 }
 .template-tile:hover {
   border-color: var(--sel-border);

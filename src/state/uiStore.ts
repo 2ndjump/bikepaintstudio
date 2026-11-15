@@ -54,6 +54,10 @@ interface UIState {
   pathTraceSamples: number;
   /** Why path tracing can't run here (null = available). */
   pathTraceError: string | null;
+  /** A bike model (GLB) is being fetched — first load or a variant switch. */
+  modelLoading: boolean;
+  /** Id of the template being loaded from the strip (null = none). */
+  templateLoading: string | null;
   setLang(lang: Lang): void;
   addPaletteColor(color: string): void;
   removePaletteColor(color: string): void;
@@ -68,6 +72,8 @@ interface UIState {
   setCapturing(on: boolean): void;
   setPathTrace(on: boolean): void;
   setPathTraceSamples(n: number): void;
+  setModelLoading(on: boolean): void;
+  setTemplateLoading(id: string | null): void;
   setPathTraceError(error: string | null): void;
 }
 
@@ -85,6 +91,8 @@ export const useUIStore = create<UIState>((set) => ({
   pathTrace: false,
   pathTraceSamples: 0,
   pathTraceError: null,
+  modelLoading: false,
+  templateLoading: null,
   setLang: (lang) => set({ lang }),
   setActiveDividerId: (activeDividerId) => set({ activeDividerId }),
   setSelectedLayerId: (selectedLayerId) => set({ selectedLayerId }),
@@ -110,6 +118,8 @@ export const useUIStore = create<UIState>((set) => ({
   setCapturing: (capturing) => set({ capturing }),
   setPathTrace: (pathTrace) => set({ pathTrace, pathTraceSamples: 0 }),
   setPathTraceSamples: (pathTraceSamples) => set({ pathTraceSamples }),
+  setModelLoading: (modelLoading) => set({ modelLoading }),
+  setTemplateLoading: (templateLoading) => set({ templateLoading }),
   setPathTraceError: (pathTraceError) => set({ pathTraceError, pathTrace: false }),
   addPaletteColor: (color) =>
     set((s) => {

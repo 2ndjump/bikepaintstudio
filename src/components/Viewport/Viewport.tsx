@@ -117,11 +117,24 @@ function PostEffects() {
  * The selected variant's bike on the turntable: Blender frameset + procedural
  * wheels at its hubs, standing on the studio floor. Suspends while the GLB loads.
  */
+/** Suspense fallback of the first model load: raises the loading flag while mounted. */
+function ModelLoading() {
+  useEffect(() => {
+    useUIStore.getState().setModelLoading(true);
+    return () => useUIStore.getState().setModelLoading(false);
+  }, []);
+  return null;
+}
+
 function Bike() {
   // Deferred: while another variant's GLB (~4.7 MB, fetched only when picked)
   // loads, the current bike stays up (no Suspense fallback, the turntable
   // keeps its angle) and swaps when ready.
-  const variant = useDeferredValue(useDesignStore((s) => s.variant));
+  const wanted = useDesignStore((s) => s.variant);
+  const variant = useDeferredValue(wanted);
+  useEffect(() => {
+    useUIStore.getState().setModelLoading(wanted !== variant);
+  }, [wanted, variant]);
   const activeZone = useDesignStore((s) => s.activeZone);
   const model = useBikeModel(variant);
   // Wheel designer: the bike is hidden (keeping its turntable angle) and the
@@ -193,7 +206,7 @@ export function Viewport() {
         <ViewFit />
         <DividerSync />
         <EditControls />
-        <Suspense fallback={null}>
+        <Suspense fallback={<ModelLoading />}>
           <Bike />
         </Suspense>
         <PostEffects />

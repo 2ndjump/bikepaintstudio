@@ -152,6 +152,7 @@ export type I18nKey =
   | 'spinPlay'
   | 'dragToTurn'
   | 'turnHintMouse'
+  | 'loading'
   | 'turnHintTouch'
   | 'spinSpeed'
   | 'handleScale'
@@ -354,6 +355,7 @@ const STRINGS: Record<I18nKey, Record<Lang, string>> = {
   spinPause: { de: 'Pause', en: 'Pause' },
   spinPlay: { de: 'Drehen', en: 'Spin' },
   dragToTurn: { de: 'Ziehen zum Drehen', en: 'Drag to turn' },
+  loading: { de: 'Lädt …', en: 'Loading …' },
   turnHintMouse: { de: 'Rechte Maustaste ziehen: Rad drehen', en: 'Right-drag to turn the bike' },
   turnHintTouch: { de: 'Wischen: Rad drehen', en: 'Swipe to turn the bike' },
   spinSpeed: { de: 'Tempo', en: 'Speed' },

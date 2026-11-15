@@ -4,6 +4,7 @@ import { isRimZone } from '../../state/types';
 import { useUIStore } from '../../state/uiStore';
 import { useT } from '../../i18n/useT';
 import { CATEGORIES, TEMPLATES } from '../../templates/templates';
+import { Spinner } from '../ui/Spinner';
 
 /** Toolbar button showing/hiding the template strip. */
 export function TemplateGalleryToggle() {
@@ -39,6 +40,7 @@ export function TemplateGallery({ floating = false }: { floating?: boolean }) {
   // One row per filter, stacked: the wheel scrolls between them.
   const rows = [{ id: 'all', nameKey: 'catAll' as const }, ...CATEGORIES];
   const rowsRef = useRef<HTMLDivElement>(null);
+  const loadingId = useUIStore((s) => s.templateLoading);
   const catsRef = useRef<HTMLDivElement>(null);
   const active = rows.findIndex((c) => c.id === category);
 
@@ -145,9 +147,17 @@ export function TemplateGallery({ floating = false }: { floating?: boolean }) {
 
   async function choose(tpl: (typeof TEMPLATES)[number], tile: HTMLElement) {
     tile.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
-    const design = await tpl.load();
-    if (wheelMode) useDesignStore.getState().loadRims(design);
-    else loadDesignFile(design);
+    const ui = useUIStore.getState();
+    ui.setTemplateLoading(tpl.id);
+    try {
+      const design = await tpl.load();
+      if (wheelMode) useDesignStore.getState().loadRims(design);
+      else loadDesignFile(design);
+      // Keep the spinner up until the new paint has had a moment to draw.
+      await new Promise((r) => setTimeout(r, 300));
+    } finally {
+      ui.setTemplateLoading(null);
+    }
   }
 
   return (
@@ -187,6 +197,11 @@ export function TemplateGallery({ floating = false }: { floating?: boolean }) {
                 onClick={(e) => choose(tpl, e.currentTarget)}
               >
                 <img src={wheelMode ? tpl.wheelThumb : tpl.thumb} alt="" width={320} height={240} />
+                {loadingId === tpl.id && (
+                  <span className="template-tile-loading">
+                    <Spinner size={22} />
+                  </span>
+                )}
                 {t(tpl.nameKey)}
               </button>
             ))}

@@ -10,6 +10,7 @@ import { VariantPicker } from './components/Sidebar/VariantPicker';
 import { WheelPanel } from './components/Sidebar/WheelPanel';
 import { WheelSpinControls } from './components/Viewport/WheelSpinControls';
 import { TurnHint } from './components/Viewport/TurnHint';
+import { LoadingIndicator } from './components/Viewport/LoadingIndicator';
 import { Toolbar } from './components/Toolbar/Toolbar';
 import { TemplateGallery } from './components/Toolbar/TemplateGallery';
 import { preloadCommonFonts } from './fonts/fontLoader';
@@ -127,6 +128,7 @@ export default function App() {
       <TemplateGallery floating />
 
       {isRim ? <WheelSpinControls /> : <TurnHint />}
+      <LoadingIndicator />
 
       <aside data-overlay="left" className="glass glass-panel left-[var(--glass-gap)]">
         {paintSections}
