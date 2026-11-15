@@ -1,8 +1,20 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 172 32" fill="none">
-  <rect width="32" height="32" rx="7" fill="#1d1d1f"/>
-  <g stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M11 10h10M11 10l3 11M14 21H6l5-11M21 10l5 11"/>
-    <path d="M21 10l-7 11" stroke="#4d7dff"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 245 36" fill="none">
+  <!-- mark: frame on a tile (same as favicon.svg) -->
+  <g transform="translate(0 2)">
+    <rect width="32" height="32" rx="7" fill="#1d1d1f"/>
+    <g stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M11 10h10M11 10l3 11M14 21H6l5-11M21 10l5 11"/>
+      <path d="M21 10l-7 11" stroke="#4d7dff"/>
+    </g>
   </g>
-  <text x="42" y="21.5" textLength="128" font-family="-apple-system, 'Segoe UI', system-ui, Helvetica, Arial, sans-serif" font-size="17" letter-spacing="-0.2" fill="#1d1d1f"><tspan font-weight="700">bike</tspan><tspan font-weight="700" fill="#2457d6">paint</tspan><tspan font-weight="400">studio</tspan></text>
+  <!-- wordmark "bikepaintstudio": tube-like monoline letters; the b and the last o are wheels, a chain runs under "paint" -->
+  <g stroke-linecap="round" stroke-linejoin="round" stroke-width="2.8">
+    <path stroke="#1d1d1f" d="M44,4V24M44,18a6,6 0 1 0 12,0a6,6 0 1 0 -12,0M61.4,12V24M66.8,4V24M73.8,12L66.8,19.5M69.6,16.6L74.4,24M79.8,18H91.8A6,6 0 1 0 90.04,22.24"/>
+    <path stroke="#2457d6" d="M97.2,12V32M97.2,18a6,6 0 1 0 12,0a6,6 0 1 0 -12,0M114.6,18a6,6 0 1 0 12,0a6,6 0 1 0 -12,0M126.6,12V24M132,12V24M137.4,12V24M137.4,17a5,5 0 0 1 10,0V24M156.3,6V20.5a3.5,3.5 0 0 0 3.5,3.5h1M152.8,12H160.8"/>
+    <path stroke="#1d1d1f" d="M171.8,13.5A3,3 0 1 0 169.2,18A3,3 0 1 1 166.6,22.5M181.1,6V20.5a3.5,3.5 0 0 0 3.5,3.5h1M177.6,12H185.6M191,12V19a5,5 0 0 0 10,0V12M201,12V24M206.4,18a6,6 0 1 0 12,0a6,6 0 1 0 -12,0M218.4,4V24M223.8,12V24M229.2,18a6,6 0 1 0 12,0a6,6 0 1 0 -12,0"/>
+  </g>
+  <path stroke="#1d1d1f" stroke-width="0.7" d="M45,18L55,18M45.67,15.5L54.33,20.5M47.5,13.67L52.5,22.33M50,13L50,23M52.5,13.67L47.5,22.33M54.33,15.5L45.67,20.5M230.2,18L240.2,18M230.87,15.5L239.53,20.5M232.7,13.67L237.7,22.33M235.2,13L235.2,23M237.7,13.67L232.7,22.33M239.53,15.5L230.87,20.5"/>
+  <circle cx="50" cy="18" r="1.5" fill="#1d1d1f"/><circle cx="235.2" cy="18" r="1.5" fill="#1d1d1f"/>
+  <circle cx="61.4" cy="6.6" r="1.9" fill="#1d1d1f"/><circle cx="132" cy="6.6" r="1.9" fill="#2457d6"/><circle cx="223.8" cy="6.6" r="1.9" fill="#1d1d1f"/>
+  <path stroke="#2457d6" stroke-width="1.7" stroke-linecap="round" stroke-dasharray="0.01 3.3" d="M102.7,30.6H160.8"/>
 </svg>

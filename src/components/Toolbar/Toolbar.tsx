@@ -129,7 +129,7 @@ export function Toolbar({ floating = false }: { floating?: boolean }) {
           src={`${import.meta.env.BASE_URL}logo.svg`}
           alt="Bike Paint Studio"
           title="Bike Paint Studio"
-          width={151}
+          width={191}
           height={28}
           className="mr-1 shrink-0"
         />
