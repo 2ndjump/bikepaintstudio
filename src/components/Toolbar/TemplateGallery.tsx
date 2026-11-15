@@ -6,22 +6,6 @@ import { useT } from '../../i18n/useT';
 import { CATEGORIES, TEMPLATES } from '../../templates/templates';
 import { Spinner } from '../ui/Spinner';
 
-/** Toolbar button showing/hiding the template strip. */
-export function TemplateGalleryToggle() {
-  const t = useT();
-  const open = useUIStore((s) => s.galleryOpen);
-  const setOpen = useUIStore((s) => s.setGalleryOpen);
-  return (
-    <button
-      className={`m3-btn m3-btn-sm ${open ? 'm3-btn-filled' : 'm3-btn-tonal'}`}
-      aria-pressed={open}
-      onClick={() => setOpen(!open)}
-    >
-      {t('templates')}
-    </button>
-  );
-}
-
 /**
  * Strip of the bundled templates along the bottom edge (desktop: floating
  * between the side panels; phones: in the page flow). Picking one loads it

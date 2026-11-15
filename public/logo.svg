@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 172 32" fill="none">
+  <rect width="32" height="32" rx="7" fill="#1d1d1f"/>
+  <g stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M11 10h10M11 10l3 11M14 21H6l5-11M21 10l5 11"/>
+    <path d="M21 10l-7 11" stroke="#4d7dff"/>
+  </g>
+  <text x="42" y="21.5" textLength="128" font-family="-apple-system, 'Segoe UI', system-ui, Helvetica, Arial, sans-serif" font-size="17" letter-spacing="-0.2" fill="#1d1d1f"><tspan font-weight="700">bike</tspan><tspan font-weight="700" fill="#2457d6">paint</tspan><tspan font-weight="400">studio</tspan></text>
+</svg>

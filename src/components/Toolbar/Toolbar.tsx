@@ -1,9 +1,9 @@
+import { useEffect, useRef, useState } from 'react';
 import { loadDesignFile, useDesignStore, type DesignFile } from '../../state/designStore';
 import type { DesignState } from '../../state/types';
 import { useUIStore, type Lang } from '../../state/uiStore';
 import { useT } from '../../i18n/useT';
 import { ModeTabs } from './ModeTabs';
-import { TemplateGalleryToggle } from './TemplateGallery';
 
 /** Minimal shape of the File System Access API's save picker (not in lib.dom). */
 type ShowSaveFilePicker = (opts: {
@@ -22,6 +22,8 @@ export function Toolbar({ floating = false }: { floating?: boolean }) {
   const t = useT();
   const lang = useUIStore((s) => s.lang);
   const setLang = useUIStore((s) => s.setLang);
+  const galleryOpen = useUIStore((s) => s.galleryOpen);
+  const setGalleryOpen = useUIStore((s) => s.setGalleryOpen);
   const undo = useDesignStore((s) => s.undo);
   const redo = useDesignStore((s) => s.redo);
   const pastLen = useDesignStore((s) => s.history.past.length);
@@ -124,10 +126,10 @@ export function Toolbar({ floating = false }: { floating?: boolean }) {
           sits in the middle whenever there is room (never overlapping). */}
       <div className="flex-1 flex items-center gap-2 min-w-max">
         <img
-          src={`${import.meta.env.BASE_URL}favicon.svg`}
+          src={`${import.meta.env.BASE_URL}logo.svg`}
           alt="Bike Paint Studio"
           title="Bike Paint Studio"
-          width={28}
+          width={151}
           height={28}
           className="mr-1 shrink-0"
         />
@@ -158,18 +160,80 @@ export function Toolbar({ floating = false }: { floating?: boolean }) {
           ))}
         </SegmentedControl>
 
-        <TemplateGalleryToggle />
-        <button className="m3-btn m3-btn-tonal m3-btn-sm" onClick={exportPNG}>
-          {t('pngExport')}
-        </button>
-        <button className="m3-btn m3-btn-tonal m3-btn-sm" onClick={exportJSON}>
-          {t('save')}
-        </button>
-        <button className="m3-btn m3-btn-tonal m3-btn-sm" onClick={importJSON}>
-          {t('load')}
-        </button>
+        <MoreMenu>
+          {(close) => (
+            <>
+              <button
+                role="menuitemcheckbox"
+                aria-checked={galleryOpen}
+                className="menu-item"
+                onClick={() => {
+                  setGalleryOpen(!galleryOpen);
+                  close();
+                }}
+              >
+                {t('templates')}
+                {galleryOpen && <span aria-hidden="true">✓</span>}
+              </button>
+              <button role="menuitem" className="menu-item" onClick={() => { close(); exportPNG(); }}>
+                {t('pngExport')}
+              </button>
+              <button role="menuitem" className="menu-item" onClick={() => { close(); exportJSON(); }}>
+                {t('save')}
+              </button>
+              <button role="menuitem" className="menu-item" onClick={() => { close(); importJSON(); }}>
+                {t('load')}
+              </button>
+            </>
+          )}
+        </MoreMenu>
       </div>
     </header>
+  );
+}
+
+/** "…" button with a small drop-down; closes on a pick, an outside press or Escape. */
+function MoreMenu({ children }: { children: (close: () => void) => React.ReactNode }) {
+  const t = useT();
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!open) return;
+    const onDown = (e: PointerEvent) => {
+      if (!ref.current?.contains(e.target as Node)) setOpen(false);
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setOpen(false);
+    };
+    document.addEventListener('pointerdown', onDown);
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('pointerdown', onDown);
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [open]);
+  return (
+    <div ref={ref} className="relative">
+      <button
+        className="m3-btn m3-btn-tonal m3-btn-sm"
+        aria-haspopup="menu"
+        aria-expanded={open}
+        aria-label={t('more')}
+        title={t('more')}
+        onClick={() => setOpen(!open)}
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <circle cx="5" cy="12" r="2" />
+          <circle cx="12" cy="12" r="2" />
+          <circle cx="19" cy="12" r="2" />
+        </svg>
+      </button>
+      {open && (
+        <div role="menu" className="glass glass-solid more-menu">
+          {children(() => setOpen(false))}
+        </div>
+      )}
+    </div>
   );
 }
 

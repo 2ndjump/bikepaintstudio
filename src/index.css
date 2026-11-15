@@ -177,6 +177,32 @@ canvas {
 }
 .toolbar:not(.toolbar-floating) { border-radius: 0; padding-top: 0.4rem; padding-bottom: 0.4rem; }
 
+/* Drop-down of the toolbar's "…" button. */
+.more-menu {
+  position: absolute;
+  z-index: 50;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  min-width: 11rem;
+  padding: 0.3rem;
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--md-radius-lg);
+}
+.menu-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.45rem 0.65rem;
+  border-radius: var(--md-radius-sm);
+  font-size: 0.875rem;
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.menu-item:hover { background: color-mix(in srgb, var(--md-on-surface) 8%, transparent); }
+
 /* Undo/redo in the middle of the top bar. */
 .history-group {
   display: inline-flex;

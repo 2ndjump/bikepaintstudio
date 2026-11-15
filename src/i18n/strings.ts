@@ -162,6 +162,7 @@ export type I18nKey =
   | 'layerName'
   | 'zoneClickHint'
   | 'templates'
+  | 'more'
   | 'templatesHint'
   | 'templatesWheelHint'
   | 'tplDiagonal'
@@ -356,6 +357,7 @@ const STRINGS: Record<I18nKey, Record<Lang, string>> = {
   zoneClickHint: { de: 'Tipp: Klicke ein Rahmenteil im Bild an, um es auszuwählen.', en: 'Tip: click a part of the frame to select it.' },
   handleRotate: { de: 'Drehen (Shift: 15°-Schritte)', en: 'Rotate (Shift: 15° steps)' },
   templates: { de: 'Vorlagen', en: 'Templates' },
+  more: { de: 'Mehr', en: 'More' },
   templatesHint: { de: 'Ersetzt das aktuelle Design (Strg+Z macht es rückgängig).', en: 'Replaces the current design (Ctrl+Z undoes it).' },
   templatesWheelHint: { de: 'Übernimmt nur die Laufräder dieser Vorlage (Strg+Z macht es rückgängig).', en: 'Takes only the wheels of this template (Ctrl+Z undoes it).' },
   tplDiagonal: { de: 'Diagonale', en: 'Diagonal Split' },
