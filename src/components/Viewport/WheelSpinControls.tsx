@@ -16,7 +16,7 @@ export function WheelSpinControls() {
 
   return (
     <div className="viewport-dock">
-      <div className="glass flex items-center gap-4 pl-1.5 pr-5 py-1.5 rounded-full" title={t('dragToTurn')}>
+      <div className="glass flex items-center gap-4 pl-1.5 pr-5 py-1.5" title={t('dragToTurn')}>
         <button
           type="button"
           onClick={() => setSpin(!spin)}
