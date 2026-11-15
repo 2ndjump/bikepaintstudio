@@ -1,3 +1,4 @@
+import { useEffect, useLayoutEffect, useRef } from 'react';
 import { loadDesignFile, useDesignStore } from '../../state/designStore';
 import { isRimZone } from '../../state/types';
 import { useUIStore } from '../../state/uiStore';
@@ -35,9 +36,48 @@ export function TemplateGallery({ floating = false }: { floating?: boolean }) {
   const stored = useUIStore((s) => s.galleryCategory);
   const setCategory = useUIStore((s) => s.setGalleryCategory);
   const category = CATEGORIES.some((c) => c.id === stored) ? stored : 'all';
-  const shown = category === 'all' ? TEMPLATES : TEMPLATES.filter((tpl) => tpl.category === category);
+  // One row per filter, stacked: the wheel scrolls between them.
+  const rows = [{ id: 'all', nameKey: 'catAll' as const }, ...CATEGORIES];
+  const rowsRef = useRef<HTMLDivElement>(null);
 
-  async function choose(tpl: (typeof TEMPLATES)[number]) {
+  // Jump to the remembered category's row whenever the strip gets shown.
+  useLayoutEffect(() => {
+    const el = rowsRef.current;
+    if (el) el.scrollTop = rows.findIndex((c) => c.id === category) * el.clientHeight;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
+
+  // One wheel notch = one row (native snapping drops a notch shorter than half
+  // a row). Needs a non-passive listener to preventDefault.
+  useEffect(() => {
+    const el = rowsRef.current;
+    if (!el) return;
+    let last = 0;
+    const onWheel = (e: WheelEvent) => {
+      if (e.shiftKey || Math.abs(e.deltaX) > Math.abs(e.deltaY)) return; // sideways: native
+      e.preventDefault();
+      if (e.timeStamp - last < 200) return;
+      last = e.timeStamp;
+      scrollToRow(Math.round(el.scrollTop / el.clientHeight) + Math.sign(e.deltaY));
+    };
+    el.addEventListener('wheel', onWheel, { passive: false });
+    return () => el.removeEventListener('wheel', onWheel);
+  }, []);
+
+  function scrollToRow(index: number) {
+    const el = rowsRef.current;
+    if (el) el.scrollTo({ top: index * el.clientHeight, behavior: 'smooth' });
+  }
+
+  function onRowsScroll() {
+    const el = rowsRef.current;
+    if (!el || !el.clientHeight) return;
+    const row = rows[Math.round(el.scrollTop / el.clientHeight)];
+    if (row && row.id !== category) setCategory(row.id);
+  }
+
+  async function choose(tpl: (typeof TEMPLATES)[number], tile: HTMLElement) {
+    tile.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
     const design = await tpl.load();
     if (wheelMode) useDesignStore.getState().loadRims(design);
     else loadDesignFile(design);
@@ -51,31 +91,35 @@ export function TemplateGallery({ floating = false }: { floating?: boolean }) {
       className={`glass template-strip ${floating ? 'template-strip-floating' : ''} ${open ? '' : 'hidden'}`}
     >
       <div className="template-cats" role="radiogroup" aria-label={t('templates')}>
-        {[{ id: 'all', nameKey: 'catAll' as const }, ...CATEGORIES].map((c) => (
+        {rows.map((c, i) => (
           <button
             key={c.id}
             type="button"
             role="radio"
             aria-checked={category === c.id}
             className={`m3-chip ${category === c.id ? 'm3-chip-active' : ''}`}
-            onClick={() => setCategory(c.id)}
+            onClick={() => scrollToRow(i)}
           >
             {t(c.nameKey)}
           </button>
         ))}
       </div>
-      <div className="template-row" key={category}>
-        {shown.map((tpl) => (
-          <button
-            key={tpl.id}
-            type="button"
-            className="template-tile"
-            title={t(wheelMode ? 'templatesWheelHint' : 'templatesHint')}
-            onClick={() => choose(tpl)}
-          >
-            <img src={wheelMode ? tpl.wheelThumb : tpl.thumb} alt="" width={320} height={240} />
-            {t(tpl.nameKey)}
-          </button>
+      <div className="template-rows" ref={rowsRef} onScroll={onRowsScroll}>
+        {rows.map((c) => (
+          <div className="template-row" key={c.id}>
+            {(c.id === 'all' ? TEMPLATES : TEMPLATES.filter((tpl) => tpl.category === c.id)).map((tpl) => (
+              <button
+                key={tpl.id}
+                type="button"
+                className="template-tile"
+                title={t(wheelMode ? 'templatesWheelHint' : 'templatesHint')}
+                onClick={(e) => choose(tpl, e.currentTarget)}
+              >
+                <img src={wheelMode ? tpl.wheelThumb : tpl.thumb} alt="" width={320} height={240} />
+                {t(tpl.nameKey)}
+              </button>
+            ))}
+          </div>
         ))}
       </div>
     </div>

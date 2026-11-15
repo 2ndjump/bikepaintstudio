@@ -568,12 +568,23 @@ select.m3-field { cursor: pointer; }
   font-weight: 500;
   white-space: nowrap;
 }
+/* One row per category filter ("all" first), stacked; the wheel scrolls
+   between them, snapping row by row. */
+.template-rows {
+  min-width: 0;
+  height: calc(var(--gallery-h) - 1rem);
+  overflow-y: auto;
+  scroll-snap-type: y mandatory;
+  scrollbar-width: none;
+}
 .template-row {
   display: flex;
+  align-items: center;
   gap: 0.5rem;
-  min-width: 0;
+  height: 100%;
+  scroll-snap-align: start;
   overflow-x: auto;
-  overscroll-behavior: contain;
+  overscroll-behavior-x: contain;
   padding: 3px; /* room for the hover ring */
 }
 .template-tile {
