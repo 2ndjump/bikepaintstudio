@@ -47,13 +47,6 @@ interface UIState {
   spinHold: boolean;
   /** True while a PNG is captured: on-canvas guides and highlights hide. */
   capturing: boolean;
-  /** Path-traced still of the current view (toolbar "Render"); any change to
-   *  the view or the design switches it off again. */
-  pathTrace: boolean;
-  /** Samples the path-traced image has converged over so far. */
-  pathTraceSamples: number;
-  /** Why path tracing can't run here (null = available). */
-  pathTraceError: string | null;
   /** A bike model (GLB) is being fetched — first load or a variant switch. */
   modelLoading: boolean;
   /** Id of the template being loaded from the strip (null = none). */
@@ -70,11 +63,8 @@ interface UIState {
   setGalleryCategory(category: string): void;
   setSpinHold(on: boolean): void;
   setCapturing(on: boolean): void;
-  setPathTrace(on: boolean): void;
-  setPathTraceSamples(n: number): void;
   setModelLoading(on: boolean): void;
   setTemplateLoading(id: string | null): void;
-  setPathTraceError(error: string | null): void;
 }
 
 export const useUIStore = create<UIState>((set) => ({
@@ -88,9 +78,6 @@ export const useUIStore = create<UIState>((set) => ({
   galleryCategory: readGalleryCategory(),
   spinHold: false,
   capturing: false,
-  pathTrace: false,
-  pathTraceSamples: 0,
-  pathTraceError: null,
   modelLoading: false,
   templateLoading: null,
   setLang: (lang) => set({ lang }),
@@ -116,11 +103,8 @@ export const useUIStore = create<UIState>((set) => ({
   },
   setSpinHold: (spinHold) => set({ spinHold }),
   setCapturing: (capturing) => set({ capturing }),
-  setPathTrace: (pathTrace) => set({ pathTrace, pathTraceSamples: 0 }),
-  setPathTraceSamples: (pathTraceSamples) => set({ pathTraceSamples }),
   setModelLoading: (modelLoading) => set({ modelLoading }),
   setTemplateLoading: (templateLoading) => set({ templateLoading }),
-  setPathTraceError: (pathTraceError) => set({ pathTraceError, pathTrace: false }),
   addPaletteColor: (color) =>
     set((s) => {
       const c = color.toLowerCase();

@@ -94,9 +94,8 @@ export function WheelStage({ zone, model }: { zone: RimZone; model: BikeModel })
 
   useFrame((_, dt) => {
     // Clockwise seen from the camera = rolling forward (towards +x).
-    const { spinHold, wheelKmh, pathTrace } = useUIStore.getState();
-    // Also still while a path-traced still is shown.
-    const hold = dragging.current || spinHold || pathTrace;
+    const { spinHold, wheelKmh } = useUIStore.getState();
+    const hold = dragging.current || spinHold;
     if (!playing || hold || !spin.current) {
       speed.current = 0; // stop at once (a held wheel must not drift)
       return;

@@ -1,7 +1,6 @@
 import { useEffect, useMemo } from 'react';
 import { useThree } from '@react-three/fiber';
 import * as THREE from 'three';
-import { useUIStore } from '../../state/uiStore';
 import { RectAreaLightUniformsLib } from 'three/examples/jsm/lights/RectAreaLightUniformsLib.js';
 import { HDRLoader } from 'three/examples/jsm/loaders/HDRLoader.js';
 
@@ -62,24 +61,18 @@ function getBlobTexture(): THREE.CanvasTexture {
  * of its parent group (y = 0). Costs nothing per frame; turns with its parent.
  */
 export function FloorShadow({ x, length, width }: { x: number; length: number; width: number }) {
-  const tracing = useUIStore((s) => s.pathTrace);
   return (
-    <mesh visible={!tracing} position={[x, 0.002, 0]} rotation={[-Math.PI / 2, 0, 0]} scale={[length, width, 1]}>
+    <mesh position={[x, 0.002, 0]} rotation={[-Math.PI / 2, 0, 0]} scale={[length, width, 1]}>
       <planeGeometry />
       <meshBasicMaterial map={getBlobTexture()} transparent opacity={0.45} depthWrite={false} />
     </mesh>
   );
 }
 
-/** Backdrop self-glow in the path-traced still (see the cyclorama below). */
-const PT_BACKDROP_GLOW = 0.12;
-
 /**
  * The reflection environment: the white studio (cyclorama + the five softbox
  * panels) baked in Blender from the bike's centre as an equirect Radiance HDR
  * (blender/bake_studio_hdri.py; three's equirect orientation, so no turn).
- * The path tracer doesn't use it: it traces the real cyclorama and softbox
- * lights the HDRI was baked from (using both would count them twice).
  */
 const STUDIO_HDRI = 'assets/hdri/studio_2k.hdr';
 /** Turn (about +y) and strength of the HDRI: 0.3 puts the softbox panels near
@@ -124,8 +117,6 @@ export function StudioEnvironment() {
   const gl = useThree((s) => s.gl);
   const scene = useThree((s) => s.scene);
   const cyclo = useMemo(() => cycloramaGeometry(), []);
-  // Path-traced still: real area light only (no raster helpers).
-  const tracing = useUIStore((s) => s.pathTrace);
 
   useEffect(() => () => cyclo.dispose(), [cyclo]);
 
@@ -157,13 +148,12 @@ export function StudioEnvironment() {
   return (
     <>
       {/* A touch of emissive lifts the backdrop to clean white without
-          brightening the bike, while the key shadow still reads on it. The
-          path tracer has no environment light on it, so it gets more. */}
+          brightening the bike, while the key shadow still reads on it. */}
       <mesh geometry={cyclo}>
         <meshStandardMaterial
           color={BACKDROP_COLOR}
           emissive={BACKDROP_COLOR}
-          emissiveIntensity={tracing ? PT_BACKDROP_GLOW : 0.06}
+          emissiveIntensity={0.06}
           roughness={0.9}
           metalness={0}
         />
@@ -175,7 +165,7 @@ export function StudioEnvironment() {
           position={b.pos}
           width={b.w}
           height={b.h}
-          intensity={i === 0 && !tracing ? b.radiance * KEY_AREA_SHARE : b.radiance}
+          intensity={i === 0 ? b.radiance * KEY_AREA_SHARE : b.radiance}
           onUpdate={(l) => l.lookAt(CENTER)}
         />
       ))}
@@ -183,7 +173,6 @@ export function StudioEnvironment() {
       {/* The bike's self-shadow (tube on tube): along the key, aimed at the
           bike centre, PCF-softened. */}
       <directionalLight
-        visible={!tracing}
         intensity={2.0}
         position={[key.x - CENTER.x, key.y - CENTER.y, key.z - CENTER.z]}
         castShadow
