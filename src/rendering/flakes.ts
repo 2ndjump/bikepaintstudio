@@ -24,23 +24,28 @@ vec3 flakeHash(vec3 p) {
   return fract((p.xxy + p.yxx) * p.zyx);
 }
 // x: flash strength of the flake under p, y: a random 0..1 per flake.
-vec2 flakeFlash(vec3 p, vec3 n, vec3 v) {
+vec2 flakeFlash(vec3 p, vec3 n, vec3 v, float power) {
   vec3 cell = floor(p);
   vec3 h = flakeHash(cell);
   vec3 h2 = flakeHash(cell + 17.0);
   vec3 fn = normalize(n + (h * 2.0 - 1.0) * 0.85);
   // The softboxes as seen from the camera (it always faces the back wall):
   // key front-left above, overhead strip, fill from the right.
-  float s = pow(max(dot(fn, normalize(v + vec3(-0.45, 0.55, 0.70))), 0.0), 120.0);
-  s += 0.7 * pow(max(dot(fn, normalize(v + vec3(0.0, 0.97, 0.24))), 0.0), 120.0);
-  s += 0.5 * pow(max(dot(fn, normalize(v + vec3(0.75, 0.30, 0.59))), 0.0), 120.0);
+  float s = pow(max(dot(fn, normalize(v + vec3(-0.45, 0.55, 0.70))), 0.0), power);
+  s += 0.7 * pow(max(dot(fn, normalize(v + vec3(0.0, 0.97, 0.24))), 0.0), power);
+  s += 0.5 * pow(max(dot(fn, normalize(v + vec3(0.75, 0.30, 0.59))), 0.0), power);
   float disc = smoothstep(0.5, 0.25, length(fract(p) - 0.5));
   return vec2(s * disc * step(0.3, h2.x), h2.y);
 }
 `;
 
-/** `color` is a GLSL function body mapping the per-flake random `r` to a colour. */
-function fragBody(color: string, gain: number): string {
+/**
+ * `color` is a GLSL expression mapping the per-flake random `r` to a colour.
+ * A lower `power` lets flakes flash further away from the mirror angle, so
+ * more of them are lit at once.
+ */
+function fragBody(color: string, gain: number, power: number): string {
+  const pw = power.toFixed(1);
   return /* glsl */ `
 {
   vec3 flakeP = vFlakePos / ${FLAKE_SIZE};
@@ -49,32 +54,39 @@ function fragBody(color: string, gain: number): string {
   float flakeLod = max(log2(flakeW / 0.6), 0.0);
   float flakeL0 = floor(flakeLod);
   vec3 flakeV = normalize(vViewPosition);
-  vec2 flakeA = flakeFlash(flakeP / exp2(flakeL0), normal, flakeV);
-  vec2 flakeB = flakeFlash(flakeP / exp2(flakeL0 + 1.0), normal, flakeV);
+  // Two interleaved sets of flakes per level (the second shifted half a cell).
+  vec2 flakeA = flakeFlash(flakeP / exp2(flakeL0), normal, flakeV, ${pw});
+  vec2 flakeA2 = flakeFlash(flakeP / exp2(flakeL0) + 0.5, normal, flakeV, ${pw});
+  vec2 flakeB = flakeFlash(flakeP / exp2(flakeL0 + 1.0), normal, flakeV, ${pw});
+  vec2 flakeB2 = flakeFlash(flakeP / exp2(flakeL0 + 1.0) + 0.5, normal, flakeV, ${pw});
   float r = flakeA.y;
-  vec3 flakeCa = ${color};
+  vec3 flakeCa = (${color}) * flakeA.x;
+  r = flakeA2.y;
+  flakeCa += (${color}) * flakeA2.x;
   r = flakeB.y;
-  vec3 flakeCb = ${color};
-  totalEmissiveRadiance += mix(flakeCa * flakeA.x, flakeCb * flakeB.x, flakeLod - flakeL0) * ${gain.toFixed(1)};
+  vec3 flakeCb = (${color}) * flakeB.x;
+  r = flakeB2.y;
+  flakeCb += (${color}) * flakeB2.x;
+  totalEmissiveRadiance += mix(flakeCa, flakeCb, flakeLod - flakeL0) * ${gain.toFixed(1)};
 }
 `;
 }
 
-function inject(shader: CompileShader, color: string, gain: number): void {
+function inject(shader: CompileShader, color: string, gain: number, power: number): void {
   shader.vertexShader = shader.vertexShader
     .replace('#include <common>', '#include <common>\nvarying vec3 vFlakePos;')
     .replace('#include <begin_vertex>', '#include <begin_vertex>\nvFlakePos = position;');
   shader.fragmentShader = shader.fragmentShader
     .replace('#include <common>', '#include <common>' + FRAG_HEAD)
-    .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>' + fragBody(color, gain));
+    .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>' + fragBody(color, gain, power));
 }
 
 /** Metallic: silver flakes tinted by the paint under them. */
 export function injectMetallicFlakes(shader: CompileShader): void {
-  inject(shader, 'mix(diffuseColor.rgb, vec3(1.0), 0.45 + 0.4 * r)', 3.0);
+  inject(shader, 'mix(diffuseColor.rgb, vec3(1.0), 0.45 + 0.4 * r)', 2.2, 120);
 }
 
-/** Chameleon: flakes in the three flip colours (uniforms of ChameleonMaterial). */
+/** Chameleon: a dense glitter of flakes in the three flip colours (uniforms of ChameleonMaterial). */
 export function injectChameleonFlakes(shader: CompileShader): void {
-  inject(shader, 'mix(mix(uChamA, uChamB, smoothstep(0.0, 0.5, r)), uChamC, smoothstep(0.5, 1.0, r)) * 1.4 + 0.3', 5.0);
+  inject(shader, 'mix(mix(uChamA, uChamB, smoothstep(0.0, 0.5, r)), uChamC, smoothstep(0.5, 1.0, r)) * 1.4 + 0.3', 4.0, 50);
 }
