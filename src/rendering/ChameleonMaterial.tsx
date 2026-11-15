@@ -1,6 +1,7 @@
 import { useEffect, useMemo } from 'react';
 import * as THREE from 'three';
 import type { FinishParams } from './finish';
+import { injectChameleonFlakes } from './flakes';
 
 interface Props {
   texture: THREE.Texture;
@@ -55,6 +56,7 @@ export function ChameleonMaterial({ texture, fp, colors, side }: Props) {
           '#include <common>\nuniform vec3 uChamA;\nuniform vec3 uChamB;\nuniform vec3 uChamC;',
         )
         .replace('#include <color_fragment>', `#include <color_fragment>\n${CHAM_COLOR_INJECT}`);
+      injectChameleonFlakes(shader);
     };
 
     return m;

@@ -4,12 +4,23 @@ import { finishParams } from '../../rendering/finish';
 import { useZoneTexture } from '../../rendering/useZoneTexture';
 import { ChameleonMaterial } from '../../rendering/ChameleonMaterial';
 import { applyDividerShaderMapped } from '../../rendering/dividers';
+import { injectMetallicFlakes } from '../../rendering/flakes';
 import { DEFAULT_CHAMELEON_COLORS, type ZoneId } from '../../state/types';
 
 interface Props {
   zone: ZoneId;
   side?: THREE.Side;
 }
+
+type Compile = NonNullable<THREE.Material['onBeforeCompile']>;
+
+/** Metallic paint on the frame: dividers under the layers, then the flakes. */
+const compileDividerFlakes: Compile = function (this: THREE.Material, shader, renderer) {
+  (applyDividerShaderMapped as Compile).call(this, shader, renderer);
+  injectMetallicFlakes(shader);
+};
+/** Metallic paint on a rim (no dividers there). */
+const compileFlakes: Compile = (shader) => injectMetallicFlakes(shader);
 
 /**
  * The painted material for a zone: the compositor CanvasTexture as the base
@@ -35,9 +46,15 @@ export function ZonePaintedMaterial({ zone, side }: Props) {
 
   // Dividers sit UNDER the layers: the coverage-aware shader recolours the
   // base coat only.
+  const metallic = finish === 'metallic';
   const dividerProps = !useDivider
-    ? {}
-    : { onBeforeCompile: applyDividerShaderMapped, userData: { divCoverage: tex.coverage } };
+    ? metallic
+      ? { onBeforeCompile: compileFlakes }
+      : {}
+    : {
+        onBeforeCompile: metallic ? compileDividerFlakes : applyDividerShaderMapped,
+        userData: { divCoverage: tex.coverage },
+      };
 
   if (finish === 'chameleon') {
     return <ChameleonMaterial texture={tex.map} fp={fp} colors={chameleonColors} side={side} />;
@@ -49,6 +66,8 @@ export function ZonePaintedMaterial({ zone, side }: Props) {
   // so the clearcoat layer is a no-op there.
   return (
     <meshPhysicalMaterial
+      // A different shader with flakes: remount instead of patching in place.
+      key={metallic ? 'flakes' : 'plain'}
       map={tex.map}
       roughness={fp.roughness}
       metalness={fp.metalness}
