@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef } from 'react';
+import { useEffect, useLayoutEffect, useRef, type CSSProperties } from 'react';
 import { loadDesignFile, useDesignStore } from '../../state/designStore';
 import { isRimZone } from '../../state/types';
 import { useUIStore } from '../../state/uiStore';
@@ -39,6 +39,8 @@ export function TemplateGallery({ floating = false }: { floating?: boolean }) {
   // One row per filter, stacked: the wheel scrolls between them.
   const rows = [{ id: 'all', nameKey: 'catAll' as const }, ...CATEGORIES];
   const rowsRef = useRef<HTMLDivElement>(null);
+  const catsRef = useRef<HTMLDivElement>(null);
+  const active = rows.findIndex((c) => c.id === category);
 
   // Jump to the remembered category's row whenever the strip gets shown.
   useLayoutEffect(() => {
@@ -47,11 +49,13 @@ export function TemplateGallery({ floating = false }: { floating?: boolean }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
-  // One wheel notch = one row (native snapping drops a notch shorter than half
-  // a row). Needs a non-passive listener to preventDefault.
+  // One wheel notch = one row, over the rows and over the category dial (native
+  // snapping drops a notch shorter than half a row). Needs a non-passive
+  // listener to preventDefault.
   useEffect(() => {
     const el = rowsRef.current;
-    if (!el) return;
+    const cats = catsRef.current;
+    if (!el || !cats) return;
     let last = 0;
     const onWheel = (e: WheelEvent) => {
       if (e.shiftKey || Math.abs(e.deltaX) > Math.abs(e.deltaY)) return; // sideways: native
@@ -61,7 +65,11 @@ export function TemplateGallery({ floating = false }: { floating?: boolean }) {
       scrollToRow(Math.round(el.scrollTop / el.clientHeight) + Math.sign(e.deltaY));
     };
     el.addEventListener('wheel', onWheel, { passive: false });
-    return () => el.removeEventListener('wheel', onWheel);
+    cats.addEventListener('wheel', onWheel, { passive: false });
+    return () => {
+      el.removeEventListener('wheel', onWheel);
+      cats.removeEventListener('wheel', onWheel);
+    };
   }, []);
 
   // Hovering near the strip's left/right edge scrolls the row under the mouse
@@ -149,19 +157,23 @@ export function TemplateGallery({ floating = false }: { floating?: boolean }) {
       aria-label={t('templates')}
       className={`glass template-strip ${floating ? 'template-strip-floating' : ''} ${open ? '' : 'hidden'}`}
     >
-      <div className="template-cats" role="radiogroup" aria-label={t('templates')}>
-        {rows.map((c, i) => (
-          <button
-            key={c.id}
-            type="button"
-            role="radio"
-            aria-checked={category === c.id}
-            className={`m3-chip ${category === c.id ? 'm3-chip-active' : ''}`}
-            onClick={() => scrollToRow(i)}
-          >
-            {t(c.nameKey)}
-          </button>
-        ))}
+      {/* Category dial: the chips stacked on a drum, the active one in the middle. */}
+      <div className="template-cats" ref={catsRef} role="radiogroup" aria-label={t('templates')}>
+        <div className="template-dial" style={{ '--active': active } as CSSProperties}>
+          {rows.map((c, i) => (
+            <button
+              key={c.id}
+              type="button"
+              role="radio"
+              aria-checked={category === c.id}
+              className={`m3-chip ${category === c.id ? 'm3-chip-active' : ''}`}
+              style={{ '--s': i - active } as CSSProperties}
+              onClick={() => scrollToRow(i)}
+            >
+              {t(c.nameKey)}
+            </button>
+          ))}
+        </div>
       </div>
       <div className="template-rows" ref={rowsRef} onScroll={onRowsScroll}>
         {rows.map((c) => (
