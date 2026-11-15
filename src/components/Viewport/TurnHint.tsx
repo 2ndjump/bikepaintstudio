@@ -1,22 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useT } from '../../i18n/useT';
 
-const SEEN_KEY = 'bps.turnHintSeen';
-
-function readSeen(): boolean {
-  try {
-    return localStorage.getItem(SEEN_KEY) === '1';
-  } catch {
-    return false;
-  }
-}
-
 /**
- * Small pill under the bike saying how to turn it. Fades out for good the
- * first time the bike is turned (right mouse button / one finger on the canvas).
+ * Small pill under the bike saying how to turn it. Shown on every
+ * page load; fades out the first time the bike is turned (right mouse button /
+ * one finger on the canvas).
  */
 export function TurnHint() {
-  const [seen, setSeen] = useState(readSeen);
+  const [seen, setSeen] = useState(false);
   const t = useT();
 
   useEffect(() => {
@@ -24,11 +15,6 @@ export function TurnHint() {
     const onDown = (e: PointerEvent) => {
       if (!(e.target instanceof HTMLCanvasElement)) return;
       if (e.button !== 2 && e.pointerType !== 'touch') return;
-      try {
-        localStorage.setItem(SEEN_KEY, '1');
-      } catch {
-        // Private mode: the hint just comes back next time.
-      }
       setSeen(true);
     };
     window.addEventListener('pointerdown', onDown);
