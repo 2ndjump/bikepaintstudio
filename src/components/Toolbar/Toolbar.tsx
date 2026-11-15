@@ -123,7 +123,14 @@ export function Toolbar({ floating = false }: { floating?: boolean }) {
       {/* Left and right clusters share the free width equally, so undo/redo
           sits in the middle whenever there is room (never overlapping). */}
       <div className="flex-1 flex items-center gap-2 min-w-max">
-        <h1 className="m3-title text-base mr-1 whitespace-nowrap">Bike Paint Studio</h1>
+        <img
+          src={`${import.meta.env.BASE_URL}favicon.svg`}
+          alt="Bike Paint Studio"
+          title="Bike Paint Studio"
+          width={28}
+          height={28}
+          className="mr-1 shrink-0"
+        />
         <ModeTabs />
       </div>
 
