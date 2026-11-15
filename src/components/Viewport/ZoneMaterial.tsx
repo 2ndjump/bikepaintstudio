@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { useDesignStore } from '../../state/designStore';
-import { finishParams } from '../../rendering/finish';
+import { envGain, finishParams } from '../../rendering/finish';
 import { useZoneTexture } from '../../rendering/useZoneTexture';
 import { ChameleonMaterial } from '../../rendering/ChameleonMaterial';
 import { applyDividerShaderMapped } from '../../rendering/dividers';
@@ -73,7 +73,9 @@ export function ZonePaintedMaterial({ zone, side }: Props) {
       metalness={fp.metalness}
       clearcoat={fp.clearcoat}
       clearcoatRoughness={fp.clearcoatRoughness}
-      envMapIntensity={fp.envMapIntensity}
+      sheen={fp.sheen}
+      sheenRoughness={0.6}
+      onBeforeRender={envGain(fp.envMapIntensity)}
       side={side ?? THREE.FrontSide}
       {...dividerProps}
     />

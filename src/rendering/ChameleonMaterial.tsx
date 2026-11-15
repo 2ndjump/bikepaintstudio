@@ -1,6 +1,6 @@
 import { useEffect, useMemo } from 'react';
 import * as THREE from 'three';
-import type { FinishParams } from './finish';
+import { envGain, type FinishParams } from './finish';
 import { injectChameleonFlakes } from './flakes';
 
 interface Props {
@@ -46,6 +46,8 @@ export function ChameleonMaterial({ texture, fp, colors, side }: Props) {
       side: side ?? THREE.FrontSide,
     });
 
+    m.onBeforeRender = envGain(fp.envMapIntensity);
+
     m.onBeforeCompile = (shader) => {
       shader.uniforms.uChamA = uniforms.uChamA;
       shader.uniforms.uChamB = uniforms.uChamB;
@@ -60,7 +62,7 @@ export function ChameleonMaterial({ texture, fp, colors, side }: Props) {
     };
 
     return m;
-  }, [texture, fp.roughness, fp.metalness, fp.clearcoat, fp.clearcoatRoughness, fp.iridescence, fp.iridescenceIOR, fp.sheen, side, uniforms]);
+  }, [texture, fp.roughness, fp.metalness, fp.clearcoat, fp.clearcoatRoughness, fp.iridescence, fp.iridescenceIOR, fp.sheen, fp.envMapIntensity, side, uniforms]);
 
   useEffect(() => {
     uniforms.uChamA.value.set(colors[0]);

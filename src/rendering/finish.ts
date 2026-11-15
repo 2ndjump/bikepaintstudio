@@ -1,3 +1,4 @@
+import type * as THREE from 'three';
 import type { FinishType } from '../state/types';
 
 export interface FinishParams {
@@ -10,8 +11,22 @@ export interface FinishParams {
   sheen: number;
   /** Dielectric specular F0 multiplier (0 = no white specular reflection). */
   specularIntensity: number;
-  /** Per-material env-map intensity. */
+  /** Strength of the studio reflections relative to the scene's (see envGain). */
   envMapIntensity: number;
+}
+
+/**
+ * `onBeforeRender` for a paint material: three ignores a material's
+ * envMapIntensity while the reflections come from scene.environment, so every
+ * finish reflected the studio equally. This hands the scene's environment to
+ * the material itself, scaled by the finish's own strength.
+ */
+export function envGain(gain: number) {
+  return function (this: THREE.Material, _renderer: THREE.WebGLRenderer, scene: THREE.Scene): void {
+    const m = this as THREE.MeshPhysicalMaterial;
+    m.envMap = scene.environment;
+    m.envMapIntensity = scene.environmentIntensity * gain;
+  };
 }
 
 /**
@@ -25,27 +40,28 @@ export function finishParams(finish: FinishType): FinishParams {
   switch (finish) {
     case 'matte':
       return {
-        roughness: 0.74,
+        roughness: 0.7,
         metalness: 0.04,
         clearcoat: 0.0,
         clearcoatRoughness: 1.0,
         iridescence: 0,
         iridescenceIOR: 1.3,
-        sheen: 0,
+        // A soft glow toward the silhouette rounds the tubes off.
+        sheen: 0.35,
         specularIntensity: 1.0,
-        envMapIntensity: 0.55,
+        envMapIntensity: 0.8,
       };
     case 'satin':
       return {
         roughness: 0.42,
         metalness: 0.05,
-        clearcoat: 0.45,
-        clearcoatRoughness: 0.45,
+        clearcoat: 0.6,
+        clearcoatRoughness: 0.35,
         iridescence: 0,
         iridescenceIOR: 1.3,
-        sheen: 0,
+        sheen: 0.15,
         specularIntensity: 1.0,
-        envMapIntensity: 0.85,
+        envMapIntensity: 1.3,
       };
     case 'glossy':
       // Paint under a thick, mirror-smooth clear coat (the coat carries the
@@ -59,7 +75,7 @@ export function finishParams(finish: FinishType): FinishParams {
         iridescenceIOR: 1.3,
         sheen: 0,
         specularIntensity: 1.0,
-        envMapIntensity: 1.15,
+        envMapIntensity: 2.0,
       };
     case 'metallic':
       // Flake base under a full gloss clear coat, like automotive metallic.
@@ -72,7 +88,7 @@ export function finishParams(finish: FinishType): FinishParams {
         iridescenceIOR: 1.3,
         sheen: 0,
         specularIntensity: 1.0,
-        envMapIntensity: 1.25,
+        envMapIntensity: 1.8,
       };
     case 'chameleon':
       return {
@@ -84,7 +100,7 @@ export function finishParams(finish: FinishType): FinishParams {
         iridescenceIOR: 1.8,
         sheen: 0,
         specularIntensity: 1.0,
-        envMapIntensity: 1.6,
+        envMapIntensity: 1.9,
       };
   }
 }
