@@ -5,7 +5,7 @@ import type { WebGLPathTracer } from 'three-gpu-pathtracer';
 import { useDesignStore } from '../../state/designStore';
 import { useUIStore } from '../../state/uiStore';
 import { createDividerBakeMaterial } from '../../rendering/dividers';
-import { DEFAULT_CHAMELEON_COLORS, type ZoneId } from '../../state/types';
+import { DEFAULT_CHAMELEON_COLORS, isRimZone, type ZoneId } from '../../state/types';
 
 /** Samples after which the image counts as converged and tracing stops. */
 const MAX_SAMPLES = 1000;
@@ -79,8 +79,9 @@ function bakeZone(gl: THREE.WebGLRenderer, mesh: THREE.Mesh, map: THREE.Texture,
  * Path-traced still of the current view (three-gpu-pathtracer), switched on
  * by the toolbar's Render button (uiStore.pathTrace). While on it takes over
  * drawing (the composer is disabled in Viewport) and converges sample by
- * sample; anything that changes the view or the design switches it off and
- * the raster view is back the next frame.
+ * sample. It ends when the picture itself changes — the paint, the model or
+ * the bike's/wheel's angle — and the raster view is back the next frame;
+ * zooming or panning only restarts the accumulation from the new view.
  *
  * The scene is traced as it is (cyclorama, softbox RectAreaLights, the bike)
  * with these swaps for its duration: the painted zones get MeshPhysical copies
@@ -115,15 +116,30 @@ export function PathTracer() {
       if (!cancelled) useUIStore.getState().setPathTrace(false);
     };
 
-    // Any design change (paint, layers, variant, mode, undo …) ends it at once.
-    restore.push(useDesignStore.subscribe(stop));
+    // A change to what is painted (paint, layers, dividers, variant, frame ↔
+    // wheel mode, undo …) ends it at once; just selecting another zone doesn't.
+    restore.push(
+      useDesignStore.subscribe((d, prev) => {
+        if (
+          d.zones !== prev.zones ||
+          d.rim !== prev.rim ||
+          d.dividers !== prev.dividers ||
+          d.variant !== prev.variant ||
+          isRimZone(d.activeZone) !== isRimZone(prev.activeZone)
+        )
+          stop();
+      }),
+    );
+    // So does a drag that turns the subject, which the traced scene can't
+    // follow: the bike on right mouse / one finger, the wheel on any button.
     const dom = gl.domElement;
-    dom.addEventListener('pointerdown', stop);
-    dom.addEventListener('wheel', stop, { passive: true });
+    const onDown = (e: PointerEvent) => {
+      if (e.button === 2 || e.pointerType === 'touch' || isRimZone(useDesignStore.getState().activeZone)) stop();
+    };
+    dom.addEventListener('pointerdown', onDown);
     window.addEventListener('resize', stop);
     restore.push(() => {
-      dom.removeEventListener('pointerdown', stop);
-      dom.removeEventListener('wheel', stop);
+      dom.removeEventListener('pointerdown', onDown);
       window.removeEventListener('resize', stop);
     });
     ui.setCapturing(true); // guides and highlights out of the scene
@@ -233,9 +249,11 @@ export function PathTracer() {
   useFrame(({ gl }) => {
     const t = tracer.current;
     if (!on || !t || view.current.sum === 0) return; // off, or not built yet
-    if (viewSum(camera) !== view.current.sum) {
-      useUIStore.getState().setPathTrace(false); // camera moved (zoom, pan, resize …)
-      return;
+    const sum = viewSum(camera);
+    if (sum !== view.current.sum) {
+      // Camera moved (zoom, pan): start accumulating again from the new view.
+      view.current.sum = sum;
+      t.updateCamera();
     }
     t.pausePathTracing = t.samples >= MAX_SAMPLES;
     const tm = gl.toneMapping;
