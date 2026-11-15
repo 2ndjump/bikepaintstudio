@@ -105,16 +105,18 @@ export function Wheel({ position, zone, tireWidth = 0.014, wheelRadius = 0.339, 
         <meshStandardMaterial color="#2a2a2a" roughness={0.45} metalness={0.85} />
       </mesh>
 
-      {/* Valve stem */}
-      <mesh
-        position={[rimInner - valveLen / 2, 0, 0]}
-        rotation={[0, 0, Math.PI / 2]}
-        castShadow
-        receiveShadow
-      >
-        <cylinderGeometry args={[0.0022, 0.0022, valveLen, 12]} />
-        <meshStandardMaterial color="#9a9a9a" roughness={0.35} metalness={0.9} />
-      </mesh>
+      {/* Valve stem, half a spoke pitch on from spoke 0: between two spokes. */}
+      <group rotation={[0, Math.PI / rim.spokeCount, 0]}>
+        <mesh
+          position={[rimInner - valveLen / 2, 0, 0]}
+          rotation={[0, 0, Math.PI / 2]}
+          castShadow
+          receiveShadow
+        >
+          <cylinderGeometry args={[0.0022, 0.0022, valveLen, 12]} />
+          <meshStandardMaterial color="#9a9a9a" roughness={0.35} metalness={0.9} />
+        </mesh>
+      </group>
     </group>
   );
 }
