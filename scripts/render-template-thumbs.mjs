@@ -21,8 +21,9 @@ const DIR = path.resolve(import.meta.dirname, '../src/templates');
 const PORT = 9339;
 // The bike in the default 3/4 view at a 1600×1000 window, as a 4:3 crop.
 const CLIP = { x: 455, y: 302, width: 900, height: 675 };
-// The wheel designer's face-on wheel (with its floor shadow), also 4:3.
-const CLIP_WHEEL = { x: 387, y: 222, width: 826, height: 620 };
+// The wheel designer's face-on wheel, close up: a 4:3 crop as wide as the
+// wheel, so its lower quarter is cut off and the rim graphics read larger.
+const CLIP_WHEEL = { x: 425, y: 150, width: 750, height: 562 };
 const THUMB_W = 320;
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));

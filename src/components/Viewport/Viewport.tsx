@@ -34,8 +34,10 @@ const FIT_ASPECT = 1.2;
 /** Share of the free height the subject may fill (wide windows): leaves room
  *  for the floor shadow below the wheels. */
 const FIT_HEIGHT = 0.85;
-/** The same for the wheel designer's single wheel. */
+/** The same for the wheel designer's single wheel (close up: it nearly fills
+ *  the height). */
 const FIT_ASPECT_WHEEL = 1.0;
+const FIT_HEIGHT_WHEEL = 0.88;
 
 /**
  * Keep the subject centred and fully visible in the free area between the
@@ -45,7 +47,9 @@ const FIT_ASPECT_WHEEL = 1.0;
  */
 function ViewFit() {
   const size = useThree((s) => s.size);
-  const aspect = useDesignStore((s) => (isRimZone(s.activeZone) ? FIT_ASPECT_WHEEL : FIT_ASPECT));
+  const wheel = useDesignStore((s) => isRimZone(s.activeZone));
+  const aspect = wheel ? FIT_ASPECT_WHEEL : FIT_ASPECT;
+  const fitHeight = wheel ? FIT_HEIGHT_WHEEL : FIT_HEIGHT;
   const get = useThree((s) => s.get);
 
   useEffect(() => {
@@ -70,14 +74,14 @@ function ViewFit() {
       const fw = Math.max(1, right - left);
       const fh = Math.max(1, bottom - top);
       camera.setViewOffset(W, H, W / 2 - (left + right) / 2, H / 2 - (top + bottom) / 2, W, H);
-      camera.zoom = Math.min(1, fw / (aspect * H), (FIT_HEIGHT * fh) / H);
+      camera.zoom = Math.min(1, fw / (aspect * H), (fitHeight * fh) / H);
       camera.updateProjectionMatrix();
     };
     update();
     const ro = new ResizeObserver(update);
     document.querySelectorAll('[data-overlay]').forEach((el) => ro.observe(el));
     return () => ro.disconnect();
-  }, [size, get, aspect]);
+  }, [size, get, aspect, fitHeight]);
 
   return null;
 }

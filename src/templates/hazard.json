@@ -128,8 +128,8 @@
       ],
       "layers": [
         {
-          "id": "shape-t22j",
-          "name": "Stripe",
+          "id": "rimfx-1",
+          "name": "Ring",
           "visible": true,
           "opacity": 1,
           "blendMode": "normal",
@@ -137,10 +137,28 @@
           "shape": "rectangle",
           "color": "#e5ff00",
           "x": 0.5,
-          "y": 0.82,
+          "y": 0.8,
           "width": 1,
-          "height": 0.08,
+          "height": 0.34,
           "rotation": 0
+        },
+        {
+          "id": "rimfx-2",
+          "name": "stripes",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "pattern",
+          "pattern": "stripes",
+          "color": "#151515",
+          "scale": 16,
+          "scaleX": 1,
+          "scaleY": 1,
+          "rotation": 45,
+          "rotationX": 0,
+          "rotationY": 0,
+          "intensity": 1,
+          "clip": true
         },
         {
           "letterSpacing": 6,
@@ -223,8 +241,8 @@
       ],
       "layers": [
         {
-          "id": "shape-t22n",
-          "name": "Stripe",
+          "id": "rimfx-501",
+          "name": "Ring",
           "visible": true,
           "opacity": 1,
           "blendMode": "normal",
@@ -232,10 +250,28 @@
           "shape": "rectangle",
           "color": "#e5ff00",
           "x": 0.5,
-          "y": 0.82,
+          "y": 0.8,
           "width": 1,
-          "height": 0.08,
+          "height": 0.34,
           "rotation": 0
+        },
+        {
+          "id": "rimfx-502",
+          "name": "stripes",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "type": "pattern",
+          "pattern": "stripes",
+          "color": "#151515",
+          "scale": 16,
+          "scaleX": 1,
+          "scaleY": 1,
+          "rotation": 45,
+          "rotationX": 0,
+          "rotationY": 0,
+          "intensity": 1,
+          "clip": true
         },
         {
           "letterSpacing": 6,

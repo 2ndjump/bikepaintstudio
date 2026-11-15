@@ -9,7 +9,7 @@ import { Wheel } from './Wheel';
 
 /** Where the preview wheel stands (x) and how far the camera sits from it. */
 const STAGE_X = 0.09;
-const CAMERA_DIST = 1.7;
+const CAMERA_DIST = 1.3;
 
 /**
  * Wheel designer preview: the selected wheel alone, standing face-on in the
