@@ -200,6 +200,21 @@ canvas {
   pointer-events: none;
 }
 .viewport-dock > * { pointer-events: auto; }
+
+/* How-to-turn hint: small, never in the way of a drag, gone once used. */
+.viewport-dock > .turn-hint {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.8rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  color: var(--md-on-surface-variant);
+  opacity: 0.85;
+  pointer-events: none;
+  transition: opacity 0.6s;
+}
+.viewport-dock > .turn-hint-seen { opacity: 0; }
 @media (min-width: 1024px) {
   .viewport-dock { right: calc(var(--glass-gap) * 2 + 19rem); }
 }
