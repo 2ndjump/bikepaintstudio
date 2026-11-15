@@ -127,7 +127,7 @@ export function ColorPicker({
         createPortal(
           <div
             ref={popRef}
-            className="glass fixed z-50 p-3 flex flex-col gap-2.5 w-52"
+            className="glass glass-solid fixed z-50 p-3 flex flex-col gap-2.5 w-52"
             style={{ top: coords.top, left: coords.left }}
           >
             {/* Hue/saturation picker */}

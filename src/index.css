@@ -37,19 +37,32 @@
 
   --md-error: #d70015;
 
-  /* Glass panels: a thin clear fill, slightly denser at the top. */
-  --glass-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.34) 0%, rgba(255, 255, 255, 0.2) 100%);
-  --glass-border: rgba(255, 255, 255, 0.55);
+  /* Glass panels: an almost clear fill with a specular sheen in the top-left
+     corner and a fainter one bottom-right; the rim is a gradient border that
+     is bright where the light hits (top-left, bottom-right) and thin between. */
+  --glass-bg:
+    radial-gradient(120% 90% at 0% 0%, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0) 55%),
+    radial-gradient(90% 70% at 100% 100%, rgba(255, 255, 255, 0.28) 0%, rgba(255, 255, 255, 0) 60%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.24), rgba(255, 255, 255, 0.14));
+  --glass-rim: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 1) 0%,
+    rgba(255, 255, 255, 0.35) 28%,
+    rgba(255, 255, 255, 0.2) 62%,
+    rgba(255, 255, 255, 0.9) 100%
+  );
   --glass-radius: 28px;
-  /* Specular rim (bright top edge, faint bottom edge), hairline so the edge
-     reads on the white studio, soft depth. */
+  /* Bevel: light caught inside the top-left and bottom-right edges, a soft
+     shade along the inside of the bottom edge (thickness), then the drop
+     shadow that lifts the sheet off the studio. */
   --glass-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.95),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.35),
-    inset 0 0 14px rgba(255, 255, 255, 0.22),
-    0 0 0 0.5px rgba(0, 0, 0, 0.1),
-    0 2px 6px rgba(0, 0, 0, 0.05),
-    0 12px 32px rgba(0, 0, 0, 0.12);
+    inset 2px 2px 2px -1px rgba(255, 255, 255, 0.95),
+    inset -2px -2px 2px -1px rgba(255, 255, 255, 0.7),
+    inset 0 14px 22px -16px rgba(255, 255, 255, 0.9),
+    inset 0 -16px 22px -16px rgba(0, 0, 0, 0.1),
+    0 0 0 0.5px rgba(0, 0, 0, 0.14),
+    0 3px 8px rgba(0, 0, 0, 0.08),
+    0 18px 44px rgba(0, 0, 0, 0.18);
   /* Controls / cards inside a panel. */
   --glass-control-border: rgba(255, 255, 255, 0.7);
   --glass-control-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8), 0 0 0 0.5px rgba(0, 0, 0, 0.08),
@@ -121,13 +134,19 @@ canvas {
 .glass {
   /* tw-glass: edge refraction + backdrop blur/saturation/brightness; the
      contrast cut lifts a black tyre behind the thin fill so text stays legible. */
-  @apply glass-strength-5 glass-blur-6 glass-saturation-160 glass-brightness-106;
-  --tw-backdrop-contrast: contrast(0.9);
-  background: var(--glass-bg);
-  border: 1px solid var(--glass-border);
+  @apply glass-strength-10 glass-blur-3 glass-saturation-170 glass-brightness-98;
+  --tw-backdrop-contrast: contrast(0.86);
+  background: var(--glass-bg) padding-box, var(--glass-rim) border-box;
+  border: 1px solid transparent;
   border-radius: var(--glass-radius);
   box-shadow: var(--glass-shadow);
   color: var(--md-on-surface);
+}
+
+/* A popover on top of a panel (colour picker): nearly opaque, so the controls
+   under it don't show through. */
+.glass-solid {
+  background: linear-gradient(rgba(250, 250, 252, 0.94), rgba(250, 250, 252, 0.94)) padding-box, var(--glass-rim) border-box;
 }
 
 /* Floating side panel: below the toolbar, as tall as its content, scrolling
@@ -436,7 +455,7 @@ canvas {
   padding: 2px;
   border: 0;
   background: rgba(118, 118, 128, 0.16);
-  border-radius: var(--md-radius-full);
+  border-radius: 10px;
   overflow: hidden;
   height: 2rem;
 }
@@ -460,7 +479,7 @@ canvas {
 .m3-seg-active, .m3-seg-active:hover {
   background: #fff;
   color: var(--md-on-surface);
-  border-radius: var(--md-radius-full);
+  border-radius: 8px;
   box-shadow: 0 0 0 0.5px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.16);
 }
 .m3-seg-active, .m3-seg-active + .m3-seg { border-left-color: transparent; }
