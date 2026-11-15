@@ -1,68 +1,59 @@
 @import "tailwindcss";
+@import "tw-glass";
 
 /* ============================================================
-   Light "liquid glass" scheme (Material 3 token names kept).
-   The UI floats over the bright white studio as translucent glass: a thin,
-   faintly cool fill over a strongly blurred + saturated backdrop, a bright
-   rim top-left and a darker one bottom-right, layered soft shadows. The fill
-   never drops below ~50 % white so dark text stays AA-legible even with a
-   black bike right behind. Controls inside are a second, denser tier of
-   plain translucent fills (no extra backdrop-filters).
+   Liquid-glass scheme, after Apple's Liquid Glass (Material 3 token names
+   kept). The material itself comes from tw-glass: its `glass` utility
+   refracts the backdrop at the element's edges through an SVG displacement
+   map (plain blur where a browser can't). On top: a thin clear fill, a bright
+   specular rim and a soft drop shadow. Colours are neutral — the paint on
+   the bike is the only colour on screen; "selected" is graphite or a raised
+   white capsule, never a hue.
    ============================================================ */
 :root {
-  /* Primary */
-  --md-primary: #2457d6;
+  /* Accent: graphite (prominent buttons, selection outlines, focus). */
+  --md-primary: #1d1d1f;
   --md-on-primary: #ffffff;
-  --md-primary-container: #dce6ff;
-  --md-on-primary-container: #0b2a6b;
+  --md-primary-container: rgba(255, 255, 255, 0.92);
+  --md-on-primary-container: #1d1d1f;
 
-  /* Tonal / selected states */
-  --md-secondary-container: rgba(214, 226, 250, 0.78);
-  --md-on-secondary-container: #102446;
+  /* Tonal buttons: a denser sheet of the same glass. */
+  --md-secondary-container: rgba(255, 255, 255, 0.6);
+  --md-on-secondary-container: #1d1d1f;
 
-  /* Surfaces — page, then increasingly "solid" fills inside the glass
-     (the second glass tier: controls, cards, fields). */
-  --md-surface: #f2f3f5;
-  --md-surface-container-low: rgba(255, 255, 255, 0.5);
-  --md-surface-container: rgba(255, 255, 255, 0.68);
-  --md-surface-container-high: rgba(255, 255, 255, 0.88);
-  --md-surface-container-highest: rgba(15, 23, 42, 0.14);
+  /* Surfaces — page, then increasingly solid fills inside the glass
+     (controls, cards, fields). */
+  --md-surface: #f2f2f4;
+  --md-surface-container-low: rgba(255, 255, 255, 0.4);
+  --md-surface-container: rgba(255, 255, 255, 0.62);
+  --md-surface-container-high: rgba(255, 255, 255, 0.86);
+  --md-surface-container-highest: rgba(60, 60, 67, 0.16);
 
   /* Content */
-  --md-on-surface: #14171c;
-  --md-on-surface-variant: #333a47;
-  --md-outline: #7d8492;
-  --md-outline-variant: rgba(15, 23, 42, 0.12);
+  --md-on-surface: #1d1d1f;
+  --md-on-surface-variant: #3a3a3c;
+  --md-outline: #8e8e93;
+  --md-outline-variant: rgba(60, 60, 67, 0.14);
 
-  --md-error: #c62828;
+  --md-error: #d70015;
 
-  /* Glass panels (first tier): diagonal sheen from a brighter top-left to a
-     thinner, faintly blue bottom-right. */
-  --glass-bg: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.66) 0%,
-    rgba(246, 249, 255, 0.55) 45%,
-    rgba(232, 239, 252, 0.54) 100%
-  );
-  /* contrast < 1 lifts the darkest backdrop (a black tyre) before the fill
-     goes on top, so the fill can stay thin; saturate keeps colours vivid. */
-  --glass-filter: blur(26px) contrast(0.72) brightness(1.14) saturate(220%);
+  /* Glass panels: a thin clear fill, slightly denser at the top. */
+  --glass-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.34) 0%, rgba(255, 255, 255, 0.2) 100%);
   --glass-border: rgba(255, 255, 255, 0.55);
   --glass-radius: 28px;
-  /* Rims (bright top-left, darker bottom-right, faint outer hairline so the
-     edge reads on the white studio) + layered soft depth. */
+  /* Specular rim (bright top edge, faint bottom edge), hairline so the edge
+     reads on the white studio, soft depth. */
   --glass-shadow:
-    inset 1.5px 1.5px 0 rgba(255, 255, 255, 0.95),
-    inset 0 0 18px rgba(255, 255, 255, 0.35),
-    inset -1px -1px 0 rgba(28, 40, 72, 0.12),
-    0 0 0 1px rgba(28, 40, 72, 0.07),
-    0 2px 4px rgba(18, 28, 48, 0.06),
-    0 10px 24px rgba(18, 28, 48, 0.1),
-    0 28px 64px rgba(18, 28, 48, 0.12);
-  /* Second tier (controls / cards inside a panel). */
-  --glass-control-border: rgba(255, 255, 255, 0.75);
-  --glass-control-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85), 0 0 0 1px rgba(28, 40, 72, 0.06),
-    0 1px 3px rgba(18, 28, 48, 0.08);
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.35),
+    inset 0 0 14px rgba(255, 255, 255, 0.22),
+    0 0 0 0.5px rgba(0, 0, 0, 0.1),
+    0 2px 6px rgba(0, 0, 0, 0.05),
+    0 12px 32px rgba(0, 0, 0, 0.12);
+  /* Controls / cards inside a panel. */
+  --glass-control-border: rgba(255, 255, 255, 0.7);
+  --glass-control-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8), 0 0 0 0.5px rgba(0, 0, 0, 0.08),
+    0 1px 2px rgba(0, 0, 0, 0.06);
   --glass-gap: 12px;
   --toolbar-h: 3.25rem;
   /* Template strip at the bottom edge (Toolbar/TemplateGallery). */
@@ -83,7 +74,7 @@ html, body, #root {
   margin: 0;
   background: var(--md-surface);
   color: var(--md-on-surface);
-  font-family: "Roboto", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif;
   overscroll-behavior: none;
 }
 body { overflow: hidden; }
@@ -128,9 +119,11 @@ canvas {
    ============================================================ */
 /* Floating frosted-glass panel (toolbar, side panels, viewport overlays). */
 .glass {
+  /* tw-glass: edge refraction + backdrop blur/saturation/brightness; the
+     contrast cut lifts a black tyre behind the thin fill so text stays legible. */
+  @apply glass-strength-5 glass-blur-6 glass-saturation-160 glass-brightness-106;
+  --tw-backdrop-contrast: contrast(0.9);
   background: var(--glass-bg);
-  -webkit-backdrop-filter: var(--glass-filter);
-  backdrop-filter: var(--glass-filter);
   border: 1px solid var(--glass-border);
   border-radius: var(--glass-radius);
   box-shadow: var(--glass-shadow);
@@ -440,9 +433,9 @@ canvas {
    ============================================================ */
 .m3-segmented {
   display: inline-flex;
-  border: 1px solid var(--glass-control-border);
-  background: var(--md-surface-container-low);
-  box-shadow: var(--glass-control-shadow);
+  padding: 2px;
+  border: 0;
+  background: rgba(118, 118, 128, 0.16);
   border-radius: var(--md-radius-full);
   overflow: hidden;
   height: 2rem;
@@ -463,8 +456,14 @@ canvas {
 }
 .m3-seg:first-child { border-left: none; }
 .m3-seg:hover { background: color-mix(in srgb, var(--md-on-surface) 8%, transparent); }
-.m3-seg-active { background: var(--md-primary); color: var(--md-on-primary); }
-.m3-seg-active:hover { background: var(--md-primary); }
+/* Selected segment: a raised white capsule on the track. */
+.m3-seg-active, .m3-seg-active:hover {
+  background: #fff;
+  color: var(--md-on-surface);
+  border-radius: var(--md-radius-full);
+  box-shadow: 0 0 0 0.5px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.16);
+}
+.m3-seg-active, .m3-seg-active + .m3-seg { border-left-color: transparent; }
 .m3-seg:disabled { opacity: 0.38; cursor: default; }
 
 /* ============================================================
