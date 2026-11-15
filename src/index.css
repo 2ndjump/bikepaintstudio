@@ -572,11 +572,11 @@ select.m3-field { cursor: pointer; }
    under the other on a drum that turns the active one (--active) into the
    middle; the others tilt away and fade with their distance (--s). */
 .template-cats {
-  --dial-item: 1.8rem;
+  --dial-item: 2rem;
   flex: none;
   align-self: stretch;
   position: relative;
-  width: 6.25rem;
+  width: 7.5rem;
   overflow: hidden;
   perspective: 16rem;
   mask-image: linear-gradient(to bottom, transparent, #000 28%, #000 72%, transparent);
@@ -592,19 +592,29 @@ select.m3-field { cursor: pointer; }
   transform-style: preserve-3d;
   transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
+/* Plain text on the drum, no pill: the active one is bold in the primary colour. */
 .template-cats .m3-chip {
   --dist: max(var(--s), -1 * var(--s));
   justify-content: center;
-  height: calc(var(--dial-item) - 0.3rem);
-  margin: 0.15rem 0.25rem;
-  padding: 0 0.55rem;
-  border-radius: var(--md-radius-full);
-  font-size: 0.6875rem;
+  height: var(--dial-item);
+  padding: 0 0.4rem;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  color: var(--md-on-surface-variant);
+  font-size: 0.9375rem;
   font-weight: 500;
   white-space: nowrap;
   opacity: calc(1 - var(--dist) * 0.36);
   transform: rotateX(calc(var(--s) * -24deg)) scale(calc(1 - var(--dist) * 0.07));
-  transition: transform 0.3s, opacity 0.3s, background-color 0.15s;
+  transition: transform 0.3s, opacity 0.3s, color 0.15s;
+}
+.template-cats .m3-chip:hover { color: var(--md-on-surface); }
+.template-cats .m3-chip-active,
+.template-cats .m3-chip-active:hover {
+  color: var(--md-primary);
+  font-weight: 700;
 }
 /* One row per category filter ("all" first), stacked; the wheel scrolls
    between them, snapping row by row. */
