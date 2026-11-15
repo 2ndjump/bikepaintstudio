@@ -64,6 +64,65 @@ export function TemplateGallery({ floating = false }: { floating?: boolean }) {
     return () => el.removeEventListener('wheel', onWheel);
   }, []);
 
+  // Hovering near the strip's left/right edge scrolls the row under the mouse
+  // that way, faster the closer to the edge. A press stops it until the mouse
+  // has left the edge zone, so the tile there holds still for the click (and
+  // the centring that follows isn't scrolled away again).
+  useEffect(() => {
+    const el = rowsRef.current;
+    if (!el) return;
+    const ZONE = 56; // px from the edge
+    const MAX_SPEED = 420; // px/s at the very edge
+    let row: HTMLElement | null = null;
+    let speed = 0; // px/s, signed
+    let held = false;
+    let frame = 0;
+    let lastT = 0;
+    const step = (now: number) => {
+      frame = 0;
+      if (!row || !speed) return;
+      row.scrollLeft += (speed * Math.min(now - lastT, 50)) / 1000;
+      lastT = now;
+      frame = requestAnimationFrame(step);
+    };
+    const onMove = (e: PointerEvent) => {
+      if (e.pointerType !== 'mouse') return;
+      const r = el.getBoundingClientRect();
+      const left = e.clientX - r.left;
+      const right = r.right - e.clientX;
+      const near = Math.min(left, right);
+      if (near >= ZONE) {
+        speed = 0;
+        held = false;
+        return;
+      }
+      if (held) return;
+      row = el.children[Math.round(el.scrollTop / el.clientHeight)] as HTMLElement;
+      speed = (left < right ? -1 : 1) * MAX_SPEED * (1 - Math.max(near, 0) / ZONE);
+      if (!frame) {
+        lastT = performance.now();
+        frame = requestAnimationFrame(step);
+      }
+    };
+    const onDown = () => {
+      held = true;
+      speed = 0;
+    };
+    const onLeave = () => {
+      speed = 0;
+      held = false;
+    };
+    el.addEventListener('pointermove', onMove);
+    el.addEventListener('pointerdown', onDown);
+    el.addEventListener('pointerleave', onLeave);
+    return () => {
+      cancelAnimationFrame(frame);
+      el.removeEventListener('pointermove', onMove);
+      el.removeEventListener('pointerdown', onDown);
+      el.removeEventListener('pointerleave', onLeave);
+    };
+  }, []);
+
   function scrollToRow(index: number) {
     const el = rowsRef.current;
     if (el) el.scrollTo({ top: index * el.clientHeight, behavior: 'smooth' });
