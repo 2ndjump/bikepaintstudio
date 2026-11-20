@@ -13,9 +13,6 @@ interface CompileShader {
   fragmentShader: string;
 }
 
-/** Smallest flake cell (metres). */
-const FLAKE_SIZE = '0.0005';
-
 const FRAG_HEAD = /* glsl */ `
 varying vec3 vFlakePos;
 vec3 flakeHash(vec3 p) {
@@ -44,14 +41,14 @@ vec2 flakeFlash(vec3 p, vec3 n, vec3 v, float power) {
  * A lower `power` lets flakes flash further away from the mirror angle, so
  * more of them are lit at once.
  */
-function fragBody(color: string, gain: number, power: number): string {
+function fragBody(color: string, gain: number, power: number, size: number, px: number): string {
   const pw = power.toFixed(1);
   return /* glsl */ `
 {
-  vec3 flakeP = vFlakePos / ${FLAKE_SIZE};
+  vec3 flakeP = vFlakePos / ${size.toFixed(5)};
   float flakeW = max(fwidth(flakeP.x), max(fwidth(flakeP.y), fwidth(flakeP.z)));
-  // Double the cell size until a cell covers about a pixel; blend two levels.
-  float flakeLod = max(log2(flakeW / 0.6), 0.0);
+  // Double the cell size until a cell covers the set pixel count; blend two levels.
+  float flakeLod = max(log2(flakeW * ${px.toFixed(2)}), 0.0);
   float flakeL0 = floor(flakeLod);
   vec3 flakeV = normalize(vViewPosition);
   // Two interleaved sets of flakes per level (the second shifted half a cell).
@@ -72,21 +69,25 @@ function fragBody(color: string, gain: number, power: number): string {
 `;
 }
 
-function inject(shader: CompileShader, color: string, gain: number, power: number): void {
+/**
+ * `size`: smallest flake cell (metres, seen up close); `px`: about how many
+ * pixels a cell covers when zoomed out.
+ */
+function inject(shader: CompileShader, color: string, gain: number, power: number, size: number, px: number): void {
   shader.vertexShader = shader.vertexShader
     .replace('#include <common>', '#include <common>\nvarying vec3 vFlakePos;')
     .replace('#include <begin_vertex>', '#include <begin_vertex>\nvFlakePos = position;');
   shader.fragmentShader = shader.fragmentShader
     .replace('#include <common>', '#include <common>' + FRAG_HEAD)
-    .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>' + fragBody(color, gain, power));
+    .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>' + fragBody(color, gain, power, size, px));
 }
 
 /** Metallic: silver flakes tinted by the paint under them. */
 export function injectMetallicFlakes(shader: CompileShader): void {
-  inject(shader, 'mix(diffuseColor.rgb, vec3(1.0), 0.45 + 0.4 * r)', 2.2, 120);
+  inject(shader, 'mix(diffuseColor.rgb, vec3(1.0), 0.45 + 0.4 * r)', 2.2, 120, 0.0005, 1.67);
 }
 
 /** Chameleon: a dense glitter of flakes in the three flip colours (uniforms of ChameleonMaterial). */
 export function injectChameleonFlakes(shader: CompileShader): void {
-  inject(shader, 'mix(mix(uChamA, uChamB, smoothstep(0.0, 0.5, r)), uChamC, smoothstep(0.5, 1.0, r)) * 1.4 + 0.3', 4.0, 50);
+  inject(shader, 'mix(mix(uChamA, uChamB, smoothstep(0.0, 0.5, r)), uChamC, smoothstep(0.5, 1.0, r)) * 1.4 + 0.3', 4.0, 50, 0.0002, 1.0);
 }
