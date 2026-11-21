@@ -92,15 +92,16 @@ export function finishParams(finish: FinishType): FinishParams {
       };
     case 'chameleon':
       return {
-        roughness: 0.22,
-        metalness: 0.25,
+        roughness: 0.3,
+        // Metallic pigment: reflections take the flip colours (no thin-film tint).
+        metalness: 0.7,
         clearcoat: 1.0,
         clearcoatRoughness: 0.10,
-        iridescence: 1.0,
+        iridescence: 0,
         iridescenceIOR: 1.8,
         sheen: 0,
         specularIntensity: 1.0,
-        envMapIntensity: 1.9,
+        envMapIntensity: 1.3,
       };
   }
 }
