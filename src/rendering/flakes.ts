@@ -89,5 +89,5 @@ export function injectMetallicFlakes(shader: CompileShader): void {
 
 /** Chameleon: a dense glitter of flakes in the three flip colours (uniforms of ChameleonMaterial). */
 export function injectChameleonFlakes(shader: CompileShader): void {
-  inject(shader, 'mix(mix(uChamA, uChamB, smoothstep(0.0, 0.5, r)), uChamC, smoothstep(0.5, 1.0, r)) * 1.4 + 0.3', 4.0, 50, 0.0002, 1.0);
+  inject(shader, 'mix(mix(uChamA, uChamB, smoothstep(0.0, 0.5, r)), uChamC, smoothstep(0.5, 1.0, r)) * 1.4 + 0.3', 4.0, 50, 0.0001, 0.75);
 }
