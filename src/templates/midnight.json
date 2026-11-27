@@ -1,0 +1,255 @@
+{
+  "activeZone": "topTube",
+  "zones": {
+    "headTube": {
+      "finish": "chameleon",
+      "baseColor": "#9a9a9a",
+      "chameleonColors": [
+        "#0c1d40",
+        "#33104a",
+        "#160612"
+      ],
+      "layers": []
+    },
+    "topTube": {
+      "finish": "chameleon",
+      "baseColor": "#9a9a9a",
+      "chameleonColors": [
+        "#0c1d40",
+        "#33104a",
+        "#160612"
+      ],
+      "layers": []
+    },
+    "downTube": {
+      "finish": "chameleon",
+      "baseColor": "#9a9a9a",
+      "chameleonColors": [
+        "#0c1d40",
+        "#33104a",
+        "#160612"
+      ],
+      "layers": [
+        {
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "id": "decal-chamv",
+          "type": "decal",
+          "name": "MITTERNACHT",
+          "font": "Michroma",
+          "size": 26,
+          "color": "#b8b8c8",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "letterSpacing": 6,
+          "x": 0.25,
+          "y": 0.52,
+          "rotation": 0,
+          "glyphRotation": 0,
+          "bold": true,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false,
+          "text": "MITTERNACHT",
+          "finish": "satin"
+        },
+        {
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "id": "decal-chamw",
+          "type": "decal",
+          "name": "MITTERNACHT (L)",
+          "font": "Michroma",
+          "size": 26,
+          "color": "#b8b8c8",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "letterSpacing": 6,
+          "x": 0.75,
+          "y": 0.52,
+          "rotation": 180,
+          "glyphRotation": 0,
+          "bold": true,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false,
+          "text": "MITTERNACHT",
+          "finish": "satin"
+        }
+      ]
+    },
+    "seatTube": {
+      "finish": "chameleon",
+      "baseColor": "#9a9a9a",
+      "chameleonColors": [
+        "#0c1d40",
+        "#33104a",
+        "#160612"
+      ],
+      "layers": []
+    },
+    "seatStays": {
+      "finish": "chameleon",
+      "baseColor": "#9a9a9a",
+      "chameleonColors": [
+        "#0c1d40",
+        "#33104a",
+        "#160612"
+      ],
+      "layers": []
+    },
+    "chainStays": {
+      "finish": "chameleon",
+      "baseColor": "#9a9a9a",
+      "chameleonColors": [
+        "#0c1d40",
+        "#33104a",
+        "#160612"
+      ],
+      "layers": []
+    },
+    "fork": {
+      "finish": "chameleon",
+      "baseColor": "#9a9a9a",
+      "chameleonColors": [
+        "#0c1d40",
+        "#33104a",
+        "#160612"
+      ],
+      "layers": []
+    },
+    "frontRim": {
+      "finish": "matte",
+      "baseColor": "#0c0c0e",
+      "chameleonColors": [
+        "#0c1d40",
+        "#33104a",
+        "#160612"
+      ],
+      "layers": [
+        {
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "id": "shape-chamz",
+          "type": "shape",
+          "name": "Pinstripe",
+          "shape": "rectangle",
+          "color": "#8a8a8a",
+          "x": 0.5,
+          "y": 0.15,
+          "width": 1,
+          "height": 0.05,
+          "rotation": 0,
+          "finish": "chameleon"
+        },
+        {
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "id": "decal-cham10",
+          "type": "decal",
+          "name": "MN",
+          "font": "Michroma",
+          "size": 44,
+          "color": "#b8b8c8",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "letterSpacing": 10,
+          "x": 0.1667,
+          "y": 0.55,
+          "rotation": 0,
+          "glyphRotation": 0,
+          "bold": true,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false,
+          "text": "MN",
+          "finish": "satin",
+          "repeat": 3
+        }
+      ]
+    },
+    "rearRim": {
+      "finish": "matte",
+      "baseColor": "#0c0c0e",
+      "chameleonColors": [
+        "#0c1d40",
+        "#33104a",
+        "#160612"
+      ],
+      "layers": [
+        {
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "id": "shape-cham13",
+          "type": "shape",
+          "name": "Pinstripe",
+          "shape": "rectangle",
+          "color": "#8a8a8a",
+          "x": 0.5,
+          "y": 0.15,
+          "width": 1,
+          "height": 0.05,
+          "rotation": 0,
+          "finish": "chameleon"
+        },
+        {
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "id": "decal-cham14",
+          "type": "decal",
+          "name": "MN",
+          "font": "Michroma",
+          "size": 44,
+          "color": "#b8b8c8",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "letterSpacing": 10,
+          "x": 0.1667,
+          "y": 0.55,
+          "rotation": 0,
+          "glyphRotation": 0,
+          "bold": true,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false,
+          "text": "MN",
+          "finish": "satin",
+          "repeat": 3
+        }
+      ]
+    }
+  },
+  "rim": {
+    "depth": 60,
+    "width": 25,
+    "spokeCount": 20
+  },
+  "dividers": [
+    {
+      "id": "div-cham2",
+      "color": "#08080c",
+      "ax": -0.6,
+      "ay": 0.32,
+      "bx": 0.8,
+      "by": 0.22,
+      "softness": 1
+    }
+  ],
+  "variant": {
+    "discipline": "road",
+    "style": "aero"
+  },
+  "palette": [
+    "#0c1d40",
+    "#33104a",
+    "#160612",
+    "#b8b8c8",
+    "#08080c"
+  ]
+}

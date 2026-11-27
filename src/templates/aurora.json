@@ -1,0 +1,278 @@
+{
+  "activeZone": "topTube",
+  "zones": {
+    "headTube": {
+      "finish": "chameleon",
+      "baseColor": "#8f8f8f",
+      "chameleonColors": [
+        "#0b6e5c",
+        "#173f80",
+        "#47207a"
+      ],
+      "layers": []
+    },
+    "topTube": {
+      "finish": "chameleon",
+      "baseColor": "#8f8f8f",
+      "chameleonColors": [
+        "#0b6e5c",
+        "#173f80",
+        "#47207a"
+      ],
+      "layers": [
+        {
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "id": "shape-chamc",
+          "type": "shape",
+          "name": "Band",
+          "shape": "rectangle",
+          "color": "#ececec",
+          "x": 0.5,
+          "y": 0.5,
+          "width": 1,
+          "height": 0.22,
+          "rotation": 0,
+          "finish": "matte"
+        }
+      ]
+    },
+    "downTube": {
+      "finish": "chameleon",
+      "baseColor": "#8f8f8f",
+      "chameleonColors": [
+        "#0b6e5c",
+        "#173f80",
+        "#47207a"
+      ],
+      "layers": [
+        {
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "id": "shape-chamd",
+          "type": "shape",
+          "name": "Band",
+          "shape": "rectangle",
+          "color": "#ececec",
+          "x": 0.5,
+          "y": 0.5,
+          "width": 1,
+          "height": 0.42,
+          "rotation": 0,
+          "finish": "matte"
+        },
+        {
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "id": "decal-chame",
+          "type": "decal",
+          "name": "AURORA",
+          "font": "Exo 2",
+          "size": 40,
+          "color": "#6e6e6e",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "letterSpacing": 10,
+          "x": 0.25,
+          "y": 0.5,
+          "rotation": 0,
+          "glyphRotation": 0,
+          "bold": true,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false,
+          "text": "AURORA",
+          "finish": "chameleon"
+        },
+        {
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "id": "decal-chamf",
+          "type": "decal",
+          "name": "AURORA (L)",
+          "font": "Exo 2",
+          "size": 40,
+          "color": "#6e6e6e",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "letterSpacing": 10,
+          "x": 0.75,
+          "y": 0.5,
+          "rotation": 180,
+          "glyphRotation": 0,
+          "bold": true,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false,
+          "text": "AURORA",
+          "finish": "chameleon"
+        }
+      ]
+    },
+    "seatTube": {
+      "finish": "chameleon",
+      "baseColor": "#8f8f8f",
+      "chameleonColors": [
+        "#0b6e5c",
+        "#173f80",
+        "#47207a"
+      ],
+      "layers": []
+    },
+    "seatStays": {
+      "finish": "chameleon",
+      "baseColor": "#8f8f8f",
+      "chameleonColors": [
+        "#0b6e5c",
+        "#173f80",
+        "#47207a"
+      ],
+      "layers": []
+    },
+    "chainStays": {
+      "finish": "chameleon",
+      "baseColor": "#8f8f8f",
+      "chameleonColors": [
+        "#0b6e5c",
+        "#173f80",
+        "#47207a"
+      ],
+      "layers": []
+    },
+    "fork": {
+      "finish": "chameleon",
+      "baseColor": "#8f8f8f",
+      "chameleonColors": [
+        "#0b6e5c",
+        "#173f80",
+        "#47207a"
+      ],
+      "layers": []
+    },
+    "frontRim": {
+      "finish": "satin",
+      "baseColor": "#1a1a1a",
+      "chameleonColors": [
+        "#0b6e5c",
+        "#173f80",
+        "#47207a"
+      ],
+      "layers": [
+        {
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "id": "shape-chami",
+          "type": "shape",
+          "name": "Ring",
+          "shape": "rectangle",
+          "color": "#9a9a9a",
+          "x": 0.5,
+          "y": 0.9,
+          "width": 1,
+          "height": 0.06,
+          "rotation": 0,
+          "finish": "chameleon"
+        },
+        {
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "id": "decal-chamj",
+          "type": "decal",
+          "name": "AURORA",
+          "font": "Exo 2",
+          "size": 40,
+          "color": "#e8e8e8",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "letterSpacing": 10,
+          "x": 0.1,
+          "y": 0.45,
+          "rotation": 0,
+          "glyphRotation": 0,
+          "bold": true,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false,
+          "text": "AURORA",
+          "finish": "matte",
+          "repeat": 5
+        }
+      ]
+    },
+    "rearRim": {
+      "finish": "satin",
+      "baseColor": "#1a1a1a",
+      "chameleonColors": [
+        "#0b6e5c",
+        "#173f80",
+        "#47207a"
+      ],
+      "layers": [
+        {
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "id": "shape-chamm",
+          "type": "shape",
+          "name": "Ring",
+          "shape": "rectangle",
+          "color": "#9a9a9a",
+          "x": 0.5,
+          "y": 0.9,
+          "width": 1,
+          "height": 0.06,
+          "rotation": 0,
+          "finish": "chameleon"
+        },
+        {
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "id": "decal-chamn",
+          "type": "decal",
+          "name": "AURORA",
+          "font": "Exo 2",
+          "size": 40,
+          "color": "#e8e8e8",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "letterSpacing": 10,
+          "x": 0.1,
+          "y": 0.45,
+          "rotation": 0,
+          "glyphRotation": 0,
+          "bold": true,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false,
+          "text": "AURORA",
+          "finish": "matte",
+          "repeat": 5
+        }
+      ]
+    }
+  },
+  "rim": {
+    "depth": 50,
+    "width": 25,
+    "spokeCount": 20
+  },
+  "dividers": [],
+  "variant": {
+    "discipline": "road",
+    "style": "classic"
+  },
+  "palette": [
+    "#0b6e5c",
+    "#173f80",
+    "#47207a",
+    "#ececec",
+    "#1a1a1a"
+  ]
+}

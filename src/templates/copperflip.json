@@ -1,0 +1,230 @@
+{
+  "activeZone": "topTube",
+  "zones": {
+    "headTube": {
+      "finish": "chameleon",
+      "baseColor": "#8a8a8a",
+      "chameleonColors": [
+        "#6e3218",
+        "#4a1634",
+        "#6b5317"
+      ],
+      "layers": []
+    },
+    "topTube": {
+      "finish": "chameleon",
+      "baseColor": "#8a8a8a",
+      "chameleonColors": [
+        "#6e3218",
+        "#4a1634",
+        "#6b5317"
+      ],
+      "layers": [
+        {
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "id": "shape-chamo",
+          "type": "shape",
+          "name": "Pinstripe",
+          "shape": "rectangle",
+          "color": "#0f0f0f",
+          "x": 0.2,
+          "y": 0.5,
+          "width": 0.06,
+          "height": 1,
+          "rotation": 0,
+          "finish": "glossy"
+        }
+      ]
+    },
+    "downTube": {
+      "finish": "chameleon",
+      "baseColor": "#8a8a8a",
+      "chameleonColors": [
+        "#6e3218",
+        "#4a1634",
+        "#6b5317"
+      ],
+      "layers": [
+        {
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "id": "decal-champ",
+          "type": "decal",
+          "name": "KUPFER",
+          "font": "Bebas Neue",
+          "size": 44,
+          "color": "#c9a24a",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "letterSpacing": 8,
+          "x": 0.25,
+          "y": 0.52,
+          "rotation": 0,
+          "glyphRotation": 0,
+          "bold": true,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false,
+          "text": "KUPFER",
+          "finish": "metallic"
+        },
+        {
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "id": "decal-chamq",
+          "type": "decal",
+          "name": "KUPFER (L)",
+          "font": "Bebas Neue",
+          "size": 44,
+          "color": "#c9a24a",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "letterSpacing": 8,
+          "x": 0.75,
+          "y": 0.52,
+          "rotation": 180,
+          "glyphRotation": 0,
+          "bold": true,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false,
+          "text": "KUPFER",
+          "finish": "metallic"
+        }
+      ]
+    },
+    "seatTube": {
+      "finish": "chameleon",
+      "baseColor": "#8a8a8a",
+      "chameleonColors": [
+        "#6e3218",
+        "#4a1634",
+        "#6b5317"
+      ],
+      "layers": []
+    },
+    "seatStays": {
+      "finish": "chameleon",
+      "baseColor": "#8a8a8a",
+      "chameleonColors": [
+        "#6e3218",
+        "#4a1634",
+        "#6b5317"
+      ],
+      "layers": []
+    },
+    "chainStays": {
+      "finish": "chameleon",
+      "baseColor": "#8a8a8a",
+      "chameleonColors": [
+        "#6e3218",
+        "#4a1634",
+        "#6b5317"
+      ],
+      "layers": []
+    },
+    "fork": {
+      "finish": "chameleon",
+      "baseColor": "#8a8a8a",
+      "chameleonColors": [
+        "#6e3218",
+        "#4a1634",
+        "#6b5317"
+      ],
+      "layers": []
+    },
+    "frontRim": {
+      "finish": "satin",
+      "baseColor": "#2a2622",
+      "chameleonColors": [
+        "#6e3218",
+        "#4a1634",
+        "#6b5317"
+      ],
+      "layers": [
+        {
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "id": "decal-chams",
+          "type": "decal",
+          "name": "KUPFER",
+          "font": "Bebas Neue",
+          "size": 48,
+          "color": "#c9a24a",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "letterSpacing": 10,
+          "x": 0.25,
+          "y": 0.5,
+          "rotation": 0,
+          "glyphRotation": 0,
+          "bold": true,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false,
+          "text": "KUPFER",
+          "finish": "metallic",
+          "repeat": 2
+        }
+      ]
+    },
+    "rearRim": {
+      "finish": "satin",
+      "baseColor": "#2a2622",
+      "chameleonColors": [
+        "#6e3218",
+        "#4a1634",
+        "#6b5317"
+      ],
+      "layers": [
+        {
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "id": "decal-chamu",
+          "type": "decal",
+          "name": "KUPFER",
+          "font": "Bebas Neue",
+          "size": 48,
+          "color": "#c9a24a",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "letterSpacing": 10,
+          "x": 0.25,
+          "y": 0.5,
+          "rotation": 0,
+          "glyphRotation": 0,
+          "bold": true,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false,
+          "text": "KUPFER",
+          "finish": "metallic",
+          "repeat": 2
+        }
+      ]
+    }
+  },
+  "rim": {
+    "depth": 50,
+    "width": 25,
+    "spokeCount": 20
+  },
+  "dividers": [],
+  "variant": {
+    "discipline": "gravel",
+    "style": "aero"
+  },
+  "palette": [
+    "#6e3218",
+    "#4a1634",
+    "#6b5317",
+    "#c9a24a",
+    "#0f0f0f"
+  ]
+}

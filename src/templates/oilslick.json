@@ -1,0 +1,223 @@
+{
+  "activeZone": "topTube",
+  "zones": {
+    "headTube": {
+      "finish": "chameleon",
+      "baseColor": "#7a7a7a",
+      "chameleonColors": [
+        "#123d24",
+        "#2e1450",
+        "#5a4410"
+      ],
+      "layers": []
+    },
+    "topTube": {
+      "finish": "chameleon",
+      "baseColor": "#7a7a7a",
+      "chameleonColors": [
+        "#123d24",
+        "#2e1450",
+        "#5a4410"
+      ],
+      "layers": []
+    },
+    "downTube": {
+      "finish": "chameleon",
+      "baseColor": "#7a7a7a",
+      "chameleonColors": [
+        "#123d24",
+        "#2e1450",
+        "#5a4410"
+      ],
+      "layers": [
+        {
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "id": "decal-cham6",
+          "type": "decal",
+          "name": "SLICK",
+          "font": "Michroma",
+          "size": 34,
+          "color": "#f2f2f2",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "letterSpacing": 10,
+          "x": 0.25,
+          "y": 0.52,
+          "rotation": 0,
+          "glyphRotation": 0,
+          "bold": true,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false,
+          "text": "SLICK",
+          "finish": "satin"
+        },
+        {
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "id": "decal-cham7",
+          "type": "decal",
+          "name": "SLICK (L)",
+          "font": "Michroma",
+          "size": 34,
+          "color": "#f2f2f2",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "letterSpacing": 10,
+          "x": 0.75,
+          "y": 0.52,
+          "rotation": 180,
+          "glyphRotation": 0,
+          "bold": true,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false,
+          "text": "SLICK",
+          "finish": "satin"
+        }
+      ]
+    },
+    "seatTube": {
+      "finish": "chameleon",
+      "baseColor": "#7a7a7a",
+      "chameleonColors": [
+        "#123d24",
+        "#2e1450",
+        "#5a4410"
+      ],
+      "layers": []
+    },
+    "seatStays": {
+      "finish": "chameleon",
+      "baseColor": "#7a7a7a",
+      "chameleonColors": [
+        "#123d24",
+        "#2e1450",
+        "#5a4410"
+      ],
+      "layers": []
+    },
+    "chainStays": {
+      "finish": "chameleon",
+      "baseColor": "#7a7a7a",
+      "chameleonColors": [
+        "#123d24",
+        "#2e1450",
+        "#5a4410"
+      ],
+      "layers": []
+    },
+    "fork": {
+      "finish": "chameleon",
+      "baseColor": "#7a7a7a",
+      "chameleonColors": [
+        "#123d24",
+        "#2e1450",
+        "#5a4410"
+      ],
+      "layers": []
+    },
+    "frontRim": {
+      "finish": "glossy",
+      "baseColor": "#121212",
+      "chameleonColors": [
+        "#123d24",
+        "#2e1450",
+        "#5a4410"
+      ],
+      "layers": [
+        {
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "id": "decal-cham9",
+          "type": "decal",
+          "name": "SLICK",
+          "font": "Michroma",
+          "size": 36,
+          "color": "#8c8c8c",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "letterSpacing": 10,
+          "x": 0.125,
+          "y": 0.5,
+          "rotation": 0,
+          "glyphRotation": 0,
+          "bold": true,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false,
+          "text": "SLICK",
+          "finish": "chameleon",
+          "repeat": 4
+        }
+      ]
+    },
+    "rearRim": {
+      "finish": "glossy",
+      "baseColor": "#121212",
+      "chameleonColors": [
+        "#123d24",
+        "#2e1450",
+        "#5a4410"
+      ],
+      "layers": [
+        {
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "normal",
+          "id": "decal-chamb",
+          "type": "decal",
+          "name": "SLICK",
+          "font": "Michroma",
+          "size": 36,
+          "color": "#8c8c8c",
+          "outlineColor": "#000000",
+          "outlineWidth": 0,
+          "letterSpacing": 10,
+          "x": 0.125,
+          "y": 0.5,
+          "rotation": 0,
+          "glyphRotation": 0,
+          "bold": true,
+          "italic": false,
+          "underline": false,
+          "strikethrough": false,
+          "text": "SLICK",
+          "finish": "chameleon",
+          "repeat": 4
+        }
+      ]
+    }
+  },
+  "rim": {
+    "depth": 50,
+    "width": 25,
+    "spokeCount": 20
+  },
+  "dividers": [
+    {
+      "id": "div-cham1",
+      "color": "#0e0e0e",
+      "ax": -0.6,
+      "ay": 0.2,
+      "bx": 0.8,
+      "by": 0.12,
+      "softness": 0
+    }
+  ],
+  "variant": {
+    "discipline": "gravel",
+    "style": "classic"
+  },
+  "palette": [
+    "#123d24",
+    "#2e1450",
+    "#5a4410",
+    "#0e0e0e",
+    "#f2f2f2"
+  ]
+}

@@ -22,6 +22,7 @@ export const CATEGORIES: { id: string; nameKey: I18nKey }[] = [
   { id: 'artistic', nameKey: 'catArtistic' },
   { id: 'heritage', nameKey: 'catHeritage' },
   { id: 'clean', nameKey: 'catClean' },
+  { id: 'chameleon', nameKey: 'catChameleon' },
 ];
 
 const LIST: { id: string; nameKey: I18nKey; category: string }[] = [
@@ -37,7 +38,6 @@ const LIST: { id: string; nameKey: I18nKey; category: string }[] = [
   { id: 'glitch', nameKey: 'tplGlitch', category: 'aggressive' },
   { id: 'fade', nameKey: 'tplFade', category: 'artistic' },
   { id: 'pop', nameKey: 'tplPop', category: 'artistic' },
-  { id: 'chameleon', nameKey: 'tplChameleon', category: 'artistic' },
   { id: 'splatter', nameKey: 'tplSplatter', category: 'artistic' },
   { id: 'marble', nameKey: 'tplMarble', category: 'artistic' },
   { id: 'retro', nameKey: 'tplRetro', category: 'heritage' },
@@ -48,6 +48,11 @@ const LIST: { id: string; nameKey: I18nKey; category: string }[] = [
   { id: 'diagonal', nameKey: 'tplDiagonal', category: 'clean' },
   { id: 'accentline', nameKey: 'tplAccentline', category: 'clean' },
   { id: 'pastel', nameKey: 'tplPastel', category: 'clean' },
+  { id: 'chameleon', nameKey: 'tplChameleon', category: 'chameleon' },
+  { id: 'oilslick', nameKey: 'tplOilslick', category: 'chameleon' },
+  { id: 'aurora', nameKey: 'tplAurora', category: 'chameleon' },
+  { id: 'copperflip', nameKey: 'tplCopperflip', category: 'chameleon' },
+  { id: 'midnight', nameKey: 'tplMidnight', category: 'chameleon' },
 ];
 
 export const TEMPLATES = LIST.map((t) => ({

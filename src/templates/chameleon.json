@@ -3,372 +3,192 @@
   "zones": {
     "headTube": {
       "finish": "chameleon",
-      "baseColor": "#d0d0d0",
+      "baseColor": "#8a8a8a",
       "chameleonColors": [
-        "#00b3a4",
-        "#6a1fd1",
-        "#e8a317"
+        "#0d4f52",
+        "#35195e",
+        "#5e4618"
       ],
       "layers": []
     },
     "topTube": {
       "finish": "chameleon",
-      "baseColor": "#d0d0d0",
+      "baseColor": "#8a8a8a",
       "chameleonColors": [
-        "#00b3a4",
-        "#6a1fd1",
-        "#e8a317"
+        "#0d4f52",
+        "#35195e",
+        "#5e4618"
       ],
       "layers": []
     },
     "downTube": {
       "finish": "chameleon",
-      "baseColor": "#d0d0d0",
+      "baseColor": "#8a8a8a",
       "chameleonColors": [
-        "#00b3a4",
-        "#6a1fd1",
-        "#e8a317"
+        "#0d4f52",
+        "#35195e",
+        "#5e4618"
       ],
       "layers": [
         {
-          "letterSpacing": 12,
-          "glyphRotation": 0,
-          "id": "decal-tpl3b",
-          "name": "Wordmark",
           "visible": true,
           "opacity": 1,
           "blendMode": "normal",
+          "id": "decal-cham0",
           "type": "decal",
-          "text": "PRISMA",
+          "name": "PRISMA",
           "font": "Orbitron",
           "size": 38,
-          "color": "#111111",
+          "color": "#cfcfcf",
           "outlineColor": "#000000",
           "outlineWidth": 0,
+          "letterSpacing": 12,
           "x": 0.25,
           "y": 0.55,
           "rotation": 0,
+          "glyphRotation": 0,
           "bold": true,
           "italic": false,
           "underline": false,
-          "strikethrough": false
+          "strikethrough": false,
+          "text": "PRISMA",
+          "finish": "metallic"
         },
         {
-          "letterSpacing": 12,
-          "glyphRotation": 0,
-          "id": "decal-tpl3c",
-          "name": "Wordmark (L)",
           "visible": true,
           "opacity": 1,
           "blendMode": "normal",
+          "id": "decal-cham1",
           "type": "decal",
-          "text": "PRISMA",
+          "name": "PRISMA (L)",
           "font": "Orbitron",
           "size": 38,
-          "color": "#111111",
+          "color": "#cfcfcf",
           "outlineColor": "#000000",
           "outlineWidth": 0,
+          "letterSpacing": 12,
           "x": 0.75,
           "y": 0.55,
           "rotation": 180,
+          "glyphRotation": 0,
           "bold": true,
           "italic": false,
           "underline": false,
-          "strikethrough": false
+          "strikethrough": false,
+          "text": "PRISMA",
+          "finish": "metallic"
         }
       ]
     },
     "seatTube": {
       "finish": "chameleon",
-      "baseColor": "#d0d0d0",
+      "baseColor": "#8a8a8a",
       "chameleonColors": [
-        "#00b3a4",
-        "#6a1fd1",
-        "#e8a317"
+        "#0d4f52",
+        "#35195e",
+        "#5e4618"
       ],
       "layers": []
     },
     "seatStays": {
       "finish": "chameleon",
-      "baseColor": "#d0d0d0",
+      "baseColor": "#8a8a8a",
       "chameleonColors": [
-        "#00b3a4",
-        "#6a1fd1",
-        "#e8a317"
+        "#0d4f52",
+        "#35195e",
+        "#5e4618"
       ],
       "layers": []
     },
     "chainStays": {
       "finish": "chameleon",
-      "baseColor": "#d0d0d0",
+      "baseColor": "#8a8a8a",
       "chameleonColors": [
-        "#00b3a4",
-        "#6a1fd1",
-        "#e8a317"
+        "#0d4f52",
+        "#35195e",
+        "#5e4618"
       ],
       "layers": []
     },
     "fork": {
       "finish": "chameleon",
-      "baseColor": "#d0d0d0",
+      "baseColor": "#8a8a8a",
       "chameleonColors": [
-        "#00b3a4",
-        "#6a1fd1",
-        "#e8a317"
+        "#0d4f52",
+        "#35195e",
+        "#5e4618"
       ],
       "layers": []
     },
     "frontRim": {
-      "finish": "chameleon",
-      "baseColor": "#d0d0d0",
+      "finish": "matte",
+      "baseColor": "#161616",
       "chameleonColors": [
-        "#00b3a4",
-        "#6a1fd1",
-        "#e8a317"
+        "#0d4f52",
+        "#35195e",
+        "#5e4618"
       ],
       "layers": [
         {
-          "id": "rimfx-1",
-          "name": "hexagons",
-          "visible": true,
-          "opacity": 0.35,
-          "blendMode": "normal",
-          "type": "pattern",
-          "pattern": "hexagons",
-          "color": "#111111",
-          "scale": 22,
-          "scaleX": 1,
-          "scaleY": 1,
-          "rotation": 0,
-          "rotationX": 0,
-          "rotationY": 0,
-          "intensity": 1
-        },
-        {
-          "id": "rimfx-2",
-          "name": "Ring",
           "visible": true,
           "opacity": 1,
           "blendMode": "normal",
-          "type": "shape",
-          "shape": "rectangle",
-          "color": "#111111",
-          "x": 0.5,
-          "y": 0.92,
-          "width": 1,
-          "height": 0.05,
-          "rotation": 0
-        },
-        {
-          "id": "rimfx-3",
-          "name": "Ring",
-          "visible": true,
-          "opacity": 1,
-          "blendMode": "normal",
-          "type": "shape",
-          "shape": "rectangle",
-          "color": "#111111",
-          "x": 0.5,
-          "y": 0.08,
-          "width": 1,
-          "height": 0.05,
-          "rotation": 0
-        },
-        {
-          "letterSpacing": 10,
-          "glyphRotation": 0,
-          "id": "decal-tpl3h",
-          "name": "Rim 1",
-          "visible": true,
-          "opacity": 1,
-          "blendMode": "normal",
+          "id": "decal-cham3",
           "type": "decal",
-          "text": "PRISMA",
+          "name": "PRISMA",
           "font": "Orbitron",
           "size": 40,
-          "color": "#111111",
+          "color": "#9a9a9a",
           "outlineColor": "#000000",
           "outlineWidth": 0,
+          "letterSpacing": 10,
           "x": 0.1667,
           "y": 0.5,
           "rotation": 0,
-          "bold": true,
-          "italic": false,
-          "underline": false,
-          "strikethrough": false
-        },
-        {
-          "letterSpacing": 10,
           "glyphRotation": 0,
-          "id": "decal-tpl3i",
-          "name": "Rim 2",
-          "visible": true,
-          "opacity": 1,
-          "blendMode": "normal",
-          "type": "decal",
-          "text": "PRISMA",
-          "font": "Orbitron",
-          "size": 40,
-          "color": "#111111",
-          "outlineColor": "#000000",
-          "outlineWidth": 0,
-          "x": 0.5,
-          "y": 0.5,
-          "rotation": 0,
           "bold": true,
           "italic": false,
           "underline": false,
-          "strikethrough": false
-        },
-        {
-          "letterSpacing": 10,
-          "glyphRotation": 0,
-          "id": "decal-tpl3j",
-          "name": "Rim 3",
-          "visible": true,
-          "opacity": 1,
-          "blendMode": "normal",
-          "type": "decal",
+          "strikethrough": false,
           "text": "PRISMA",
-          "font": "Orbitron",
-          "size": 40,
-          "color": "#111111",
-          "outlineColor": "#000000",
-          "outlineWidth": 0,
-          "x": 0.8333,
-          "y": 0.5,
-          "rotation": 0,
-          "bold": true,
-          "italic": false,
-          "underline": false,
-          "strikethrough": false
+          "finish": "chameleon",
+          "repeat": 3
         }
       ]
     },
     "rearRim": {
-      "finish": "chameleon",
-      "baseColor": "#d0d0d0",
+      "finish": "matte",
+      "baseColor": "#161616",
       "chameleonColors": [
-        "#00b3a4",
-        "#6a1fd1",
-        "#e8a317"
+        "#0d4f52",
+        "#35195e",
+        "#5e4618"
       ],
       "layers": [
         {
-          "id": "rimfx-501",
-          "name": "hexagons",
-          "visible": true,
-          "opacity": 0.35,
-          "blendMode": "normal",
-          "type": "pattern",
-          "pattern": "hexagons",
-          "color": "#111111",
-          "scale": 22,
-          "scaleX": 1,
-          "scaleY": 1,
-          "rotation": 0,
-          "rotationX": 0,
-          "rotationY": 0,
-          "intensity": 1
-        },
-        {
-          "id": "rimfx-502",
-          "name": "Ring",
           "visible": true,
           "opacity": 1,
           "blendMode": "normal",
-          "type": "shape",
-          "shape": "rectangle",
-          "color": "#111111",
-          "x": 0.5,
-          "y": 0.92,
-          "width": 1,
-          "height": 0.05,
-          "rotation": 0
-        },
-        {
-          "id": "rimfx-503",
-          "name": "Ring",
-          "visible": true,
-          "opacity": 1,
-          "blendMode": "normal",
-          "type": "shape",
-          "shape": "rectangle",
-          "color": "#111111",
-          "x": 0.5,
-          "y": 0.08,
-          "width": 1,
-          "height": 0.05,
-          "rotation": 0
-        },
-        {
-          "letterSpacing": 10,
-          "glyphRotation": 0,
-          "id": "decal-tpl3l",
-          "name": "Rim 1",
-          "visible": true,
-          "opacity": 1,
-          "blendMode": "normal",
+          "id": "decal-cham5",
           "type": "decal",
-          "text": "PRISMA",
+          "name": "PRISMA",
           "font": "Orbitron",
           "size": 40,
-          "color": "#111111",
+          "color": "#9a9a9a",
           "outlineColor": "#000000",
           "outlineWidth": 0,
+          "letterSpacing": 10,
           "x": 0.1667,
           "y": 0.5,
           "rotation": 0,
-          "bold": true,
-          "italic": false,
-          "underline": false,
-          "strikethrough": false
-        },
-        {
-          "letterSpacing": 10,
           "glyphRotation": 0,
-          "id": "decal-tpl3m",
-          "name": "Rim 2",
-          "visible": true,
-          "opacity": 1,
-          "blendMode": "normal",
-          "type": "decal",
-          "text": "PRISMA",
-          "font": "Orbitron",
-          "size": 40,
-          "color": "#111111",
-          "outlineColor": "#000000",
-          "outlineWidth": 0,
-          "x": 0.5,
-          "y": 0.5,
-          "rotation": 0,
           "bold": true,
           "italic": false,
           "underline": false,
-          "strikethrough": false
-        },
-        {
-          "letterSpacing": 10,
-          "glyphRotation": 0,
-          "id": "decal-tpl3n",
-          "name": "Rim 3",
-          "visible": true,
-          "opacity": 1,
-          "blendMode": "normal",
-          "type": "decal",
+          "strikethrough": false,
           "text": "PRISMA",
-          "font": "Orbitron",
-          "size": 40,
-          "color": "#111111",
-          "outlineColor": "#000000",
-          "outlineWidth": 0,
-          "x": 0.8333,
-          "y": 0.5,
-          "rotation": 0,
-          "bold": true,
-          "italic": false,
-          "underline": false,
-          "strikethrough": false
+          "finish": "chameleon",
+          "repeat": 3
         }
       ]
     }
@@ -384,9 +204,10 @@
     "style": "aero"
   },
   "palette": [
-    "#00b3a4",
-    "#6a1fd1",
-    "#e8a317",
-    "#111111"
+    "#0d4f52",
+    "#35195e",
+    "#5e4618",
+    "#cfcfcf",
+    "#161616"
   ]
 }
