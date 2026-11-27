@@ -58,14 +58,17 @@ export function layerBox(zone: ZoneId, layer: Layer): LayerBox | null {
   return null;
 }
 
-/** Is canvas point (x, y) inside the box? Also tries the u-wrapped copies. */
-export function boxContains(zone: ZoneId, box: LayerBox, x: number, y: number): boolean {
+/** Is canvas point (x, y) inside the box? Also tries the u-wrapped copies and,
+ *  on rims, the layer's `repeat` copies around the wheel. */
+export function boxContains(zone: ZoneId, box: LayerBox, x: number, y: number, repeat = 1): boolean {
   const { w } = ZONE_CANVAS_DIMS[zone];
   const [axx, axy] = box.ax;
   const [ayx, ayy] = box.ay;
   const det = axx * ayy - ayx * axy;
   if (Math.abs(det) < 1e-9) return false;
-  for (const off of [0, w, -w]) {
+  const n = Math.max(1, Math.round(repeat));
+  const offs = Array.from({ length: n }, (_, k) => [0, w, -w].map((o) => o - (k * w) / n)).flat();
+  for (const off of offs) {
     const dx = x + off - box.c[0];
     const dy = y - box.c[1];
     const s = (dx * ayy - dy * ayx) / det;
@@ -81,7 +84,7 @@ export function pickLayer(zone: ZoneId, layers: Layer[], x: number, y: number): 
     const l = layers[i];
     if (!l.visible) continue;
     const box = layerBox(zone, l);
-    if (box && boxContains(zone, box, x, y)) return l;
+    if (box && boxContains(zone, box, x, y, l.repeat)) return l;
   }
   return null;
 }

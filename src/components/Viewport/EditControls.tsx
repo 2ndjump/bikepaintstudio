@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useUIStore } from '../../state/uiStore';
-import { useDesignStore } from '../../state/designStore';
+import { layerGroup, useDesignStore } from '../../state/designStore';
 import { isRimZone, type ZoneId } from '../../state/types';
 import { ZONE_CANVAS_DIMS } from '../../rendering/LayerCompositor';
 import { boxContains, layerBox, pickLayer } from '../../rendering/layerBox';
@@ -15,10 +15,9 @@ const CLICK_SLOP = 5;
 
 interface MoveDrag {
   zone: ZoneId;
-  layerId: string;
   mesh: THREE.Mesh;
-  startX: number;
-  startY: number;
+  /** Start positions of the layer and the layers grouped with it. */
+  starts: Record<string, { x: number; y: number }>;
   startU: number;
   startV: number;
 }
@@ -26,7 +25,7 @@ interface MoveDrag {
 /**
  * Pointer editing on the model (always on — there's no separate tool):
  *  - press on a layer (text/shape/image) and drag: selects it and moves it
- *    along the surface; the topmost layer under the pointer wins, but the
+ *    (with the layers grouped with it) along the surface; the topmost layer under the pointer wins, but the
  *    selected one is kept when it's under the pointer too;
  *  - click a part: selects that zone (deselects the layer); click the
  *    backdrop: deselects the layer;
@@ -74,7 +73,7 @@ export function EditControls() {
       const selId = useUIStore.getState().selectedLayerId;
       const sel = layers.find((l) => l.id === selId && l.visible);
       const selBox = sel && layerBox(zone, sel);
-      const layer = sel && selBox && boxContains(zone, selBox, px, py) ? sel : pickLayer(zone, layers, px, py);
+      const layer = sel && selBox && boxContains(zone, selBox, px, py, sel.repeat) ? sel : pickLayer(zone, layers, px, py);
       if (!layer || (layer.type !== 'decal' && layer.type !== 'shape' && layer.type !== 'image')) return;
 
       // Grab the layer: select it and keep OrbitControls / turntable / wheel
@@ -87,12 +86,14 @@ export function EditControls() {
       ui.setActiveDividerId(null);
       ui.setSelectedLayerId(layer.id);
       ui.setSpinHold(true);
+      const starts: MoveDrag['starts'] = {};
+      for (const l of layerGroup(layers, layer.id)) {
+        if (l.type === 'decal' || l.type === 'shape' || l.type === 'image') starts[l.id] = { x: l.x, y: l.y };
+      }
       drag = {
         zone,
-        layerId: layer.id,
         mesh: hit.object as THREE.Mesh,
-        startX: layer.x,
-        startY: layer.y,
+        starts,
         startU: hit.uv.x,
         startV: hit.uv.y,
       };
@@ -111,10 +112,10 @@ export function EditControls() {
         // u wraps around the tube/rim: take the short way across the seam.
         let du = hit.uv.x - drag.startU;
         du -= Math.round(du);
-        useDesignStore.getState().updateLayer(drag.zone, drag.layerId, {
-          x: drag.startX + du,
-          y: drag.startY - (hit.uv.y - drag.startV), // canvas y = 1 - v
-        });
+        const dv = hit.uv.y - drag.startV; // canvas y = 1 - v
+        const patches: Record<string, { x: number; y: number }> = {};
+        for (const [id, p] of Object.entries(drag.starts)) patches[id] = { x: p.x + du, y: p.y - dv };
+        useDesignStore.getState().updateLayers(drag.zone, patches);
         return;
       }
       if (e.buttons !== 0 || e.target !== dom) {

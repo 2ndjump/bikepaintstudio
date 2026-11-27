@@ -8,8 +8,11 @@ import type {
   ShapeKind,
   ShapeLayer,
   SolidColorLayer,
+  FinishType,
   ZoneId,
 } from '../state/types';
+import { isRimZone } from '../state/types';
+import { finishMapColors, layerFinish } from './finish';
 import { renderPattern, patternRepeat } from './patterns';
 import { getZoneAspect } from './zoneMetrics';
 import { ensureFontLoaded } from '../fonts/fontLoader';
@@ -180,15 +183,16 @@ export class ZoneCompositor {
     const covCtx = this.coverageCanvas.getContext('2d');
     if (!covCtx) throw new Error('Canvas 2D context not available');
     this.coverageCtx = covCtx;
+    this.finishCanvases = [makeCanvas(dims), makeCanvas(dims), makeCanvas(dims)];
   }
 
-  render(layers: Layer[], baseColor: string): Promise<HTMLCanvasElement> {
-    const run = this.queue.catch(() => {}).then(() => this.renderNow(layers, baseColor));
+  render(layers: Layer[], baseColor: string, finish: FinishType): Promise<HTMLCanvasElement> {
+    const run = this.queue.catch(() => {}).then(() => this.renderNow(layers, baseColor, finish));
     this.queue = run;
     return run;
   }
 
-  private async renderNow(layers: Layer[], baseColor: string): Promise<HTMLCanvasElement> {
+  private async renderNow(layers: Layer[], baseColor: string, finish: FinishType): Promise<HTMLCanvasElement> {
     const ctx = this.ctx;
     const w = this.canvas.width;
     const h = this.canvas.height;
@@ -212,8 +216,20 @@ export class ZoneCompositor {
     cov.filter = 'none';
     cov.clearRect(0, 0, w, h);
 
+    // Finish maps: the part's finish everywhere, each layer painting its own
+    // finish over its footprint below.
+    const base = finishMapColors(finish);
+    this.finishCanvases.forEach((c, i) => {
+      const fx = c.getContext('2d')!;
+      fx.setTransform(1, 0, 0, 1, 0, 0);
+      fx.globalCompositeOperation = 'source-over';
+      fx.globalAlpha = 1;
+      fx.fillStyle = rgb(base[i]);
+      fx.fillRect(0, 0, w, h);
+    });
+
     // The alpha of the most recent non-clip layer's content — clip layers are
-    // masked to it ("clip to layer below" / clipping-mask groups).
+    // masked to it ("clip to layer below", older saves).
     let clipMask: HTMLCanvasElement | null = null;
 
     for (const layer of layers) {
@@ -230,11 +246,50 @@ export class ZoneCompositor {
       offCtx.globalCompositeOperation = 'source-over';
       offCtx.filter = 'none';
       offCtx.clearRect(0, 0, w, h);
-      await this.drawLayerContent(layer);
+      const placed = layer.type !== 'pattern' && layer.type !== 'solid';
+      // Rims: the canvas wraps around the wheel, so a layer over the seam is
+      // drawn again one canvas width over to continue on the other end.
+      const rim = isRimZone(this.zoneId) && placed;
+      for (const shift of rim ? [-1, 0, 1] : [0]) {
+        const at = shift === 0 ? layer : ({ ...layer, x: (layer as { x: number }).x + shift } as Layer);
+        offCtx.setTransform(1, 0, 0, 1, 0, 0);
+        offCtx.filter = 'none';
+        await this.drawLayerContent(at);
+        if (at.fill && placed) {
+          // The fill pattern only where the layer itself is painted.
+          offCtx.save();
+          offCtx.setTransform(1, 0, 0, 1, 0, 0);
+          offCtx.filter = 'none';
+          offCtx.globalCompositeOperation = 'source-atop';
+          const { x, y } = at as { x: number; y: number };
+          await this.drawPattern(
+            { ...at.fill, scaleX: 1, scaleY: 1, rotationX: 0, rotationY: 0 } as PatternLayer,
+            [w * x, h * y],
+          );
+          offCtx.restore();
+        }
+      }
       this.ctx = prevCtx;
 
       if (layer.effect && layer.effect.amount > 0) {
         applyEffect(off.canvas, offCtx, layer.effect);
+      }
+
+      // `repeat`: copies evenly around the rim (the wrapped drawing above is
+      // periodic, so each shifted copy is drawn at s and s − one width).
+      const n = rim ? Math.max(1, Math.round(layer.repeat ?? 1)) : 1;
+      if (n > 1) {
+        const snap = this.snapshot(off.canvas);
+        offCtx.setTransform(1, 0, 0, 1, 0, 0);
+        offCtx.globalAlpha = 1;
+        offCtx.globalCompositeOperation = 'source-over';
+        offCtx.filter = 'none';
+        offCtx.clearRect(0, 0, w, h);
+        for (let k = 0; k < n; k++) {
+          const s = (k * w) / n;
+          offCtx.drawImage(snap, s, 0);
+          if (s > 0) offCtx.drawImage(snap, s - w, 0);
+        }
       }
 
       // Clip to the layer below (mask by its alpha) when requested.
@@ -265,11 +320,55 @@ export class ZoneCompositor {
         cov.drawImage(off.canvas, 0, 0);
       }
 
+      // The layer's finish over its footprint (its alpha, times opacity).
+      const lf = finishMapColors(layerFinish(layer.finish, finish));
+      const sx = this.getScratch();
+      this.finishCanvases.forEach((c, i) => {
+        sx.ctx.globalCompositeOperation = 'source-over';
+        sx.ctx.clearRect(0, 0, w, h);
+        sx.ctx.drawImage(off.canvas, 0, 0);
+        sx.ctx.globalCompositeOperation = 'source-in';
+        sx.ctx.fillStyle = rgb(lf[i]);
+        sx.ctx.fillRect(0, 0, w, h);
+        const fx = c.getContext('2d')!;
+        fx.globalAlpha = layer.opacity;
+        fx.drawImage(sx.canvas, 0, 0);
+        fx.globalAlpha = 1;
+      });
+
       // A non-clip layer becomes the mask base for the clip layers above it.
       if (!layer.clip) clipMask = this.snapshotClipMask(off.canvas);
     }
 
     return this.canvas;
+  }
+
+  /** The per-texel finish maps (see finishMapColors), same layout as `canvas`. */
+  finishCanvases: HTMLCanvasElement[];
+
+  private zoneDims() {
+    return ZONE_CANVAS_DIMS[this.zoneId];
+  }
+
+  private scratch?: { canvas: HTMLCanvasElement; ctx: CanvasRenderingContext2D };
+
+  private getScratch() {
+    if (!this.scratch) {
+      const canvas = makeCanvas(this.zoneDims());
+      this.scratch = { canvas, ctx: canvas.getContext('2d')! };
+    }
+    return this.scratch;
+  }
+
+  private snapCanvas?: HTMLCanvasElement;
+
+  /** Copy of `src` in a persistent canvas (to redraw it shifted). */
+  private snapshot(src: HTMLCanvasElement): HTMLCanvasElement {
+    this.snapCanvas ??= makeCanvas(this.zoneDims());
+    const cx = this.snapCanvas.getContext('2d')!;
+    cx.clearRect(0, 0, this.snapCanvas.width, this.snapCanvas.height);
+    cx.drawImage(src, 0, 0);
+    return this.snapCanvas;
   }
 
   private clipMaskCanvas?: HTMLCanvasElement;
@@ -341,7 +440,8 @@ export class ZoneCompositor {
     ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
   }
 
-  private async drawPattern(layer: PatternLayer) {
+  /** `anchor`: canvas point the tiling is centred on (default: the canvas centre). */
+  private async drawPattern(layer: PatternLayer, anchor?: [number, number]) {
     const ctx = this.ctx;
     const tile = await renderPattern(layer);
     const pattern = ctx.createPattern(tile, 'repeat');
@@ -356,8 +456,7 @@ export class ZoneCompositor {
     pattern.setTransform?.(new DOMMatrix([f, 0, 0, f, 0, 0]));
     const w = this.canvas.width;
     const h = this.canvas.height;
-    const cx = w / 2;
-    const cy = h / 2;
+    const [cx, cy] = anchor ?? [w / 2, h / 2];
 
     const rx = ((layer.rotationX ?? 0) * Math.PI) / 180;
     const ry = ((layer.rotationY ?? 0) * Math.PI) / 180;
@@ -529,6 +628,19 @@ export class ZoneCompositor {
     }
   }
 
+}
+
+function makeCanvas({ w, h }: { w: number; h: number }): HTMLCanvasElement {
+  const c = document.createElement('canvas');
+  c.width = w;
+  c.height = h;
+  return c;
+}
+
+/** Opaque CSS colour of three 0…1 channels. */
+function rgb(v: number[]): string {
+  const b = (x: number) => Math.round(Math.min(1, Math.max(0, x)) * 255);
+  return `rgb(${b(v[0])}, ${b(v[1])}, ${b(v[2])})`;
 }
 
 const compositors = new Map<ZoneId, ZoneCompositor>();

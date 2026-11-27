@@ -82,9 +82,19 @@ export interface LayerBase {
   blendMode: BlendMode;
   /** Optional per-layer effect (blur/smear). Absent = no effect. */
   effect?: LayerEffect;
-  /** Clip to the layer directly below: this layer only shows where that layer
-   *  is opaque (e.g. a pattern confined to a shape). */
+  /** Legacy (older saves): clip to the layer directly below. Pattern-in-shape
+   *  clips are turned into `fill` on load; others still render clipped. */
   clip?: boolean;
+  /** Own paint finish for this layer. Absent = the part's finish (glossy on a
+   *  chameleon part, whose colour flip belongs to the base coat only). */
+  finish?: FinishType;
+  /** Grouped with the layer directly below: moved, scaled and rotated with it. */
+  group?: boolean;
+  /** Rims only: the layer repeats this many times evenly around the rim
+   *  (2 = on the half, … 5 = on the fifth). Absent/1 = once. */
+  repeat?: number;
+  /** A pattern drawn inside the layer's own outline (text, shape, image). */
+  fill?: LayerFill;
   /** Sit UNDER the global colour dividers: the divider colour paints over this
    *  layer (below its line) instead of leaving it on top. Default (absent) =
    *  above the dividers. */
@@ -111,6 +121,15 @@ export type PatternKind =
   | 'circuit'
   | 'mesh'
   | 'forged';
+
+/** A pattern filling a layer's outline (see LayerBase.fill). */
+export interface LayerFill {
+  pattern: PatternKind;
+  color: string;
+  scale: number;
+  rotation: number;
+  intensity: number;
+}
 
 export interface PatternLayer extends LayerBase {
   type: 'pattern';

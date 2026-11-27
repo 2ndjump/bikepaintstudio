@@ -57,7 +57,12 @@ export function DecalLayerEditor({ layer, zoneId }: Props) {
       <input
         type="text"
         value={layer.text}
-        onChange={(e) => updateLayer(zoneId, layer.id, { text: e.target.value })}
+        onChange={(e) => {
+          const text = e.target.value;
+          // The layer is named after its text, unless the user renamed it.
+          const named = layer.name === layer.text || layer.name === 'Text';
+          updateLayer(zoneId, layer.id, named ? { text, name: text || 'Text' } : { text });
+        }}
         placeholder={t('text')}
         className="m3-field text-sm"
       />

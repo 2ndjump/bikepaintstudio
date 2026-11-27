@@ -2,6 +2,7 @@ import { useDesignStore } from '../../state/designStore';
 import { DEFAULT_CHAMELEON_COLORS, type FinishType, type ZoneId } from '../../state/types';
 import { useT } from '../../i18n/useT';
 import type { I18nKey } from '../../i18n/strings';
+import { FINISHES } from './finishes';
 import { ColorPicker } from '../ui/ColorPicker';
 
 // Without a `zone`, the picker controls the whole frame (finish/colour apply to
@@ -9,14 +10,6 @@ import { ColorPicker } from '../ui/ColorPicker';
 // regardless of the active zone. With a `zone` (a rim), it controls just that
 // rim. The store setters decide frame-global vs per-rim from the passed zone.
 const FRAME_REF_ZONE: ZoneId = 'topTube';
-
-const FINISHES: { value: FinishType; labelKey: I18nKey }[] = [
-  { value: 'matte', labelKey: 'finishMatte' },
-  { value: 'satin', labelKey: 'finishSatin' },
-  { value: 'glossy', labelKey: 'finishGlossy' },
-  { value: 'metallic', labelKey: 'finishMetallic' },
-  { value: 'chameleon', labelKey: 'finishChameleon' },
-];
 
 const CHAMELEON_LABELS: Record<0 | 1 | 2, I18nKey> = {
   0: 'chameleonColorA',

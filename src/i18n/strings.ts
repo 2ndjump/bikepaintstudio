@@ -57,7 +57,12 @@ export type I18nKey =
   | 'layerShow'
   | 'layerHide'
   | 'layerDuplicate'
-  | 'layerClip'
+  | 'layerGroup'
+  | 'layerFinish'
+  | 'finishInherit'
+  | 'layerRepeat'
+  | 'repeatOnce'
+  | 'layerFill'
   | 'layerBelowDivider'
   | 'layerOptions'
   | 'blend'
@@ -157,8 +162,6 @@ export type I18nKey =
   | 'shape'
   | 'image'
   | 'layerEditHint'
-  | 'dupMirrorH'
-  | 'dupMirrorV'
   | 'layerName'
   | 'zoneClickHint'
   | 'templates'
@@ -178,6 +181,7 @@ export type I18nKey =
   | 'catArtistic'
   | 'catHeritage'
   | 'catClean'
+  | 'catChameleon'
   | 'catAll'
   | 'tplTeamblock'
   | 'tplTricolore'
@@ -193,7 +197,11 @@ export type I18nKey =
   | 'tplCeleste'
   | 'tplBarber'
   | 'tplAccentline'
-  | 'tplPastel';
+  | 'tplPastel'
+  | 'tplOilslick'
+  | 'tplAurora'
+  | 'tplCopperflip'
+  | 'tplMidnight';
 
 const STRINGS: Record<I18nKey, Record<Lang, string>> = {
   active: { de: 'Aktiv', en: 'Active' },
@@ -252,7 +260,12 @@ const STRINGS: Record<I18nKey, Record<Lang, string>> = {
   layerShow: { de: 'Einblenden', en: 'Show' },
   layerHide: { de: 'Ausblenden', en: 'Hide' },
   layerDuplicate: { de: 'Duplizieren', en: 'Duplicate' },
-  layerClip: { de: 'An Ebene darunter anheften', en: 'Clip to layer below' },
+  layerGroup: { de: 'Mit Ebene darunter gruppieren', en: 'Group with layer below' },
+  layerFinish: { de: 'Finish', en: 'Finish' },
+  finishInherit: { de: 'Wie Lack', en: 'As paint' },
+  layerRepeat: { de: 'Wiederholen', en: 'Repeat' },
+  repeatOnce: { de: 'Einmal', en: 'Once' },
+  layerFill: { de: 'Muster in der Ebene', en: 'Pattern inside' },
   layerBelowDivider: { de: 'Unter dem Divider', en: 'Below divider' },
   layerOptions: { de: 'Optionen', en: 'Options' },
   blend: { de: 'Mischmodus', en: 'Blend' },
@@ -351,8 +364,6 @@ const STRINGS: Record<I18nKey, Record<Lang, string>> = {
   shape: { de: 'Form', en: 'Shape' },
   image: { de: 'Bild', en: 'Image' },
   layerEditHint: { de: 'Auf dem Modell ziehen zum Verschieben, Griffe zum Skalieren und Drehen.', en: 'Drag it on the model to move; use the handles to scale and rotate.' },
-  dupMirrorH: { de: 'Gespiegelt ↔', en: 'Mirrored ↔' },
-  dupMirrorV: { de: 'Gespiegelt ↕', en: 'Mirrored ↕' },
   layerName: { de: 'Name', en: 'Name' },
   zoneClickHint: { de: 'Tipp: Klicke ein Rahmenteil im Bild an, um es auszuwählen.', en: 'Tip: click a part of the frame to select it.' },
   handleRotate: { de: 'Drehen (Shift: 15°-Schritte)', en: 'Rotate (Shift: 15° steps)' },
@@ -373,6 +384,7 @@ const STRINGS: Record<I18nKey, Record<Lang, string>> = {
   catArtistic: { de: 'Künstlerisch', en: 'Artistic' },
   catHeritage: { de: 'Klassisch', en: 'Heritage' },
   catClean: { de: 'Clean', en: 'Clean' },
+  catChameleon: { de: 'Chamäleon', en: 'Chameleon' },
   catAll: { de: 'Alle', en: 'All' },
   tplTeamblock: { de: 'Profiteam', en: 'Pro Team' },
   tplTricolore: { de: 'Trikolore', en: 'Tricolour' },
@@ -389,6 +401,10 @@ const STRINGS: Record<I18nKey, Record<Lang, string>> = {
   tplBarber: { de: 'Barber Pole', en: 'Barber Pole' },
   tplAccentline: { de: 'Akzentlinie', en: 'Accent Line' },
   tplPastel: { de: 'Pastell', en: 'Pastel' },
+  tplOilslick: { de: 'Ölfilm', en: 'Oil Slick' },
+  tplAurora: { de: 'Nordlicht', en: 'Aurora' },
+  tplCopperflip: { de: 'Kupferflip', en: 'Copper Flip' },
+  tplMidnight: { de: 'Mitternacht', en: 'Midnight' },
 };
 
 export function translate(key: I18nKey, lang: Lang): string {

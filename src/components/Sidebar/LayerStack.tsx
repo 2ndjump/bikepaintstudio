@@ -1,6 +1,6 @@
 import { Fragment } from 'react';
 import { useDesignStore, newLayerId } from '../../state/designStore';
-import { ZONE_LABELS, isRimZone, type BlendMode, type Layer } from '../../state/types';
+import { ZONE_LABELS, isRimZone, type BlendMode, type FinishType, type Layer } from '../../state/types';
 import { useUIStore } from '../../state/uiStore';
 import { visibleSpot } from '../Viewport/viewportBridge';
 import { Slider } from '../ui/Slider';
@@ -10,6 +10,8 @@ import { ImageLayerEditor } from '../LayerTypes/ImageLayer';
 import { DecalLayerEditor } from '../LayerTypes/DecalLayer';
 import { ShapeLayerEditor } from '../LayerTypes/ShapeLayer';
 import { EffectEditor } from '../LayerTypes/EffectEditor';
+import { FillEditor } from '../LayerTypes/FillEditor';
+import { FINISHES } from './finishes';
 import { useT } from '../../i18n/useT';
 
 const EMPTY_LAYERS: Layer[] = [];
@@ -58,7 +60,7 @@ export function ShapeIcon() {
   );
 }
 
-/** Chain link — connects a layer to the one below (clipping mask). */
+/** Chain link — groups a layer with the one below. */
 function LinkIcon() {
   return (
     <svg
@@ -121,6 +123,15 @@ function LayerChip({ layer, icon: Icon }: { layer: Layer; icon: () => React.Reac
   );
 }
 
+/** Rim repeat choices: once, or evenly on the half, third, quarter, fifth. */
+const REPEATS = [
+  { n: 1, label: '1' },
+  { n: 2, label: '½' },
+  { n: 3, label: '⅓' },
+  { n: 4, label: '¼' },
+  { n: 5, label: '⅕' },
+];
+
 const BLEND_MODES: BlendMode[] = [
   'normal',
   'multiply',
@@ -158,9 +169,9 @@ export function LayerStack() {
     useUIStore.getState().setActiveDividerId(null);
   }
 
-  function duplicate(layerId: string, mirrorH: boolean, mirrorV: boolean) {
+  function duplicate(layerId: string) {
     const before = new Set(useDesignStore.getState().zones[activeZone].layers.map((l) => l.id));
-    duplicateLayer(activeZone, layerId, { mirrorH, mirrorV });
+    duplicateLayer(activeZone, layerId);
     const clone = useDesignStore.getState().zones[activeZone].layers.find((l) => !before.has(l.id));
     if (clone) select(clone.id);
   }
@@ -299,11 +310,10 @@ export function LayerStack() {
 
       <div>
         {[...layers].reverse().map((layer, ri, rev) => {
-          // A layer can clip to the one below it unless it's the bottom layer.
+          // A layer can group with the one below it unless it's the bottom layer.
           const hasBelow = ri < rev.length - 1;
-          const isClipped = !!layer.clip && hasBelow; // this layer clips downward
-          const isBase = ri > 0 && !!rev[ri - 1].clip; // the layer above clips to it
-          const inClipGroup = isClipped || isBase;
+          const inGroup = (!!layer.group && hasBelow) || (ri > 0 && !!rev[ri - 1].group);
+          const placeable = layer.type !== 'pattern' && layer.type !== 'solid';
           const selected = layer.id === selectedId;
           const Icon = TYPE_ICON[layer.type];
           const idx = layers.length - 1 - ri;
@@ -311,7 +321,7 @@ export function LayerStack() {
             <Fragment key={layer.id}>
               <div
                 className={`list-row layer-row ${selected ? 'list-row-selected' : ''} ${
-                  inClipGroup ? 'list-row-rail' : ''
+                  inGroup ? 'list-row-rail' : ''
                 }`}
               >
                 <div className="flex items-center gap-0.5">
@@ -357,7 +367,7 @@ export function LayerStack() {
                   <button
                     type="button"
                     className="m3-icon-btn m3-icon-btn-sm"
-                    onClick={() => duplicate(layer.id, false, false)}
+                    onClick={() => duplicate(layer.id)}
                     title={t('layerDuplicate')}
                   >
                     <RowIcon d={COPY} />
@@ -414,35 +424,63 @@ export function LayerStack() {
                       />
                     </div>
 
+                    <label className="m3-label flex flex-col gap-1">
+                      {t('layerFinish')}
+                      <select
+                        value={layer.finish ?? ''}
+                        onChange={(e) =>
+                          updateLayer(activeZone, layer.id, {
+                            finish: (e.target.value || undefined) as FinishType | undefined,
+                          })
+                        }
+                        className="m3-field"
+                      >
+                        <option value="">{t('finishInherit')}</option>
+                        {FINISHES.map((f) => (
+                          <option key={f.value} value={f.value}>
+                            {t(f.labelKey)}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+
+                    {isRimZone(activeZone) && placeable && (
+                      <div className="space-y-1">
+                        <div className="m3-label">{t('layerRepeat')}</div>
+                        <div className="m3-segmented w-full" role="group">
+                          {REPEATS.map(({ n, label }) => (
+                            <button
+                              key={n}
+                              type="button"
+                              className={`m3-seg flex-1 ${(layer.repeat ?? 1) === n ? 'm3-seg-active' : ''}`}
+                              title={n === 1 ? t('repeatOnce') : `${t('layerRepeat')}: ${n}×`}
+                              onClick={() => updateLayer(activeZone, layer.id, { repeat: n === 1 ? undefined : n })}
+                            >
+                              {label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
                     {layer.type === 'pattern' && <PatternLayerEditor layer={layer} zoneId={activeZone} />}
                     {layer.type === 'image' && <ImageLayerEditor layer={layer} zoneId={activeZone} />}
                     {layer.type === 'decal' && <DecalLayerEditor layer={layer} zoneId={activeZone} />}
                     {layer.type === 'shape' && <ShapeLayerEditor layer={layer} zoneId={activeZone} />}
 
+                    {placeable && (
+                      <div className="pt-2 border-t border-[var(--md-outline-variant)] space-y-2">
+                        <div className="m3-label">{t('layerFill')}</div>
+                        <FillEditor layer={layer} zoneId={activeZone} />
+                      </div>
+                    )}
+
                     <div className="pt-2 border-t border-[var(--md-outline-variant)]">
                       <EffectEditor layer={layer} zoneId={activeZone} />
                     </div>
 
-                    <div className="pt-2 border-t border-[var(--md-outline-variant)] space-y-2">
-                      <div className="flex gap-1.5">
-                        <button
-                          type="button"
-                          className="m3-btn m3-btn-tonal m3-btn-sm flex-1"
-                          onClick={() => duplicate(layer.id, true, false)}
-                          title={t('layerDuplicate')}
-                        >
-                          {t('dupMirrorH')}
-                        </button>
-                        <button
-                          type="button"
-                          className="m3-btn m3-btn-tonal m3-btn-sm flex-1"
-                          onClick={() => duplicate(layer.id, false, true)}
-                          title={t('layerDuplicate')}
-                        >
-                          {t('dupMirrorV')}
-                        </button>
-                      </div>
-                      {hasDividers && (
+                    {hasDividers && (
+                      <div className="pt-2 border-t border-[var(--md-outline-variant)]">
                         <label className="flex items-center gap-2 m3-label cursor-pointer">
                           <input
                             type="checkbox"
@@ -451,23 +489,24 @@ export function LayerStack() {
                           />
                           {t('layerBelowDivider')}
                         </label>
-                      )}
-                    </div>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
 
-              {/* Link connector to the layer below: toggles the clipping mask.
-                  Accent when connected; both rows get an accent rail (inClipGroup). */}
+              {/* Link connector to the layer below: groups the two (moved,
+                  scaled and rotated together). Accent when linked; grouped rows
+                  get an accent rail (inGroup). */}
               {hasBelow && (
                 <div className="relative flex justify-center -my-1.5">
                   <button
                     type="button"
-                    onClick={() => updateLayer(activeZone, layer.id, { clip: !layer.clip })}
-                    title={t('layerClip')}
-                    aria-pressed={!!layer.clip}
+                    onClick={() => updateLayer(activeZone, layer.id, { group: !layer.group })}
+                    title={t('layerGroup')}
+                    aria-pressed={!!layer.group}
                     className={`relative z-10 flex h-6 w-6 items-center justify-center rounded-full border transition ${
-                      layer.clip
+                      layer.group
                         ? 'border-[var(--md-primary)] text-[var(--md-primary)] bg-[var(--md-primary-container)]'
                         : 'border-[var(--md-outline-variant)] text-[var(--md-on-surface-variant)] bg-[var(--md-surface-container-high)] opacity-60 hover:opacity-100'
                     }`}

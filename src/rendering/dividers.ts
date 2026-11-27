@@ -205,10 +205,13 @@ const FRAG_HEAD_MAPPED = FRAG_HEAD + '\nuniform sampler2D uDivCoverage;';
 // the layer stack stays fully visible on top of the divider colour.
 const FRAG_BODY_MAPPED = /* glsl */ `
 float divCov = texture2D(uDivCoverage, vMapUv).a;
+// How much of the fragment the dividers recoloured in all (for its finish).
+float divTotal = 0.0;
 for (int di = 0; di < DIV_MAX; di++) {
   if (di >= uDivCount) break;
   float m = dividerMask(di) * (1.0 - divCov);
   diffuseColor.rgb = mix(diffuseColor.rgb, dividerFill(di), m);
+  divTotal = 1.0 - (1.0 - divTotal) * (1.0 - m);
 }
 `;
 

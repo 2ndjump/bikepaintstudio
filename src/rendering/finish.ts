@@ -29,6 +29,31 @@ export function envGain(gain: number) {
   };
 }
 
+/** Largest finish reflection gain; the per-texel finish map stores gain / this. */
+export const ENV_GAIN_MAX = 2.5;
+
+/**
+ * A finish as three RGB colours (0…1) for the per-texel finish maps the layer
+ * compositor paints and the paint shader reads (PaintMaterial):
+ * [roughness, metalness, clearcoat], [clearcoat roughness, reflection gain /
+ * ENV_GAIN_MAX, sheen] and [chameleon flip, metallic flakes, unused].
+ * Kept opaque: canvas alpha is premultiplied and would skew the values.
+ */
+export function finishMapColors(finish: FinishType): number[][] {
+  const p = finishParams(finish);
+  return [
+    [p.roughness, p.metalness, p.clearcoat],
+    [p.clearcoatRoughness, p.envMapIntensity / ENV_GAIN_MAX, p.sheen],
+    [finish === 'chameleon' ? 1 : 0, finish === 'metallic' ? 1 : 0, 0],
+  ];
+}
+
+/** The finish a layer is painted in: its own, else the part's — but glossy on
+ *  a chameleon part (the colour flip is the base coat's, not the layers'). */
+export function layerFinish(own: FinishType | undefined, part: FinishType): FinishType {
+  return own ?? (part === 'chameleon' ? 'glossy' : part);
+}
+
 /**
  * PBR parameters per paint finish. The four standard finishes use the exact
  * MeshPhysicalMaterial preset values from the studio paint spec (1:1, tuned for

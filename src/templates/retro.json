@@ -379,41 +379,12 @@
           "type": "shape",
           "shape": "diamond",
           "color": "#efe6cf",
-          "x": 0.3333,
+          "x": 0,
           "y": 0.5,
           "width": 0.012,
           "height": 0.3,
-          "rotation": 0
-        },
-        {
-          "id": "rimfx-5",
-          "name": "diamond",
-          "visible": true,
-          "opacity": 1,
-          "blendMode": "normal",
-          "type": "shape",
-          "shape": "diamond",
-          "color": "#efe6cf",
-          "x": 0.6667,
-          "y": 0.5,
-          "width": 0.012,
-          "height": 0.3,
-          "rotation": 0
-        },
-        {
-          "id": "rimfx-6",
-          "name": "diamond",
-          "visible": true,
-          "opacity": 1,
-          "blendMode": "normal",
-          "type": "shape",
-          "shape": "diamond",
-          "color": "#efe6cf",
-          "x": 1,
-          "y": 0.5,
-          "width": 0.012,
-          "height": 0.3,
-          "rotation": 0
+          "rotation": 0,
+          "repeat": 3
         },
         {
           "letterSpacing": 8,
@@ -436,30 +407,8 @@
           "bold": true,
           "italic": false,
           "underline": false,
-          "strikethrough": false
-        },
-        {
-          "letterSpacing": 8,
-          "glyphRotation": 0,
-          "id": "decal-tpl2q",
-          "name": "Rim 2",
-          "visible": true,
-          "opacity": 1,
-          "blendMode": "normal",
-          "type": "decal",
-          "text": "ARVENNE",
-          "font": "Playfair Display",
-          "size": 46,
-          "color": "#efe6cf",
-          "outlineColor": "#000000",
-          "outlineWidth": 0,
-          "x": 0.75,
-          "y": 0.5,
-          "rotation": 0,
-          "bold": true,
-          "italic": false,
-          "underline": false,
-          "strikethrough": false
+          "strikethrough": false,
+          "repeat": 2
         }
       ]
     },
@@ -526,41 +475,12 @@
           "type": "shape",
           "shape": "diamond",
           "color": "#efe6cf",
-          "x": 0.3333,
+          "x": 0,
           "y": 0.5,
           "width": 0.012,
           "height": 0.3,
-          "rotation": 0
-        },
-        {
-          "id": "rimfx-505",
-          "name": "diamond",
-          "visible": true,
-          "opacity": 1,
-          "blendMode": "normal",
-          "type": "shape",
-          "shape": "diamond",
-          "color": "#efe6cf",
-          "x": 0.6667,
-          "y": 0.5,
-          "width": 0.012,
-          "height": 0.3,
-          "rotation": 0
-        },
-        {
-          "id": "rimfx-506",
-          "name": "diamond",
-          "visible": true,
-          "opacity": 1,
-          "blendMode": "normal",
-          "type": "shape",
-          "shape": "diamond",
-          "color": "#efe6cf",
-          "x": 1,
-          "y": 0.5,
-          "width": 0.012,
-          "height": 0.3,
-          "rotation": 0
+          "rotation": 0,
+          "repeat": 3
         },
         {
           "letterSpacing": 8,
@@ -583,30 +503,8 @@
           "bold": true,
           "italic": false,
           "underline": false,
-          "strikethrough": false
-        },
-        {
-          "letterSpacing": 8,
-          "glyphRotation": 0,
-          "id": "decal-tpl2s",
-          "name": "Rim 2",
-          "visible": true,
-          "opacity": 1,
-          "blendMode": "normal",
-          "type": "decal",
-          "text": "ARVENNE",
-          "font": "Playfair Display",
-          "size": 46,
-          "color": "#efe6cf",
-          "outlineColor": "#000000",
-          "outlineWidth": 0,
-          "x": 0.75,
-          "y": 0.5,
-          "rotation": 0,
-          "bold": true,
-          "italic": false,
-          "underline": false,
-          "strikethrough": false
+          "strikethrough": false,
+          "repeat": 2
         }
       ]
     }

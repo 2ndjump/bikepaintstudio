@@ -41,12 +41,12 @@ vec2 flakeFlash(vec3 p, vec3 n, vec3 v, float power) {
  * A lower `power` lets flakes flash further away from the mirror angle, so
  * more of them are lit at once.
  */
-function fragBody(color: string, gain: number, power: number, size: number, px: number): string {
+function fragBody(color: string, gain: number, power: number, size: number, px: number, weight: string): string {
   const pw = power.toFixed(1);
   return /* glsl */ `
-{
+if (${weight} > 0.004) {
   vec3 flakeP = vFlakePos / ${size.toFixed(5)};
-  float flakeW = max(fwidth(flakeP.x), max(fwidth(flakeP.y), fwidth(flakeP.z)));
+  float flakeW = flakeDw / ${size.toFixed(5)};
   // Double the cell size until a cell covers the set pixel count; blend two levels.
   float flakeLod = max(log2(flakeW * ${px.toFixed(2)}), 0.0);
   float flakeL0 = floor(flakeLod);
@@ -64,30 +64,40 @@ function fragBody(color: string, gain: number, power: number, size: number, px: 
   vec3 flakeCb = (${color}) * flakeB.x;
   r = flakeB2.y;
   flakeCb += (${color}) * flakeB2.x;
-  totalEmissiveRadiance += mix(flakeCa, flakeCb, flakeLod - flakeL0) * ${gain.toFixed(1)};
+  totalEmissiveRadiance += mix(flakeCa, flakeCb, flakeLod - flakeL0) * ${gain.toFixed(1)} * ${weight};
 }
 `;
 }
 
+// Screen-space size of the flake grid, taken outside the per-kind branches
+// (derivatives are undefined under non-uniform control flow).
+const FLAKE_DW = /* glsl */ `
+float flakeDw = max(fwidth(vFlakePos.x), max(fwidth(vFlakePos.y), fwidth(vFlakePos.z)));
+`;
+
 /**
- * `size`: smallest flake cell (metres, seen up close); `px`: about how many
- * pixels a cell covers when zoomed out.
+ * Both flake kinds, each scaled by a GLSL weight expression (0…1 per fragment:
+ * where the paint is metallic resp. chameleon). The chameleon flakes take the
+ * flip colours uChamA/B/C, which the caller's shader declares. Per kind:
+ * colour, gain, power, smallest cell (metres, seen up close) and about how
+ * many pixels a cell covers when zoomed out.
  */
-function inject(shader: CompileShader, color: string, gain: number, power: number, size: number, px: number): void {
+export function injectFlakes(shader: CompileShader, metallic: string, chameleon: string): void {
   shader.vertexShader = shader.vertexShader
     .replace('#include <common>', '#include <common>\nvarying vec3 vFlakePos;')
     .replace('#include <begin_vertex>', '#include <begin_vertex>\nvFlakePos = position;');
+  // Metallic: silver flakes tinted by the paint under them.
+  const metal = fragBody('mix(diffuseColor.rgb, vec3(1.0), 0.45 + 0.4 * r)', 2.2, 120, 0.0005, 1.67, metallic);
+  // Chameleon: a dense glitter of flakes in the three flip colours.
+  const cham = fragBody(
+    'mix(mix(uChamA, uChamB, smoothstep(0.0, 0.5, r)), uChamC, smoothstep(0.5, 1.0, r)) * 1.6',
+    3.0,
+    50,
+    0.0001,
+    0.75,
+    chameleon,
+  );
   shader.fragmentShader = shader.fragmentShader
     .replace('#include <common>', '#include <common>' + FRAG_HEAD)
-    .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>' + fragBody(color, gain, power, size, px));
-}
-
-/** Metallic: silver flakes tinted by the paint under them. */
-export function injectMetallicFlakes(shader: CompileShader): void {
-  inject(shader, 'mix(diffuseColor.rgb, vec3(1.0), 0.45 + 0.4 * r)', 2.2, 120, 0.0005, 1.67);
-}
-
-/** Chameleon: a dense glitter of flakes in the three flip colours (uniforms of ChameleonMaterial). */
-export function injectChameleonFlakes(shader: CompileShader): void {
-  inject(shader, 'mix(mix(uChamA, uChamB, smoothstep(0.0, 0.5, r)), uChamC, smoothstep(0.5, 1.0, r)) * 1.6', 3.0, 50, 0.0001, 0.75);
+    .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>' + FLAKE_DW + metal + cham);
 }

@@ -1,10 +1,11 @@
 import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
-import { useDesignStore } from '../../state/designStore';
+import { layerGroup, useDesignStore } from '../../state/designStore';
 import { useUIStore } from '../../state/uiStore';
 import type { Layer } from '../../state/types';
 import { ZONE_CANVAS_DIMS } from '../../rendering/LayerCompositor';
 import { layerBox } from '../../rendering/layerBox';
+import { getZoneAspect } from '../../rendering/zoneMetrics';
 import { uvToSurface } from '../../rendering/surfaceUV';
 import { useT } from '../../i18n/useT';
 import { viewportState, zoneMesh } from './viewportBridge';
@@ -187,7 +188,6 @@ export function LayerGizmo() {
     window.addEventListener('pointerup', up);
   }
 
-  const update = (patch: Partial<Layer>) => useDesignStore.getState().updateLayer(zone, layer.id, patch);
   const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));
 
   /** Scale about the centre by the pointer's distance ratio along `axis`
@@ -204,22 +204,42 @@ export function LayerGizmo() {
       return dir ? (d[0] * dir[0] + d[1] * dir[1]) / len(dir) : len(d);
     };
     const start = along(p0) || 1;
+    const sized = (l: Layer, k: number): Partial<Layer> => {
+      if (l.type === 'shape') {
+        return {
+          width: axis === 'y' ? l.width : clamp(l.width * k, 0.02, 1),
+          height: axis === 'x' ? l.height : clamp(l.height * k, 0.02, 1),
+        };
+      }
+      if (l.type === 'image') {
+        return {
+          scaleX: axis === 'y' ? l.scaleX : clamp(l.scaleX * k, 0.05, 3),
+          scaleY: axis === 'x' ? l.scaleY : clamp(l.scaleY * k, 0.05, 3),
+        };
+      }
+      if (l.type === 'decal') return { size: Math.round(clamp(l.size * k, 8, 256)) };
+      return {};
+    };
+    // A uniform scale takes the whole group along, about this layer's centre;
+    // stretching one axis stays with this layer.
+    const members = axis ? [l0] : groupOf(l0);
     startDrag(e, (p) => {
       const k = Math.max(0.02, along(p) / start);
-      if (l0.type === 'shape') {
-        update({
-          width: axis === 'y' ? l0.width : clamp(l0.width * k, 0.02, 1),
-          height: axis === 'x' ? l0.height : clamp(l0.height * k, 0.02, 1),
-        });
-      } else if (l0.type === 'image') {
-        update({
-          scaleX: axis === 'y' ? l0.scaleX : clamp(l0.scaleX * k, 0.05, 3),
-          scaleY: axis === 'x' ? l0.scaleY : clamp(l0.scaleY * k, 0.05, 3),
-        });
-      } else if (l0.type === 'decal') {
-        update({ size: Math.round(clamp(l0.size * k, 8, 256)) });
+      const patches: Record<string, Partial<Layer>> = {};
+      for (const l of members) {
+        patches[l.id] = sized(l, k);
+        if (l !== l0 && 'x' in l && 'x' in l0) {
+          Object.assign(patches[l.id], { x: l0.x + (l.x - l0.x) * k, y: l0.y + (l.y - l0.y) * k });
+        }
       }
+      useDesignStore.getState().updateLayers(zone, patches);
     });
+  }
+
+  /** The selected layer and the placeable layers grouped with it, as they are now. */
+  function groupOf(l0: Layer): Layer[] {
+    const layers = useDesignStore.getState().zones[zone].layers;
+    return layerGroup(layers, l0.id).filter((l) => l.type === 'shape' || l.type === 'image' || l.type === 'decal');
   }
 
   function startRotate(e: React.PointerEvent) {
@@ -229,14 +249,35 @@ export function LayerGizmo() {
     const rect = (root.current!.parentElement as HTMLElement).getBoundingClientRect();
     const a0 = Math.atan2(e.clientY - rect.top - f.c[1], e.clientX - rect.left - f.c[0]);
     const r0 = l0.rotation;
+    const members = groupOf(l0);
+    // Grouped layers turn about this layer's centre, measured on the surface
+    // (canvas y scaled like the text, see LayerCompositor.drawDecal).
+    const { w, h } = ZONE_CANVAS_DIMS[zone];
+    const aspect = getZoneAspect(zone);
+    const ky = aspect !== undefined && isFinite((aspect * h) / w) ? (aspect * h) / w : 1;
     startDrag(e, (p, _f, ev) => {
       const a = Math.atan2(p[1] - f.c[1], p[0] - f.c[0]);
       let deg = r0 + (((a - a0) * 180) / Math.PI) * f.flip;
       if (ev.shiftKey) deg = Math.round(deg / 15) * 15;
       deg = Math.round(deg);
-      // Same ranges as the sliders: text −180…180, shapes/images 0…360.
-      deg = l0.type === 'decal' ? ((((deg + 180) % 360) + 360) % 360) - 180 : ((deg % 360) + 360) % 360;
-      update({ rotation: deg });
+      const d = deg - r0;
+      const rad = (d * Math.PI) / 180;
+      const patches: Record<string, Partial<Layer>> = {};
+      for (const l of members) {
+        if (!('rotation' in l) || !('x' in l)) continue;
+        let r = l.rotation + d;
+        // Same ranges as the sliders: text −180…180, shapes/images 0…360.
+        r = l.type === 'decal' ? ((((r + 180) % 360) + 360) % 360) - 180 : ((r % 360) + 360) % 360;
+        patches[l.id] = { rotation: r };
+        if (l !== l0) {
+          const sx = (l.x - l0.x) * w;
+          const sy = ((l.y - l0.y) * h) / ky;
+          const rx = sx * Math.cos(rad) - sy * Math.sin(rad);
+          const ry = sx * Math.sin(rad) + sy * Math.cos(rad);
+          Object.assign(patches[l.id], { x: l0.x + rx / w, y: l0.y + (ry * ky) / h });
+        }
+      }
+      useDesignStore.getState().updateLayers(zone, patches);
     });
   }
 

@@ -9,6 +9,8 @@ export interface ZoneTextures {
   map: THREE.CanvasTexture;
   /** Layer coverage (alpha) — where the layers hide the base. */
   coverage: THREE.CanvasTexture;
+  /** Per-texel finish (finishMapColors), the part's finish under the layers'. */
+  finish: THREE.CanvasTexture[];
 }
 
 const zoneTextures = new Map<ZoneId, ZoneTextures>();
@@ -36,7 +38,14 @@ function getOrCreateTextures(zoneId: ZoneId): ZoneTextures {
   coverage.wrapS = THREE.RepeatWrapping;
   coverage.wrapT = THREE.MirroredRepeatWrapping;
 
-  const textures = { map, coverage };
+  const finish = compositor.finishCanvases.map((c) => {
+    const t = new THREE.CanvasTexture(c);
+    t.wrapS = THREE.RepeatWrapping;
+    t.wrapT = THREE.MirroredRepeatWrapping;
+    return t;
+  });
+
+  const textures = { map, coverage, finish };
   zoneTextures.set(zoneId, textures);
   return textures;
 }
@@ -44,6 +53,7 @@ function getOrCreateTextures(zoneId: ZoneId): ZoneTextures {
 export function useZoneTexture(zoneId: ZoneId): ZoneTextures {
   const layers = useDesignStore((s) => s.zones[zoneId]?.layers ?? EMPTY_LAYERS);
   const baseColor = useDesignStore((s) => s.zones[zoneId]?.baseColor ?? '#888888');
+  const finish = useDesignStore((s) => s.zones[zoneId]?.finish ?? 'matte');
   // A variant switch changes the measured zone aspect (zoneMetrics) the decals
   // are drawn with, so it re-composites too.
   const variant = useDesignStore((s) => s.variant);
@@ -52,15 +62,16 @@ export function useZoneTexture(zoneId: ZoneId): ZoneTextures {
   useEffect(() => {
     const compositor = getCompositor(zoneId);
     let cancelled = false;
-    compositor.render(layers, baseColor).then(() => {
+    compositor.render(layers, baseColor, finish).then(() => {
       if (cancelled) return;
       textures.map.needsUpdate = true;
       textures.coverage.needsUpdate = true;
+      for (const t of textures.finish) t.needsUpdate = true;
     });
     return () => {
       cancelled = true;
     };
-  }, [layers, baseColor, variant, zoneId, textures]);
+  }, [layers, baseColor, finish, variant, zoneId, textures]);
 
   return textures;
 }

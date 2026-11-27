@@ -55,6 +55,36 @@ function migrateLayer(layer: Layer): Layer {
   return layer;
 }
 
+/** Older saves confined a pattern to a shape by clipping a pattern layer to
+ *  the layer below; that is now the shape's own pattern fill. */
+function clipsToFills(layers: Layer[]): Layer[] {
+  const out: Layer[] = [];
+  for (const l of layers) {
+    const below = out[out.length - 1];
+    if (
+      l.clip &&
+      l.type === 'pattern' &&
+      below &&
+      !below.fill &&
+      (below.type === 'shape' || below.type === 'decal' || below.type === 'image')
+    ) {
+      out[out.length - 1] = {
+        ...below,
+        fill: {
+          pattern: l.pattern,
+          color: l.color,
+          scale: l.scale,
+          rotation: l.rotation,
+          intensity: l.intensity * l.opacity,
+        },
+      };
+      continue;
+    }
+    out.push(l);
+  }
+  return out;
+}
+
 function migrateZone(zone: Partial<ZoneState> | undefined, fallbackColor: string): ZoneState {
   const base = makeDefaultZoneState(fallbackColor);
   if (!zone) return base;
@@ -73,6 +103,7 @@ function migrateZone(zone: Partial<ZoneState> | undefined, fallbackColor: string
     baseColor = layers[0].color;
     layers = layers.slice(1);
   }
+  layers = clipsToFills(layers);
 
   return {
     finish: zone.finish ?? base.finish,
@@ -152,11 +183,6 @@ function buildInitialZones(): Record<ZoneId, ZoneState> {
   ) as Record<ZoneId, ZoneState>;
 }
 
-export interface DuplicateOptions {
-  mirrorH: boolean;
-  mirrorV: boolean;
-}
-
 interface DesignActions {
   setActiveZone(zone: ZoneId): void;
   setFinish(zone: ZoneId, finish: FinishType): void;
@@ -166,10 +192,12 @@ interface DesignActions {
   setZoneBaseColor(zone: ZoneId, color: string): void;
   setChameleonColor(zone: ZoneId, index: 0 | 1 | 2, color: string): void;
   updateLayer(zone: ZoneId, layerId: string, patch: Partial<Layer>): void;
+  /** Patch several layers in one step (a layer group), keyed by layer id. */
+  updateLayers(zone: ZoneId, patches: Record<string, Partial<Layer>>): void;
   addLayer(zone: ZoneId, layer: Layer): void;
   removeLayer(zone: ZoneId, layerId: string): void;
   reorderLayer(zone: ZoneId, layerId: string, direction: -1 | 1): void;
-  duplicateLayer(zone: ZoneId, layerId: string, options: DuplicateOptions): void;
+  duplicateLayer(zone: ZoneId, layerId: string): void;
   setRim(patch: Partial<DesignState['rim']>): void;
   /** Copy one rim's whole paint (finish, colours, layers) onto the other. */
   copyRimDesign(from: ZoneId, to: ZoneId): void;
@@ -293,32 +321,30 @@ export const useDesignStore = create<Store>((set, get) => {
       }));
     },
 
-    duplicateLayer: (zone, layerId, { mirrorH, mirrorV }) => {
+    updateLayers: (zone, patches) => {
+      const history = recordHistory();
+      set((s) => ({
+        history,
+        zones: {
+          ...s.zones,
+          [zone]: {
+            ...s.zones[zone],
+            layers: s.zones[zone].layers.map((l) =>
+              patches[l.id] ? ({ ...l, ...patches[l.id] } as Layer) : l,
+            ),
+          },
+        },
+      }));
+    },
+
+    duplicateLayer: (zone, layerId) => {
       const history = recordHistory();
       set((s) => {
         const layers = s.zones[zone].layers;
         const idx = layers.findIndex((l) => l.id === layerId);
         if (idx < 0) return s;
         const src = layers[idx];
-        let clone: Layer = { ...src, id: newLayerId(src.type), name: src.name + ' copy' };
-        if (mirrorH || mirrorV) {
-          if (clone.type === 'decal' || clone.type === 'image') {
-            if (mirrorH) clone = { ...clone, x: 1 - (clone as { x: number }).x } as Layer;
-            if (mirrorV) clone = { ...clone, y: 1 - (clone as { y: number }).y } as Layer;
-          } else if (clone.type === 'pattern') {
-            let r = clone.rotation;
-            if (mirrorH) r = (180 - r + 360) % 360;
-            if (mirrorV) r = (360 - r) % 360;
-            clone = { ...clone, rotation: r };
-          }
-          // Mirror the per-layer effect smear angle (any layer type)
-          if (clone.effect) {
-            let a = clone.effect.angle;
-            if (mirrorH) a = (180 - a + 360) % 360;
-            if (mirrorV) a = (360 - a) % 360;
-            clone = { ...clone, effect: { ...clone.effect, angle: a } };
-          }
-        }
+        const clone: Layer = { ...src, id: newLayerId(src.type), name: src.name + ' copy' };
         const next = [...layers];
         next.splice(idx + 1, 0, clone);
         return {
@@ -500,6 +526,18 @@ export type DesignFile = DesignState & { palette?: string[] };
 export function loadDesignFile(data: DesignFile): void {
   useDesignStore.getState().loadDesign(data);
   if (Array.isArray(data.palette)) useUIStore.getState().setPalette(data.palette);
+}
+
+/** The layers grouped with `id` (itself included): the run of layers joined
+ *  by `group` (each grouped with the one below it). */
+export function layerGroup(layers: Layer[], id: string): Layer[] {
+  const i = layers.findIndex((l) => l.id === id);
+  if (i < 0) return [];
+  let lo = i;
+  while (lo > 0 && layers[lo].group) lo--;
+  let hi = i;
+  while (hi < layers.length - 1 && layers[hi + 1].group) hi++;
+  return layers.slice(lo, hi + 1);
 }
 
 export function newLayerId(prefix: string): string {
